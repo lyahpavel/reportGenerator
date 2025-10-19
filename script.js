@@ -73,15 +73,15 @@ const fallbackData = {
         {"value": "Інше", "label": "Інше"}
     ],
     "settlementOptions": [
-        {"value": "Київ", "label": "Київ"},
-        {"value": "Харків", "label": "Харків"},
-        {"value": "Одеса", "label": "Одеса"},
-        {"value": "Дніпро", "label": "Дніпро"},
-        {"value": "Донецьк", "label": "Донецьк"},
-        {"value": "Запоріжжя", "label": "Запоріжжя"},
-        {"value": "Львів", "label": "Львів"},
-        {"value": "Маріуполь", "label": "Маріуполь"},
-        {"value": "Інший", "label": "Інший"}
+        {"value": "Київ", "label": "Київ", "coordinates": "50.4501, 30.5234"},
+        {"value": "Харків", "label": "Харків", "coordinates": "49.9935, 36.2304"},
+        {"value": "Одеса", "label": "Одеса", "coordinates": "46.4825, 30.7233"},
+        {"value": "Дніпро", "label": "Дніпро", "coordinates": "48.4647, 35.0462"},
+        {"value": "Донецьк", "label": "Донецьк", "coordinates": "48.0159, 37.8028"},
+        {"value": "Запоріжжя", "label": "Запоріжжя", "coordinates": "47.8388, 35.1396"},
+        {"value": "Львів", "label": "Львів", "coordinates": "49.8397, 24.0297"},
+        {"value": "Маріуполь", "label": "Маріуполь", "coordinates": "47.0951, 37.5494"},
+        {"value": "Інший", "label": "Інший", "coordinates": null}
     ],
     "bkOptions": [
         {"value": "БК-1", "label": "БК-1"},
@@ -221,6 +221,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Встановлення поточного часу
     const currentTime = now.toTimeString().slice(0, 5);
     document.getElementById('time').value = currentTime;
+    
+    // Ініціалізація стану полів населеного пункту та координат
+    setTimeout(() => {
+        toggleCustomSettlement();
+    }, 100);
 });
 
 // Обробка відправки форми
@@ -641,18 +646,46 @@ function reloadData() {
     showSuccess('Дані перезавантажено');
 }
 
-// Функція для показу/приховування поля ручного введення населеного пункту
+// Функція для показу/приховування поля ручного введення населеного пункту та керування координатами
 function toggleCustomSettlement() {
     const settlementSelect = document.getElementById('settlement');
     const customSettlementInput = document.getElementById('customSettlement');
+    const coordinatesInput = document.getElementById('coordinates');
     
     if (settlementSelect.value === 'Інший') {
+        // Показати поле для введення назви
         customSettlementInput.style.display = 'block';
         customSettlementInput.required = true;
-    } else {
+        
+        // Дозволити ручне введення координат
+        coordinatesInput.readOnly = false;
+        coordinatesInput.value = '';
+        coordinatesInput.placeholder = 'Введіть координати вручну...';
+        coordinatesInput.style.backgroundColor = '#fff';
+    } else if (settlementSelect.value === '') {
+        // Якщо нічого не вибрано
         customSettlementInput.style.display = 'none';
         customSettlementInput.required = false;
         customSettlementInput.value = '';
+        
+        coordinatesInput.readOnly = false;
+        coordinatesInput.value = '';
+        coordinatesInput.placeholder = 'Наприклад: 50.4501, 30.5234';
+        coordinatesInput.style.backgroundColor = '#fff';
+    } else {
+        // Вибрано конкретне місто
+        customSettlementInput.style.display = 'none';
+        customSettlementInput.required = false;
+        customSettlementInput.value = '';
+        
+        // Автоматично підставити координати та заблокувати поле
+        const selectedOption = appData.settlementOptions.find(option => option.value === settlementSelect.value);
+        if (selectedOption && selectedOption.coordinates) {
+            coordinatesInput.value = selectedOption.coordinates;
+            coordinatesInput.readOnly = true;
+            coordinatesInput.style.backgroundColor = '#f8f9fa';
+            coordinatesInput.placeholder = 'Координати підставлені автоматично';
+        }
     }
 }
 

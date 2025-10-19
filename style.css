@@ -422,6 +422,19 @@ textarea {
     transform: translateY(-1px);
 }
 
+/* Стилі для readonly поля координат */
+#coordinates[readonly] {
+    background-color: #f8f9fa !important;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+#coordinates[readonly]:focus {
+    border-color: #e1e5e9;
+    box-shadow: none;
+    transform: none;
+}
+
 /* Плавна анімація для появи поля ручного введення */
 #customSettlement {
     transition: all 0.3s ease;

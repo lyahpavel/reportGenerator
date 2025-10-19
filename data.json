@@ -47,15 +47,15 @@
     {"value": "Інше", "label": "Інше"}
   ],
   "settlementOptions": [
-    {"value": "Київ", "label": "Київ"},
-    {"value": "Харків", "label": "Харків"},
-    {"value": "Одеса", "label": "Одеса"},
-    {"value": "Дніпро", "label": "Дніпро"},
-    {"value": "Донецьк", "label": "Донецьк"},
-    {"value": "Запоріжжя", "label": "Запоріжжя"},
-    {"value": "Львів", "label": "Львів"},
-    {"value": "Маріуполь", "label": "Маріуполь"},
-    {"value": "Інший", "label": "Інший"}
+    {"value": "Київ", "label": "Київ", "coordinates": "50.4501, 30.5234"},
+    {"value": "Харків", "label": "Харків", "coordinates": "49.9935, 36.2304"},
+    {"value": "Одеса", "label": "Одеса", "coordinates": "46.4825, 30.7233"},
+    {"value": "Дніпро", "label": "Дніпро", "coordinates": "48.4647, 35.0462"},
+    {"value": "Донецьк", "label": "Донецьк", "coordinates": "48.0159, 37.8028"},
+    {"value": "Запоріжжя", "label": "Запоріжжя", "coordinates": "47.8388, 35.1396"},
+    {"value": "Львів", "label": "Львів", "coordinates": "49.8397, 24.0297"},
+    {"value": "Маріуполь", "label": "Маріуполь", "coordinates": "47.0951, 37.5494"},
+    {"value": "Інший", "label": "Інший", "coordinates": null}
   ],
   "bkOptions": [
     {"value": "БК-1", "label": "БК-1"},
