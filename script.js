@@ -5,6 +5,7 @@ const reportContent = document.getElementById('reportContent');
 const copyButton = document.getElementById('copyReport');
 const downloadButton = document.getElementById('downloadReport');
 const newReportButton = document.getElementById('newReport');
+const newReportBasedOnButton = document.getElementById('newReportBasedOn');
 
 // Глобальна змінна для зберігання даних
 let appData = null;
@@ -605,6 +606,51 @@ newReportButton.addEventListener('click', function() {
     // Видалити повідомлення про помилки або успіх
     const messages = document.querySelectorAll('.error-message, .success-message');
     messages.forEach(message => message.remove());
+    
+    // Прокрутити до початку форми
+    reportForm.scrollIntoView({ behavior: 'smooth' });
+});
+
+// Створення нового звіту на основі поточного
+newReportBasedOnButton.addEventListener('click', function() {
+    reportOutput.classList.add('hidden');
+    
+    // Зберігаємо поточні дані форми
+    const currentFormData = {
+        subdivision: document.getElementById('subdivision').value,
+        droneName: document.getElementById('droneName').value,
+        droneSize: document.getElementById('droneSize').value,
+        cameraType: document.getElementById('cameraType').value,
+        videoFrequency: document.getElementById('videoFrequency').value,
+        controlFrequency: document.getElementById('controlFrequency').value,
+        fiberOptic: document.getElementById('fiberOptic').checked,
+        fiberLength: document.getElementById('fiberLength').value,
+        bk: document.getElementById('bk').value,
+        targetType: document.getElementById('targetType').value,
+        settlement: document.getElementById('settlement').value,
+        customSettlement: document.getElementById('customSettlement').value,
+        coordinates: document.getElementById('coordinates').value,
+        status: document.getElementById('status').value,
+        losses: document.getElementById('losses').value,
+        operator: document.getElementById('operator').value,
+        stream: document.getElementById('stream').checked,
+        mission: document.getElementById('mission').value
+    };
+    
+    // Оновлюємо тільки дату та час на поточні
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentTime = now.toTimeString().slice(0, 5);
+    
+    document.getElementById('date').value = today;
+    document.getElementById('time').value = currentTime;
+    
+    // Видалити повідомлення про помилки або успіх
+    const messages = document.querySelectorAll('.error-message, .success-message');
+    messages.forEach(message => message.remove());
+    
+    // Показати повідомлення про успішне копіювання
+    showSuccess('Форма підготовлена для нового звіту. Змініть потрібні поля та згенеруйте новий звіт.');
     
     // Прокрутити до початку форми
     reportForm.scrollIntoView({ behavior: 'smooth' });

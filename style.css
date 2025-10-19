@@ -228,9 +228,13 @@ textarea {
 
 .report-actions {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
+}
+
+.report-actions .btn {
+    min-width: 160px;
 }
 
 .hidden {
