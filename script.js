@@ -36,7 +36,8 @@ const fallbackData = {
         {"value": "Міні", "label": "Міні (250г - 2кг)"},
         {"value": "Малий", "label": "Малий (2кг - 25кг)"},
         {"value": "Середній", "label": "Середній (25кг - 150кг)"},
-        {"value": "Великий", "label": "Великий (> 150кг)"}
+        {"value": "Великий", "label": "Великий (> 150кг)"},
+        {"value": "Інший", "label": "Інший"}
     ],
     "cameraTypes": [
         {"value": "HD (720p)", "label": "HD (720p)"},
@@ -46,14 +47,16 @@ const fallbackData = {
         {"value": "Тепловізор", "label": "Тепловізор"},
         {"value": "Мультиспектральна", "label": "Мультиспектральна"},
         {"value": "Ніч/день", "label": "Ніч/день"},
-        {"value": "Без камери", "label": "Без камери"}
+        {"value": "Без камери", "label": "Без камери"},
+        {"value": "Інша", "label": "Інша"}
     ],
     "videoFrequencies": [
         {"value": "2.4 ГГц", "label": "2.4 ГГц", "description": "Стандартна частота відеопередачі"},
         {"value": "5.8 ГГц", "label": "5.8 ГГц", "description": "Висока частота з меншими перешкодами"},
         {"value": "1.2 ГГц", "label": "1.2 ГГц", "description": "Професійна відеопередача"},
         {"value": "900 МГц", "label": "900 МГц", "description": "Дальня відеопередача"},
-        {"value": "Аналогова 5.8 ГГц", "label": "Аналогова 5.8 ГГц", "description": "FPV аналогова передача"}
+        {"value": "Аналогова 5.8 ГГц", "label": "Аналогова 5.8 ГГц", "description": "FPV аналогова передача"},
+        {"value": "Інша", "label": "Інша"}
     ],
     "controlFrequencies": [
         {"value": "2.4 ГГц", "label": "2.4 ГГц", "description": "Стандартне керування"},
@@ -61,7 +64,8 @@ const fallbackData = {
         {"value": "868 МГц", "label": "868 МГц", "description": "Європейський стандарт"},
         {"value": "915 МГц", "label": "915 МГц", "description": "Американський стандарт"},
         {"value": "Crossfire (868/915 МГц)", "label": "Crossfire (868/915 МГц)", "description": "Надійне керування"},
-        {"value": "ExpressLRS", "label": "ExpressLRS", "description": "Низька затримка"}
+        {"value": "ExpressLRS", "label": "ExpressLRS", "description": "Низька затримка"},
+        {"value": "Інша", "label": "Інша"}
     ],
     "targetTypeOptions": [
         {"value": "Військовий об'єкт", "label": "Військовий об'єкт"},
@@ -90,7 +94,8 @@ const fallbackData = {
         {"value": "БК-3", "label": "БК-3"},
         {"value": "БК-4", "label": "БК-4"},
         {"value": "БК-5", "label": "БК-5"},
-        {"value": "Немає", "label": "Немає"}
+        {"value": "Немає", "label": "Немає"},
+        {"value": "Інший", "label": "Інший"}
     ],
     "statusOptions": [
         {"value": "Активний", "label": "Активний"},
@@ -99,7 +104,8 @@ const fallbackData = {
         {"value": "Посадка", "label": "Посадка"},
         {"value": "Втрачено", "label": "Втрачено"},
         {"value": "Пошкоджено", "label": "Пошкоджено"},
-        {"value": "Технічне обслуговування", "label": "Технічне обслуговування"}
+        {"value": "Технічне обслуговування", "label": "Технічне обслуговування"},
+        {"value": "Інший", "label": "Інший"}
     ],
     "lossOptions": [
         {"value": "Немає", "label": "Немає"},
@@ -238,16 +244,16 @@ reportForm.addEventListener('submit', function(e) {
         subdivision: document.getElementById('subdivision').value,
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
         droneSize: document.getElementById('droneSize').value === 'Інший' ? document.getElementById('customDroneSize').value : document.getElementById('droneSize').value,
-        cameraType: document.getElementById('cameraType').value,
-        videoFrequency: document.getElementById('videoFrequency').value,
-        controlFrequency: document.getElementById('controlFrequency').value,
+        cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
+        videoFrequency: document.getElementById('videoFrequency').value === 'Інша' ? document.getElementById('customVideoFrequency').value : document.getElementById('videoFrequency').value,
+        controlFrequency: document.getElementById('controlFrequency').value === 'Інша' ? document.getElementById('customControlFrequency').value : document.getElementById('controlFrequency').value,
         fiberOptic: document.getElementById('fiberOptic').checked,
         fiberLength: document.getElementById('fiberLength').value,
-        bk: document.getElementById('bk').value,
+        bk: document.getElementById('bk').value === 'Інший' ? document.getElementById('customBk').value : document.getElementById('bk').value,
         targetType: document.getElementById('targetType').value === 'Інше' ? document.getElementById('customTargetType').value : document.getElementById('targetType').value,
         settlement: document.getElementById('settlement').value === 'Інший' ? document.getElementById('customSettlement').value : document.getElementById('settlement').value,
         coordinates: document.getElementById('coordinates').value,
-        status: document.getElementById('status').value,
+        status: document.getElementById('status').value === 'Інший' ? document.getElementById('customStatus').value : document.getElementById('status').value,
         losses: document.getElementById('losses').value === 'Інше' ? document.getElementById('customLosses').value : document.getElementById('losses').value,
         operator: document.getElementById('operator').value === 'Інший' ? document.getElementById('customOperator').value : document.getElementById('operator').value,
         stream: document.getElementById('stream').checked,
@@ -769,6 +775,81 @@ function toggleCustomLosses() {
 function toggleCustomOperator() {
     const select = document.getElementById('operator');
     const customInput = document.getElementById('customOperator');
+    
+    if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення типу камери
+function toggleCustomCameraType() {
+    const select = document.getElementById('cameraType');
+    const customInput = document.getElementById('customCameraType');
+    
+    if (select.value === 'Інша') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення частоти відео
+function toggleCustomVideoFrequency() {
+    const select = document.getElementById('videoFrequency');
+    const customInput = document.getElementById('customVideoFrequency');
+    
+    if (select.value === 'Інша') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення частоти керування
+function toggleCustomControlFrequency() {
+    const select = document.getElementById('controlFrequency');
+    const customInput = document.getElementById('customControlFrequency');
+    
+    if (select.value === 'Інша') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення БК
+function toggleCustomBk() {
+    const select = document.getElementById('bk');
+    const customInput = document.getElementById('customBk');
+    
+    if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення статусу
+function toggleCustomStatus() {
+    const select = document.getElementById('status');
+    const customInput = document.getElementById('customStatus');
     
     if (select.value === 'Інший') {
         customInput.style.display = 'block';

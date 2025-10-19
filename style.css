@@ -405,7 +405,12 @@ textarea {
 #coordinates,
 #customDroneName,
 #customDroneSize,
+#customCameraType,
+#customVideoFrequency,
+#customControlFrequency,
+#customBk,
 #customTargetType,
+#customStatus,
 #customLosses,
 #customOperator {
     width: 100% !important;
@@ -422,7 +427,12 @@ textarea {
 #customSettlement,
 #customDroneName,
 #customDroneSize,
+#customCameraType,
+#customVideoFrequency,
+#customControlFrequency,
+#customBk,
 #customTargetType,
+#customStatus,
 #customLosses,
 #customOperator {
     margin-top: 5px;
@@ -432,7 +442,12 @@ textarea {
 #coordinates:focus,
 #customDroneName:focus,
 #customDroneSize:focus,
+#customCameraType:focus,
+#customVideoFrequency:focus,
+#customControlFrequency:focus,
+#customBk:focus,
 #customTargetType:focus,
+#customStatus:focus,
 #customLosses:focus,
 #customOperator:focus {
     outline: none;
@@ -458,7 +473,12 @@ textarea {
 #customSettlement,
 #customDroneName,
 #customDroneSize,
+#customCameraType,
+#customVideoFrequency,
+#customControlFrequency,
+#customBk,
 #customTargetType,
+#customStatus,
 #customLosses,
 #customOperator {
     transition: all 0.3s ease;
@@ -468,7 +488,12 @@ textarea {
 #customSettlement[style*="display: none"],
 #customDroneName[style*="display: none"],
 #customDroneSize[style*="display: none"],
+#customCameraType[style*="display: none"],
+#customVideoFrequency[style*="display: none"],
+#customControlFrequency[style*="display: none"],
+#customBk[style*="display: none"],
 #customTargetType[style*="display: none"],
+#customStatus[style*="display: none"],
 #customLosses[style*="display: none"],
 #customOperator[style*="display: none"] {
     max-height: 0;
@@ -481,7 +506,12 @@ textarea {
 #customSettlement[style*="display: block"],
 #customDroneName[style*="display: block"],
 #customDroneSize[style*="display: block"],
+#customCameraType[style*="display: block"],
+#customVideoFrequency[style*="display: block"],
+#customControlFrequency[style*="display: block"],
+#customBk[style*="display: block"],
 #customTargetType[style*="display: block"],
+#customStatus[style*="display: block"],
 #customLosses[style*="display: block"],
 #customOperator[style*="display: block"] {
     max-height: 60px;

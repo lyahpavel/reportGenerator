@@ -19,22 +19,22 @@
   "cameraTypes": [
     {"value": "Денна", "label": "Денна"},
     {"value": "Нічна", "label": "Нічна"},
-    {"value": "Тепловізор", "label": "Тепловізор"}
+    {"value": "Тепловізор", "label": "Тепловізор"},
+    {"value": "Інша", "label": "Інша"}
   ],
   "videoFrequencies": [
     {"value": "2.4 ГГц", "label": "2.4 ГГц", "description": "Стандартна частота відеопередачі"},
     {"value": "5.8 ГГц", "label": "5.8 ГГц", "description": "Висока частота з меншими перешкодами"},
     {"value": "1.2 ГГц", "label": "1.2 ГГц", "description": "Професійна відеопередача"},
     {"value": "900 МГц", "label": "900 МГц", "description": "Дальня відеопередача"},
-    {"value": "Аналогова 5.8 ГГц", "label": "Аналогова 5.8 ГГц", "description": "FPV аналогова передача"}
+    {"value": "Інша", "label": "Інша"}
   ],
   "controlFrequencies": [
     {"value": "2.4 ГГц", "label": "2.4 ГГц", "description": "Стандартне керування"},
     {"value": "433 МГц", "label": "433 МГц", "description": "Дальнього радіуса дії"},
     {"value": "868 МГц", "label": "868 МГц", "description": "Європейський стандарт"},
     {"value": "915 МГц", "label": "915 МГц", "description": "Американський стандарт"},
-    {"value": "Crossfire (868/915 МГц)", "label": "Crossfire (868/915 МГц)", "description": "Надійне керування"},
-    {"value": "ExpressLRS", "label": "ExpressLRS", "description": "Низька затримка"}
+    {"value": "Інша", "label": "Інша"}
   ],
   "targetTypeOptions": [
     {"value": "Військовий об'єкт", "label": "Військовий об'єкт"},
@@ -63,7 +63,8 @@
     {"value": "БК-3", "label": "БК-3"},
     {"value": "БК-4", "label": "БК-4"},
     {"value": "БК-5", "label": "БК-5"},
-    {"value": "Немає", "label": "Немає"}
+    {"value": "Немає", "label": "Немає"},
+    {"value": "Інший", "label": "Інший"}
   ],
   "statusOptions": [
     {"value": "Активний", "label": "Активний"},
@@ -72,7 +73,8 @@
     {"value": "Посадка", "label": "Посадка"},
     {"value": "Втрачено", "label": "Втрачено"},
     {"value": "Пошкоджено", "label": "Пошкоджено"},
-    {"value": "Технічне обслуговування", "label": "Технічне обслуговування"}
+    {"value": "Технічне обслуговування", "label": "Технічне обслуговування"},
+    {"value": "Інший", "label": "Інший"}
   ],
   "lossOptions": [
     {"value": "Немає", "label": "Немає"},

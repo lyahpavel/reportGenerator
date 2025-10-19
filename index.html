@@ -44,10 +44,11 @@
 
                 <div class="form-group">
                     <label for="cameraType">Тип камери:</label>
-                    <select id="cameraType" name="cameraType" required>
+                    <select id="cameraType" name="cameraType" required onchange="toggleCustomCameraType()">
                         <option value="">Оберіть тип камери...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
+                    <input type="text" id="customCameraType" name="customCameraType" placeholder="Введіть тип камери..." style="display: none;">
                 </div>
             </div>
 
@@ -55,18 +56,20 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="videoFrequency">Частота відео:</label>
-                    <select id="videoFrequency" name="videoFrequency" required>
+                    <select id="videoFrequency" name="videoFrequency" required onchange="toggleCustomVideoFrequency()">
                         <option value="">Оберіть частоту відео...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
+                    <input type="text" id="customVideoFrequency" name="customVideoFrequency" placeholder="Введіть частоту відео..." style="display: none;">
                 </div>
 
                 <div class="form-group">
                     <label for="controlFrequency">Частота керування:</label>
-                    <select id="controlFrequency" name="controlFrequency" required>
+                    <select id="controlFrequency" name="controlFrequency" required onchange="toggleCustomControlFrequency()">
                         <option value="">Оберіть частоту керування...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
+                    <input type="text" id="customControlFrequency" name="customControlFrequency" placeholder="Введіть частоту керування..." style="display: none;">
                 </div>
             </div>
 
@@ -89,10 +92,11 @@
             <!-- Додаткові поля -->
             <div class="form-group">
                 <label for="bk">БК:</label>
-                <select id="bk" name="bk">
+                <select id="bk" name="bk" onchange="toggleCustomBk()">
                     <option value="">Оберіть БК...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
+                <input type="text" id="customBk" name="customBk" placeholder="Введіть БК..." style="display: none;">
             </div>
 
             <!-- Ціль розділена на три поля в одному рядку -->
@@ -123,10 +127,11 @@
 
             <div class="form-group">
                 <label for="status">Статус:</label>
-                <select id="status" name="status">
+                <select id="status" name="status" onchange="toggleCustomStatus()">
                     <option value="">Оберіть статус...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
+                <input type="text" id="customStatus" name="customStatus" placeholder="Введіть статус..." style="display: none;">
             </div>
 
             <div class="form-group">
