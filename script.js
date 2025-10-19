@@ -236,20 +236,20 @@ reportForm.addEventListener('submit', function(e) {
     // Збір даних з форми
     const formData = {
         subdivision: document.getElementById('subdivision').value,
-        droneName: document.getElementById('droneName').value,
-        droneSize: document.getElementById('droneSize').value,
+        droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
+        droneSize: document.getElementById('droneSize').value === 'Інший' ? document.getElementById('customDroneSize').value : document.getElementById('droneSize').value,
         cameraType: document.getElementById('cameraType').value,
         videoFrequency: document.getElementById('videoFrequency').value,
         controlFrequency: document.getElementById('controlFrequency').value,
         fiberOptic: document.getElementById('fiberOptic').checked,
         fiberLength: document.getElementById('fiberLength').value,
         bk: document.getElementById('bk').value,
-        targetType: document.getElementById('targetType').value,
+        targetType: document.getElementById('targetType').value === 'Інше' ? document.getElementById('customTargetType').value : document.getElementById('targetType').value,
         settlement: document.getElementById('settlement').value === 'Інший' ? document.getElementById('customSettlement').value : document.getElementById('settlement').value,
         coordinates: document.getElementById('coordinates').value,
         status: document.getElementById('status').value,
-        losses: document.getElementById('losses').value,
-        operator: document.getElementById('operator').value,
+        losses: document.getElementById('losses').value === 'Інше' ? document.getElementById('customLosses').value : document.getElementById('losses').value,
+        operator: document.getElementById('operator').value === 'Інший' ? document.getElementById('customOperator').value : document.getElementById('operator').value,
         stream: document.getElementById('stream').checked,
         date: document.getElementById('date').value,
         time: document.getElementById('time').value,
@@ -702,6 +702,81 @@ function toggleCustomSettlement() {
             coordinatesInput.style.backgroundColor = '#f8f9fa';
             coordinatesInput.placeholder = 'Координати підставлені автоматично';
         }
+    }
+}
+
+// Функція для показу/приховування поля ручного введення назви дрону
+function toggleCustomDroneName() {
+    const select = document.getElementById('droneName');
+    const customInput = document.getElementById('customDroneName');
+    
+    if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення розміру дрону
+function toggleCustomDroneSize() {
+    const select = document.getElementById('droneSize');
+    const customInput = document.getElementById('customDroneSize');
+    
+    if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення типу цілі
+function toggleCustomTargetType() {
+    const select = document.getElementById('targetType');
+    const customInput = document.getElementById('customTargetType');
+    
+    if (select.value === 'Інше') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення втрат
+function toggleCustomLosses() {
+    const select = document.getElementById('losses');
+    const customInput = document.getElementById('customLosses');
+    
+    if (select.value === 'Інше') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення оператора
+function toggleCustomOperator() {
+    const select = document.getElementById('operator');
+    const customInput = document.getElementById('customOperator');
+    
+    if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
     }
 }
 

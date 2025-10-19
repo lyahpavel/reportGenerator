@@ -26,18 +26,20 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="droneName">Назва дрону:</label>
-                    <select id="droneName" name="droneName" required>
+                    <select id="droneName" name="droneName" required onchange="toggleCustomDroneName()">
                         <option value="">Оберіть назву дрону...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
+                    <input type="text" id="customDroneName" name="customDroneName" placeholder="Введіть назву дрону..." style="display: none;">
                 </div>
 
                 <div class="form-group">
                     <label for="droneSize">Розмір дрону:</label>
-                    <select id="droneSize" name="droneSize" required>
+                    <select id="droneSize" name="droneSize" required onchange="toggleCustomDroneSize()">
                         <option value="">Оберіть розмір дрону...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
+                    <input type="text" id="customDroneSize" name="customDroneSize" placeholder="Введіть розмір дрону..." style="display: none;">
                 </div>
 
                 <div class="form-group">
@@ -97,10 +99,11 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="targetType">Тип цілі:</label>
-                    <select id="targetType" name="targetType">
+                    <select id="targetType" name="targetType" onchange="toggleCustomTargetType()">
                         <option value="">Оберіть тип цілі...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
+                    <input type="text" id="customTargetType" name="customTargetType" placeholder="Введіть тип цілі..." style="display: none;">
                 </div>
 
                 <div class="form-group">
@@ -128,18 +131,20 @@
 
             <div class="form-group">
                 <label for="losses">Втрати:</label>
-                <select id="losses" name="losses">
+                <select id="losses" name="losses" onchange="toggleCustomLosses()">
                     <option value="">Оберіть втрати...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
+                <input type="text" id="customLosses" name="customLosses" placeholder="Введіть тип втрат..." style="display: none;">
             </div>
 
             <div class="form-group">
                 <label for="operator">Оператор:</label>
-                <select id="operator" name="operator">
+                <select id="operator" name="operator" onchange="toggleCustomOperator()">
                     <option value="">Оберіть оператора...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
+                <input type="text" id="customOperator" name="customOperator" placeholder="Введіть ім'я оператора..." style="display: none;">
             </div>
 
             <!-- Чекбокс стрім -->
