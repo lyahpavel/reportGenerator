@@ -1,0 +1,65 @@
+{
+  "subdivisions": [
+    {
+      "value": "ВБпАК 1б 101 обрТро",
+      "label": "ВБпАК 1б 101 обрТро"
+    }
+  ],
+  "droneNames": [
+    {"value": "Viy", "label": "Viy"},
+    {"value": "Gen Chereshnya", "label": "en Chereshnya"},
+    {"value": "Інший", "label": "Інший"}
+  ],
+  "droneSizes": [
+    {"value": "7", "label": "7 дюймів"},
+    {"value": "10", "label": "10 дюймів"},
+    {"value": "13", "label": "13 дюймів"},
+    {"value": "Інший", "label": "Інший"}
+  ],
+  "cameraTypes": [
+    {"value": "Денна", "label": "Денна"},
+    {"value": "Нічна", "label": "Нічна"},
+    {"value": "Тепловізор", "label": "Тепловізор"}
+  ],
+  "videoFrequencies": [
+    {"value": "2.4 ГГц", "label": "2.4 ГГц", "description": "Стандартна частота відеопередачі"},
+    {"value": "5.8 ГГц", "label": "5.8 ГГц", "description": "Висока частота з меншими перешкодами"},
+    {"value": "1.2 ГГц", "label": "1.2 ГГц", "description": "Професійна відеопередача"},
+    {"value": "900 МГц", "label": "900 МГц", "description": "Дальня відеопередача"},
+    {"value": "Аналогова 5.8 ГГц", "label": "Аналогова 5.8 ГГц", "description": "FPV аналогова передача"}
+  ],
+  "controlFrequencies": [
+    {"value": "2.4 ГГц", "label": "2.4 ГГц", "description": "Стандартне керування"},
+    {"value": "433 МГц", "label": "433 МГц", "description": "Дальнього радіуса дії"},
+    {"value": "868 МГц", "label": "868 МГц", "description": "Європейський стандарт"},
+    {"value": "915 МГц", "label": "915 МГц", "description": "Американський стандарт"},
+    {"value": "Crossfire (868/915 МГц)", "label": "Crossfire (868/915 МГц)", "description": "Надійне керування"},
+    {"value": "ExpressLRS", "label": "ExpressLRS", "description": "Низька затримка"}
+  ],
+  "missionTypes": [
+    {
+      "value": "Розвідка",
+      "label": "Розвідка"
+    },
+    {
+      "value": "Патрулювання",
+      "label": "Патрулювання"
+    },
+    {
+      "value": "Моніторинг",
+      "label": "Моніторинг"
+    },
+    {
+      "value": "Навчання",
+      "label": "Навчання"
+    },
+    {
+      "value": "Тестування",
+      "label": "Тестування"
+    },
+    {
+      "value": "Інше",
+      "label": "Інше"
+    }
+  ]
+}

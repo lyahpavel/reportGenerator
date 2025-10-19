@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор звітів про дрони</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Генератор звітів про дрони</h1>
+            <p>Заповніть форму для створення звіту</p>
+        </header>
+
+        <form id="reportForm" class="report-form">
+            <div class="form-group">
+                <label for="subdivision">Підрозділ:</label>
+                <select id="subdivision" name="subdivision" required>
+                    <option value="">Оберіть підрозділ...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <!-- Дрон: три окремі поля -->
+            <div class="form-group">
+                <label for="droneName">Назва дрону:</label>
+                <select id="droneName" name="droneName" required>
+                    <option value="">Оберіть назву дрону...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="droneSize">Розмір дрону:</label>
+                <select id="droneSize" name="droneSize" required>
+                    <option value="">Оберіть розмір дрону...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="cameraType">Тип камери:</label>
+                <select id="cameraType" name="cameraType" required>
+                    <option value="">Оберіть тип камери...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <!-- Частоти: два окремі поля -->
+            <div class="form-group">
+                <label for="videoFrequency">Частота відео:</label>
+                <select id="videoFrequency" name="videoFrequency" required>
+                    <option value="">Оберіть частоту відео...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="controlFrequency">Частота керування:</label>
+                <select id="controlFrequency" name="controlFrequency" required>
+                    <option value="">Оберіть частоту керування...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <!-- Оптоволоконний кабель -->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="fiberOptic" name="fiberOptic" onchange="toggleFiberLength()">
+                    Оптоволоконний кабель
+                </label>
+            </div>
+
+            <div class="form-group" id="fiberLengthGroup" style="display: none;">
+                <label for="fiberLength">Довжина котушки (м):</label>
+                <input type="number" id="fiberLength" name="fiberLength" min="1" max="10000" step="1" placeholder="Наприклад: 500">
+                <small style="color: #666; font-size: 0.85rem; margin-top: 4px; display: block;">
+                    💡 Вкажіть довжину в метрах
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Дата:</label>
+                <input type="date" id="date" name="date" required title="Оберіть сьогоднішню дату або дату з минулого">
+                <small style="color: #666; font-size: 0.85rem; margin-top: 4px; display: block;">
+                    💡 Дозволено: сьогоднішня дата та минулі дати
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="time">Час:</label>
+                <input type="time" id="time" name="time" required>
+            </div>
+
+            <div class="form-group">
+                <label for="missionType">Тип місії:</label>
+                <select id="missionType" name="missionType">
+                    <option value="">Оберіть тип місії...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="mission">Опис місії (необов'язково):</label>
+                <textarea id="mission" name="mission" rows="4" placeholder="Опишіть деталі місії або додаткову інформацію..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Генерувати звіт</button>
+                <button type="reset" class="btn btn-secondary">Очистити форму</button>
+            </div>
+        </form>
+
+        <div id="reportOutput" class="report-output hidden">
+            <h2>Згенерований звіт</h2>
+            <div id="reportContent" class="report-content"></div>
+            <div class="report-actions">
+                <button id="copyReport" class="btn btn-outline">Копіювати звіт</button>
+                <button id="downloadReport" class="btn btn-outline">Завантажити звіт</button>
+                <button id="newReport" class="btn btn-primary">Новий звіт</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Функція для показу/приховування поля довжини котушки та частот
+        function toggleFiberLength() {
+            const checkbox = document.getElementById('fiberOptic');
+            const lengthGroup = document.getElementById('fiberLengthGroup');
+            const lengthInput = document.getElementById('fiberLength');
+            const videoFreqGroup = document.getElementById('videoFrequency').parentElement;
+            const controlFreqGroup = document.getElementById('controlFrequency').parentElement;
+            const videoFreqInput = document.getElementById('videoFrequency');
+            const controlFreqInput = document.getElementById('controlFrequency');
+            
+            if (checkbox.checked) {
+                // Показати поле довжини котушки
+                lengthGroup.style.display = 'block';
+                lengthInput.required = true;
+                
+                // Приховати поля частот
+                videoFreqGroup.style.display = 'none';
+                controlFreqGroup.style.display = 'none';
+                videoFreqInput.required = false;
+                controlFreqInput.required = false;
+                videoFreqInput.value = '';
+                controlFreqInput.value = '';
+            } else {
+                // Приховати поле довжини котушки
+                lengthGroup.style.display = 'none';
+                lengthInput.required = false;
+                lengthInput.value = '';
+                
+                // Показати поля частот
+                videoFreqGroup.style.display = 'block';
+                controlFreqGroup.style.display = 'block';
+                videoFreqInput.required = true;
+                controlFreqInput.required = true;
+            }
+        }
+    </script>
+</body>
+</html>
