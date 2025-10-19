@@ -115,6 +115,70 @@
                 </small>
             </div>
 
+            <!-- Додаткові поля -->
+            <div class="form-group">
+                <label for="bk">БК:</label>
+                <select id="bk" name="bk">
+                    <option value="">Оберіть БК...</option>
+                    <option value="БК-1">БК-1</option>
+                    <option value="БК-2">БК-2</option>
+                    <option value="БК-3">БК-3</option>
+                    <option value="БК-4">БК-4</option>
+                    <option value="БК-5">БК-5</option>
+                    <option value="Немає">Немає</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Статус:</label>
+                <select id="status" name="status">
+                    <option value="">Оберіть статус...</option>
+                    <option value="Активний">Активний</option>
+                    <option value="На завданні">На завданні</option>
+                    <option value="Повернення">Повернення</option>
+                    <option value="Посадка">Посадка</option>
+                    <option value="Втрачено">Втрачено</option>
+                    <option value="Пошкоджено">Пошкоджено</option>
+                    <option value="Технічне обслуговування">Технічне обслуговування</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="losses">Втрати:</label>
+                <select id="losses" name="losses">
+                    <option value="">Оберіть втрати...</option>
+                    <option value="Немає">Немає</option>
+                    <option value="Збито">Збито</option>
+                    <option value="Технічна несправність">Технічна несправність</option>
+                    <option value="Втрата зв'язку">Втрата зв'язку</option>
+                    <option value="Розряд батареї">Розряд батареї</option>
+                    <option value="РЕБ">РЕБ</option>
+                    <option value="Погодні умови">Погодні умови</option>
+                    <option value="Інше">Інше</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="operator">Оператор:</label>
+                <select id="operator" name="operator">
+                    <option value="">Оберіть оператора...</option>
+                    <option value="Оператор-1">Оператор-1</option>
+                    <option value="Оператор-2">Оператор-2</option>
+                    <option value="Оператор-3">Оператор-3</option>
+                    <option value="Оператор-4">Оператор-4</option>
+                    <option value="Оператор-5">Оператор-5</option>
+                    <option value="Інший">Інший</option>
+                </select>
+            </div>
+
+            <!-- Чекбокс стрім -->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="stream" name="stream">
+                    Стрім
+                </label>
+            </div>
+
             <div class="form-group">
                 <label for="date">Дата:</label>
                 <input type="date" id="date" name="date" required title="Оберіть сьогоднішню дату або дату з минулого">
@@ -195,6 +259,11 @@
                 controlFrequency: document.getElementById('controlFrequency').value,
                 fiberOptic: document.getElementById('fiberOptic').checked,
                 fiberLength: document.getElementById('fiberLength').value,
+                bk: document.getElementById('bk').value,
+                status: document.getElementById('status').value,
+                losses: document.getElementById('losses').value,
+                operator: document.getElementById('operator').value,
+                stream: document.getElementById('stream').checked,
                 date: document.getElementById('date').value,
                 time: document.getElementById('time').value,
                 missionType: document.getElementById('missionType').value,
@@ -290,6 +359,31 @@
                     <span class="report-label">Час:</span>
                     <span class="report-value">${data.time}</span>
                 </div>
+                ${data.bk ? `
+                <div class="report-item">
+                    <span class="report-label">БК:</span>
+                    <span class="report-value">${data.bk}</span>
+                </div>` : ''}
+                ${data.status ? `
+                <div class="report-item">
+                    <span class="report-label">Статус:</span>
+                    <span class="report-value">${data.status}</span>
+                </div>` : ''}
+                ${data.losses ? `
+                <div class="report-item">
+                    <span class="report-label">Втрати:</span>
+                    <span class="report-value">${data.losses}</span>
+                </div>` : ''}
+                ${data.operator ? `
+                <div class="report-item">
+                    <span class="report-label">Оператор:</span>
+                    <span class="report-value">${data.operator}</span>
+                </div>` : ''}
+                ${data.stream ? `
+                <div class="report-item">
+                    <span class="report-label">Стрім:</span>
+                    <span class="report-value">Так</span>
+                </div>` : ''}
                 ${data.missionType ? `
                 <div class="report-item">
                     <span class="report-label">Тип місії:</span>
@@ -432,8 +526,9 @@
                 document.getElementById('date').value = today;
                 document.getElementById('time').value = currentTime;
                 
-                // Скинути чекбокс і приховати поле довжини
+                // Скинути чекбокси і приховати поле довжини
                 document.getElementById('fiberOptic').checked = false;
+                document.getElementById('stream').checked = false;
                 toggleFiberLength();
             }, 10);
         });

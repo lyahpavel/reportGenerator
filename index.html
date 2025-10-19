@@ -80,6 +80,47 @@
                 </small>
             </div>
 
+            <!-- Додаткові поля -->
+            <div class="form-group">
+                <label for="bk">БК:</label>
+                <select id="bk" name="bk">
+                    <option value="">Оберіть БК...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Статус:</label>
+                <select id="status" name="status">
+                    <option value="">Оберіть статус...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="losses">Втрати:</label>
+                <select id="losses" name="losses">
+                    <option value="">Оберіть втрати...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="operator">Оператор:</label>
+                <select id="operator" name="operator">
+                    <option value="">Оберіть оператора...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+            </div>
+
+            <!-- Чекбокс стрім -->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="stream" name="stream">
+                    Стрім
+                </label>
+            </div>
+
             <div class="form-group">
                 <label for="date">Дата:</label>
                 <input type="date" id="date" name="date" required title="Оберіть сьогоднішню дату або дату з минулого">

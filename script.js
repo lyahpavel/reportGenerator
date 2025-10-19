@@ -69,6 +69,41 @@ const fallbackData = {
         {"value": "Навчання", "label": "Навчання"},
         {"value": "Тестування", "label": "Тестування"},
         {"value": "Інше", "label": "Інше"}
+    ],
+    "bkOptions": [
+        {"value": "БК-1", "label": "БК-1"},
+        {"value": "БК-2", "label": "БК-2"},
+        {"value": "БК-3", "label": "БК-3"},
+        {"value": "БК-4", "label": "БК-4"},
+        {"value": "БК-5", "label": "БК-5"},
+        {"value": "Немає", "label": "Немає"}
+    ],
+    "statusOptions": [
+        {"value": "Активний", "label": "Активний"},
+        {"value": "На завданні", "label": "На завданні"},
+        {"value": "Повернення", "label": "Повернення"},
+        {"value": "Посадка", "label": "Посадка"},
+        {"value": "Втрачено", "label": "Втрачено"},
+        {"value": "Пошкоджено", "label": "Пошкоджено"},
+        {"value": "Технічне обслуговування", "label": "Технічне обслуговування"}
+    ],
+    "lossOptions": [
+        {"value": "Немає", "label": "Немає"},
+        {"value": "Збито", "label": "Збито"},
+        {"value": "Технічна несправність", "label": "Технічна несправність"},
+        {"value": "Втрата зв'язку", "label": "Втрата зв'язку"},
+        {"value": "Розряд батареї", "label": "Розряд батареї"},
+        {"value": "РЕБ", "label": "РЕБ"},
+        {"value": "Погодні умови", "label": "Погодні умови"},
+        {"value": "Інше", "label": "Інше"}
+    ],
+    "operatorOptions": [
+        {"value": "Оператор-1", "label": "Оператор-1"},
+        {"value": "Оператор-2", "label": "Оператор-2"},
+        {"value": "Оператор-3", "label": "Оператор-3"},
+        {"value": "Оператор-4", "label": "Оператор-4"},
+        {"value": "Оператор-5", "label": "Оператор-5"},
+        {"value": "Інший", "label": "Інший"}
     ]
 };
 
@@ -110,6 +145,12 @@ function populateSelects() {
     
     // Заповнення типів місій
     populateSelect('missionType', appData.missionTypes);
+    
+    // Заповнення нових полів
+    populateSelect('bk', appData.bkOptions);
+    populateSelect('status', appData.statusOptions);
+    populateSelect('losses', appData.lossOptions);
+    populateSelect('operator', appData.operatorOptions);
 }
 
 // Універсальна функція заповнення селекту
@@ -182,6 +223,11 @@ reportForm.addEventListener('submit', function(e) {
         controlFrequency: document.getElementById('controlFrequency').value,
         fiberOptic: document.getElementById('fiberOptic').checked,
         fiberLength: document.getElementById('fiberLength').value,
+        bk: document.getElementById('bk').value,
+        status: document.getElementById('status').value,
+        losses: document.getElementById('losses').value,
+        operator: document.getElementById('operator').value,
+        stream: document.getElementById('stream').checked,
         date: document.getElementById('date').value,
         time: document.getElementById('time').value,
         missionType: document.getElementById('missionType').value,
@@ -325,6 +371,41 @@ function generateReport(data) {
             <span class="report-label">Час:</span>
             <span class="report-value">${formattedTime}</span>
         </div>
+        
+        ${data.bk ? `
+        <div class="report-item">
+            <span class="report-label">БК:</span>
+            <span class="report-value">${data.bk}</span>
+        </div>
+        ` : ''}
+        
+        ${data.status ? `
+        <div class="report-item">
+            <span class="report-label">Статус:</span>
+            <span class="report-value">${data.status}</span>
+        </div>
+        ` : ''}
+        
+        ${data.losses ? `
+        <div class="report-item">
+            <span class="report-label">Втрати:</span>
+            <span class="report-value">${data.losses}</span>
+        </div>
+        ` : ''}
+        
+        ${data.operator ? `
+        <div class="report-item">
+            <span class="report-label">Оператор:</span>
+            <span class="report-value">${data.operator}</span>
+        </div>
+        ` : ''}
+        
+        ${data.stream ? `
+        <div class="report-item">
+            <span class="report-label">Стрім:</span>
+            <span class="report-value">Так</span>
+        </div>
+        ` : ''}
         
         ${data.missionType ? `
         <div class="report-item">
