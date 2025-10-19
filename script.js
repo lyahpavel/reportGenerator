@@ -62,16 +62,26 @@ const fallbackData = {
         {"value": "Crossfire (868/915 МГц)", "label": "Crossfire (868/915 МГц)", "description": "Надійне керування"},
         {"value": "ExpressLRS", "label": "ExpressLRS", "description": "Низька затримка"}
     ],
-    "targetOptions": [
-        {"value": "Розвідка", "label": "Розвідка"},
-        {"value": "Патрулювання", "label": "Патрулювання"},
-        {"value": "Моніторинг", "label": "Моніторинг"},
-        {"value": "Навчання", "label": "Навчання"},
-        {"value": "Тестування", "label": "Тестування"},
-        {"value": "Доставка", "label": "Доставка"},
-        {"value": "Картографування", "label": "Картографування"},
-        {"value": "Пошук та порятунок", "label": "Пошук та порятунок"},
-        {"value": "Інше", "label": "Інше (введіть вручну)"}
+    "targetTypeOptions": [
+        {"value": "Військовий об'єкт", "label": "Військовий об'єкт"},
+        {"value": "Техніка", "label": "Техніка"},
+        {"value": "Особовий склад", "label": "Особовий склад"},
+        {"value": "Інфраструктура", "label": "Інфраструктура"},
+        {"value": "Склад", "label": "Склад"},
+        {"value": "Блокпост", "label": "Блокпост"},
+        {"value": "Позиція", "label": "Позиція"},
+        {"value": "Інше", "label": "Інше"}
+    ],
+    "settlementOptions": [
+        {"value": "Київ", "label": "Київ"},
+        {"value": "Харків", "label": "Харків"},
+        {"value": "Одеса", "label": "Одеса"},
+        {"value": "Дніпро", "label": "Дніпро"},
+        {"value": "Донецьк", "label": "Донецьк"},
+        {"value": "Запоріжжя", "label": "Запоріжжя"},
+        {"value": "Львів", "label": "Львів"},
+        {"value": "Маріуполь", "label": "Маріуполь"},
+        {"value": "Інший", "label": "Інший"}
     ],
     "bkOptions": [
         {"value": "БК-1", "label": "БК-1"},
@@ -150,7 +160,8 @@ function populateSelects() {
     
     // Заповнення нових полів
     populateSelect('bk', appData.bkOptions);
-    populateSelect('target', appData.targetOptions);
+    populateSelect('targetType', appData.targetTypeOptions);
+    populateSelect('settlement', appData.settlementOptions);
     populateSelect('status', appData.statusOptions);
     populateSelect('losses', appData.lossOptions);
     populateSelect('operator', appData.operatorOptions);
@@ -227,7 +238,9 @@ reportForm.addEventListener('submit', function(e) {
         fiberOptic: document.getElementById('fiberOptic').checked,
         fiberLength: document.getElementById('fiberLength').value,
         bk: document.getElementById('bk').value,
-        target: document.getElementById('target').value === 'Інше' ? document.getElementById('customTarget').value : document.getElementById('target').value,
+        targetType: document.getElementById('targetType').value,
+        settlement: document.getElementById('settlement').value === 'Інший' ? document.getElementById('customSettlement').value : document.getElementById('settlement').value,
+        coordinates: document.getElementById('coordinates').value,
         status: document.getElementById('status').value,
         losses: document.getElementById('losses').value,
         operator: document.getElementById('operator').value,
@@ -382,10 +395,24 @@ function generateReport(data) {
         </div>
         ` : ''}
         
-        ${data.target ? `
+        ${data.targetType ? `
         <div class="report-item">
-            <span class="report-label">Ціль:</span>
-            <span class="report-value">${data.target}</span>
+            <span class="report-label">Тип цілі:</span>
+            <span class="report-value">${data.targetType}</span>
+        </div>
+        ` : ''}
+        
+        ${data.settlement ? `
+        <div class="report-item">
+            <span class="report-label">Населений пункт:</span>
+            <span class="report-value">${data.settlement}</span>
+        </div>
+        ` : ''}
+        
+        ${data.coordinates ? `
+        <div class="report-item">
+            <span class="report-label">Координати:</span>
+            <span class="report-value">${data.coordinates}</span>
         </div>
         ` : ''}
         
@@ -614,18 +641,18 @@ function reloadData() {
     showSuccess('Дані перезавантажено');
 }
 
-// Функція для показу/приховування поля ручного введення цілі
-function toggleCustomTarget() {
-    const targetSelect = document.getElementById('target');
-    const customTargetInput = document.getElementById('customTarget');
+// Функція для показу/приховування поля ручного введення населеного пункту
+function toggleCustomSettlement() {
+    const settlementSelect = document.getElementById('settlement');
+    const customSettlementInput = document.getElementById('customSettlement');
     
-    if (targetSelect.value === 'Інше') {
-        customTargetInput.style.display = 'block';
-        customTargetInput.required = true;
+    if (settlementSelect.value === 'Інший') {
+        customSettlementInput.style.display = 'block';
+        customSettlementInput.required = true;
     } else {
-        customTargetInput.style.display = 'none';
-        customTargetInput.required = false;
-        customTargetInput.value = '';
+        customSettlementInput.style.display = 'none';
+        customSettlementInput.required = false;
+        customSettlementInput.value = '';
     }
 }
 

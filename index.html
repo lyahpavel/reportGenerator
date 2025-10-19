@@ -93,13 +93,29 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="target">Ціль:</label>
-                <select id="target" name="target" onchange="toggleCustomTarget()">
-                    <option value="">Оберіть ціль...</option>
-                    <!-- Опції заповнюються динамічно з data.json -->
-                </select>
-                <input type="text" id="customTarget" name="customTarget" placeholder="Введіть свою ціль..." style="display: none; margin-top: 10px;">
+            <!-- Ціль розділена на три поля в одному рядку -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="targetType">Тип цілі:</label>
+                    <select id="targetType" name="targetType">
+                        <option value="">Оберіть тип цілі...</option>
+                        <!-- Опції заповнюються динамічно з data.json -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="settlement">Населений пункт:</label>
+                    <select id="settlement" name="settlement" onchange="toggleCustomSettlement()">
+                        <option value="">Оберіть населений пункт...</option>
+                        <!-- Опції заповнюються динамічно з data.json -->
+                    </select>
+                    <input type="text" id="customSettlement" name="customSettlement" placeholder="Введіть назву..." style="display: none; margin-top: 5px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="coordinates">Координати:</label>
+                    <input type="text" id="coordinates" name="coordinates" placeholder="Наприклад: 50.4501, 30.5234">
+                </div>
             </div>
 
             <div class="form-group">
