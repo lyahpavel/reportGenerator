@@ -98,14 +98,20 @@ const fallbackData = {
         {"value": "Інший", "label": "Інший"}
     ],
     "statusOptions": [
-        {"value": "Активний", "label": "Активний"},
-        {"value": "На завданні", "label": "На завданні"},
-        {"value": "Повернення", "label": "Повернення"},
-        {"value": "Посадка", "label": "Посадка"},
-        {"value": "Втрачено", "label": "Втрачено"},
+        {"value": "Уражено", "label": "Уражено"},
         {"value": "Пошкоджено", "label": "Пошкоджено"},
-        {"value": "Технічне обслуговування", "label": "Технічне обслуговування"},
+        {"value": "Не уражено", "label": "Не уражено"},
         {"value": "Інший", "label": "Інший"}
+    ],
+    "reasonOptions": [
+        {"value": "Цель недоступна", "label": "Цель недоступна"},
+        {"value": "Погодні умови", "label": "Погодні умови"},
+        {"value": "Технічні проблеми", "label": "Технічні проблеми"},
+        {"value": "Втрата зв'язку", "label": "Втрата зв'язку"},
+        {"value": "Батарея розрядилась", "label": "Батарея розрядилась"},
+        {"value": "РЕБ", "label": "РЕБ"},
+        {"value": "Ціль переміщена", "label": "Ціль переміщена"},
+        {"value": "Інша", "label": "Інша"}
     ],
     "lossOptions": [
         {"value": "Немає", "label": "Немає"},
@@ -170,6 +176,7 @@ function populateSelects() {
     populateSelect('targetType', appData.targetTypeOptions);
     populateSelect('settlement', appData.settlementOptions);
     populateSelect('status', appData.statusOptions);
+    populateSelect('reason', appData.reasonOptions);
     populateSelect('losses', appData.lossOptions);
     populateSelect('operator', appData.operatorOptions);
 }
@@ -254,6 +261,7 @@ reportForm.addEventListener('submit', function(e) {
         settlement: document.getElementById('settlement').value === 'Інший' ? document.getElementById('customSettlement').value : document.getElementById('settlement').value,
         coordinates: document.getElementById('coordinates').value,
         status: document.getElementById('status').value === 'Інший' ? document.getElementById('customStatus').value : document.getElementById('status').value,
+        reason: document.getElementById('reason').value === 'Інша' ? document.getElementById('customReason').value : document.getElementById('reason').value,
         losses: document.getElementById('losses').value === 'Інше' ? document.getElementById('customLosses').value : document.getElementById('losses').value,
         operator: document.getElementById('operator').value === 'Інший' ? document.getElementById('customOperator').value : document.getElementById('operator').value,
         stream: document.getElementById('stream').checked,
@@ -402,6 +410,13 @@ function generateReport(data) {
         <div class="report-item">
             <span class="report-label">Статус:</span>
             <span class="report-value">${data.status}</span>
+        </div>
+        ` : ''}
+        
+        ${data.reason && data.status === 'Не уражено' ? `
+        <div class="report-item">
+            <span class="report-label">Причина:</span>
+            <span class="report-value">${data.reason}</span>
         </div>
         ` : ''}
         
@@ -637,6 +652,8 @@ newReportBasedOnButton.addEventListener('click', function() {
         customSettlement: document.getElementById('customSettlement').value,
         coordinates: document.getElementById('coordinates').value,
         status: document.getElementById('status').value,
+        reason: document.getElementById('reason').value,
+        customReason: document.getElementById('customReason').value,
         losses: document.getElementById('losses').value,
         operator: document.getElementById('operator').value,
         stream: document.getElementById('stream').checked,
@@ -852,6 +869,40 @@ function toggleCustomStatus() {
     const customInput = document.getElementById('customStatus');
     
     if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля "Причина" при виборі "Не уражено"
+function toggleReasonField() {
+    const statusSelect = document.getElementById('status');
+    const reasonGroup = document.getElementById('reasonGroup');
+    
+    if (statusSelect.value === 'Не уражено') {
+        reasonGroup.style.display = 'block';
+    } else {
+        reasonGroup.style.display = 'none';
+        // Скидання полів причини при приховуванні
+        const reasonSelect = document.getElementById('reason');
+        const customReason = document.getElementById('customReason');
+        reasonSelect.value = '';
+        customReason.style.display = 'none';
+        customReason.required = false;
+        customReason.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення причини
+function toggleCustomReason() {
+    const select = document.getElementById('reason');
+    const customInput = document.getElementById('customReason');
+    
+    if (select.value === 'Інша') {
         customInput.style.display = 'block';
         customInput.required = true;
     } else {

@@ -411,6 +411,7 @@ textarea {
 #customBk,
 #customTargetType,
 #customStatus,
+#customReason,
 #customLosses,
 #customOperator {
     width: 100% !important;
@@ -433,6 +434,7 @@ textarea {
 #customBk,
 #customTargetType,
 #customStatus,
+#customReason,
 #customLosses,
 #customOperator {
     margin-top: 5px;
@@ -448,6 +450,7 @@ textarea {
 #customBk:focus,
 #customTargetType:focus,
 #customStatus:focus,
+#customReason:focus,
 #customLosses:focus,
 #customOperator:focus {
     outline: none;
@@ -479,6 +482,7 @@ textarea {
 #customBk,
 #customTargetType,
 #customStatus,
+#customReason,
 #customLosses,
 #customOperator {
     transition: all 0.3s ease;
@@ -494,6 +498,7 @@ textarea {
 #customBk[style*="display: none"],
 #customTargetType[style*="display: none"],
 #customStatus[style*="display: none"],
+#customReason[style*="display: none"],
 #customLosses[style*="display: none"],
 #customOperator[style*="display: none"] {
     max-height: 0;
@@ -512,6 +517,7 @@ textarea {
 #customBk[style*="display: block"],
 #customTargetType[style*="display: block"],
 #customStatus[style*="display: block"],
+#customReason[style*="display: block"],
 #customLosses[style*="display: block"],
 #customOperator[style*="display: block"] {
     max-height: 60px;

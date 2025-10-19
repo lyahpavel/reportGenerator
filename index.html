@@ -127,11 +127,20 @@
 
             <div class="form-group">
                 <label for="status">Статус:</label>
-                <select id="status" name="status" onchange="toggleCustomStatus()">
+                <select id="status" name="status" onchange="toggleCustomStatus(); toggleReasonField()">
                     <option value="">Оберіть статус...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
                 <input type="text" id="customStatus" name="customStatus" placeholder="Введіть статус..." style="display: none;">
+            </div>
+
+            <div class="form-group" id="reasonGroup" style="display: none;">
+                <label for="reason">Причина:</label>
+                <select id="reason" name="reason" onchange="toggleCustomReason()">
+                    <option value="">Оберіть причину...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+                <input type="text" id="customReason" name="customReason" placeholder="Введіть причину..." style="display: none;">
             </div>
 
             <div class="form-group">
