@@ -407,6 +407,10 @@ textarea {
     font-size: 1rem;
     transition: all 0.3s ease;
     background-color: #fff;
+}
+
+/* Тільки для customSettlement додаємо margin-top коли воно з'являється */
+#customSettlement {
     margin-top: 5px;
 }
 
