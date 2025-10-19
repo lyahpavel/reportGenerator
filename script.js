@@ -62,7 +62,17 @@ const fallbackData = {
         {"value": "Crossfire (868/915 МГц)", "label": "Crossfire (868/915 МГц)", "description": "Надійне керування"},
         {"value": "ExpressLRS", "label": "ExpressLRS", "description": "Низька затримка"}
     ],
-    
+    "targetOptions": [
+        {"value": "Розвідка", "label": "Розвідка"},
+        {"value": "Патрулювання", "label": "Патрулювання"},
+        {"value": "Моніторинг", "label": "Моніторинг"},
+        {"value": "Навчання", "label": "Навчання"},
+        {"value": "Тестування", "label": "Тестування"},
+        {"value": "Доставка", "label": "Доставка"},
+        {"value": "Картографування", "label": "Картографування"},
+        {"value": "Пошук та порятунок", "label": "Пошук та порятунок"},
+        {"value": "Інше", "label": "Інше (введіть вручну)"}
+    ],
     "bkOptions": [
         {"value": "БК-1", "label": "БК-1"},
         {"value": "БК-2", "label": "БК-2"},
@@ -140,6 +150,7 @@ function populateSelects() {
     
     // Заповнення нових полів
     populateSelect('bk', appData.bkOptions);
+    populateSelect('target', appData.targetOptions);
     populateSelect('status', appData.statusOptions);
     populateSelect('losses', appData.lossOptions);
     populateSelect('operator', appData.operatorOptions);
@@ -216,6 +227,7 @@ reportForm.addEventListener('submit', function(e) {
         fiberOptic: document.getElementById('fiberOptic').checked,
         fiberLength: document.getElementById('fiberLength').value,
         bk: document.getElementById('bk').value,
+        target: document.getElementById('target').value === 'Інше' ? document.getElementById('customTarget').value : document.getElementById('target').value,
         status: document.getElementById('status').value,
         losses: document.getElementById('losses').value,
         operator: document.getElementById('operator').value,
@@ -367,6 +379,13 @@ function generateReport(data) {
         <div class="report-item">
             <span class="report-label">БК:</span>
             <span class="report-value">${data.bk}</span>
+        </div>
+        ` : ''}
+        
+        ${data.target ? `
+        <div class="report-item">
+            <span class="report-label">Ціль:</span>
+            <span class="report-value">${data.target}</span>
         </div>
         ` : ''}
         
@@ -593,6 +612,21 @@ newReportButton.addEventListener('click', function() {
 function reloadData() {
     loadData();
     showSuccess('Дані перезавантажено');
+}
+
+// Функція для показу/приховування поля ручного введення цілі
+function toggleCustomTarget() {
+    const targetSelect = document.getElementById('target');
+    const customTargetInput = document.getElementById('customTarget');
+    
+    if (targetSelect.value === 'Інше') {
+        customTargetInput.style.display = 'block';
+        customTargetInput.required = true;
+    } else {
+        customTargetInput.style.display = 'none';
+        customTargetInput.required = false;
+        customTargetInput.value = '';
+    }
 }
 
 // Обробка скидання форми
