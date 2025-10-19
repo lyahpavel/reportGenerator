@@ -62,14 +62,7 @@ const fallbackData = {
         {"value": "Crossfire (868/915 МГц)", "label": "Crossfire (868/915 МГц)", "description": "Надійне керування"},
         {"value": "ExpressLRS", "label": "ExpressLRS", "description": "Низька затримка"}
     ],
-    "missionTypes": [
-        {"value": "Розвідка", "label": "Розвідка"},
-        {"value": "Патрулювання", "label": "Патрулювання"},
-        {"value": "Моніторинг", "label": "Моніторинг"},
-        {"value": "Навчання", "label": "Навчання"},
-        {"value": "Тестування", "label": "Тестування"},
-        {"value": "Інше", "label": "Інше"}
-    ],
+    
     "bkOptions": [
         {"value": "БК-1", "label": "БК-1"},
         {"value": "БК-2", "label": "БК-2"},
@@ -143,8 +136,7 @@ function populateSelects() {
     populateSelect('videoFrequency', appData.videoFrequencies);
     populateSelect('controlFrequency', appData.controlFrequencies);
     
-    // Заповнення типів місій
-    populateSelect('missionType', appData.missionTypes);
+    // Поле 'Тип місії' видалено
     
     // Заповнення нових полів
     populateSelect('bk', appData.bkOptions);
@@ -230,7 +222,6 @@ reportForm.addEventListener('submit', function(e) {
         stream: document.getElementById('stream').checked,
         date: document.getElementById('date').value,
         time: document.getElementById('time').value,
-        missionType: document.getElementById('missionType').value,
         mission: document.getElementById('mission').value
     };
     
@@ -404,13 +395,6 @@ function generateReport(data) {
         <div class="report-item">
             <span class="report-label">Стрім:</span>
             <span class="report-value">Так</span>
-        </div>
-        ` : ''}
-        
-        ${data.missionType ? `
-        <div class="report-item">
-            <span class="report-label">Тип місії:</span>
-            <span class="report-value">${data.missionType}</span>
         </div>
         ` : ''}
         
