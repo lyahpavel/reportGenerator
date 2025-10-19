@@ -352,18 +352,8 @@ function generateReport(data) {
         </div>
         
         <div class="report-item">
-            <span class="report-label">Назва дрону:</span>
-            <span class="report-value">${data.droneName}</span>
-        </div>
-        
-        <div class="report-item">
-            <span class="report-label">Розмір дрону:</span>
-            <span class="report-value">${data.droneSize}</span>
-        </div>
-        
-        <div class="report-item">
-            <span class="report-label">Тип камери:</span>
-            <span class="report-value">${data.cameraType}</span>
+            <span class="report-label">Дрон:</span>
+            <span class="report-value">${data.droneName} | ${data.droneSize} | ${data.cameraType}</span>
         </div>
         
         ${data.fiberOptic ? `
@@ -373,24 +363,14 @@ function generateReport(data) {
         </div>
         ` : `
         <div class="report-item">
-            <span class="report-label">Частота відео:</span>
-            <span class="report-value">${data.videoFrequency}</span>
-        </div>
-        
-        <div class="report-item">
-            <span class="report-label">Частота керування:</span>
-            <span class="report-value">${data.controlFrequency}</span>
+            <span class="report-label">Частоти:</span>
+            <span class="report-value">Відео: ${data.videoFrequency} | Керування: ${data.controlFrequency}</span>
         </div>
         `}
         
         <div class="report-item">
-            <span class="report-label">Дата:</span>
-            <span class="report-value">${formattedDate}</span>
-        </div>
-        
-        <div class="report-item">
-            <span class="report-label">Час:</span>
-            <span class="report-value">${formattedTime}</span>
+            <span class="report-label">Дата та час:</span>
+            <span class="report-value">${formattedDate} о ${formattedTime}</span>
         </div>
         
         ${data.bk ? `
@@ -400,24 +380,14 @@ function generateReport(data) {
         </div>
         ` : ''}
         
-        ${data.targetType ? `
+        ${(data.targetType || data.settlement || data.coordinates) ? `
         <div class="report-item">
-            <span class="report-label">Тип цілі:</span>
-            <span class="report-value">${data.targetType}</span>
-        </div>
-        ` : ''}
-        
-        ${data.settlement ? `
-        <div class="report-item">
-            <span class="report-label">Населений пункт:</span>
-            <span class="report-value">${data.settlement}</span>
-        </div>
-        ` : ''}
-        
-        ${data.coordinates ? `
-        <div class="report-item">
-            <span class="report-label">Координати:</span>
-            <span class="report-value">${data.coordinates}</span>
+            <span class="report-label">Ціль:</span>
+            <span class="report-value">${[
+                data.targetType || '',
+                data.settlement || '', 
+                data.coordinates ? `(${data.coordinates})` : ''
+            ].filter(item => item !== '').join(' | ')}</span>
         </div>
         ` : ''}
         
