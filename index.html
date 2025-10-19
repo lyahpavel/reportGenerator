@@ -22,21 +22,23 @@
                 </select>
             </div>
 
-            <!-- Дрон: три окремі поля -->
-            <div class="form-group">
-                <label for="droneName">Назва дрону:</label>
-                <select id="droneName" name="droneName" required>
-                    <option value="">Оберіть назву дрону...</option>
-                    <!-- Опції заповнюються динамічно з data.json -->
-                </select>
-            </div>
+            <!-- Дрон: назва і розмір в одному рядку -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="droneName">Назва дрону:</label>
+                    <select id="droneName" name="droneName" required>
+                        <option value="">Оберіть назву дрону...</option>
+                        <!-- Опції заповнюються динамічно з data.json -->
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label for="droneSize">Розмір дрону:</label>
-                <select id="droneSize" name="droneSize" required>
-                    <option value="">Оберіть розмір дрону...</option>
-                    <!-- Опції заповнюються динамічно з data.json -->
-                </select>
+                <div class="form-group">
+                    <label for="droneSize">Розмір дрону:</label>
+                    <select id="droneSize" name="droneSize" required>
+                        <option value="">Оберіть розмір дрону...</option>
+                        <!-- Опції заповнюються динамічно з data.json -->
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
@@ -47,21 +49,23 @@
                 </select>
             </div>
 
-            <!-- Частоти: два окремі поля -->
-            <div class="form-group">
-                <label for="videoFrequency">Частота відео:</label>
-                <select id="videoFrequency" name="videoFrequency" required>
-                    <option value="">Оберіть частоту відео...</option>
-                    <!-- Опції заповнюються динамічно з data.json -->
-                </select>
-            </div>
+            <!-- Частоти: відео і керування в одному рядку -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="videoFrequency">Частота відео:</label>
+                    <select id="videoFrequency" name="videoFrequency" required>
+                        <option value="">Оберіть частоту відео...</option>
+                        <!-- Опції заповнюються динамічно з data.json -->
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label for="controlFrequency">Частота керування:</label>
-                <select id="controlFrequency" name="controlFrequency" required>
-                    <option value="">Оберіть частоту керування...</option>
-                    <!-- Опції заповнюються динамічно з data.json -->
-                </select>
+                <div class="form-group">
+                    <label for="controlFrequency">Частота керування:</label>
+                    <select id="controlFrequency" name="controlFrequency" required>
+                        <option value="">Оберіть частоту керування...</option>
+                        <!-- Опції заповнюються динамічно з data.json -->
+                    </select>
+                </div>
             </div>
 
             <!-- Оптоволоконний кабель -->
@@ -171,8 +175,7 @@
             const checkbox = document.getElementById('fiberOptic');
             const lengthGroup = document.getElementById('fiberLengthGroup');
             const lengthInput = document.getElementById('fiberLength');
-            const videoFreqGroup = document.getElementById('videoFrequency').parentElement;
-            const controlFreqGroup = document.getElementById('controlFrequency').parentElement;
+            const frequencyRow = document.getElementById('videoFrequency').parentElement.parentElement;
             const videoFreqInput = document.getElementById('videoFrequency');
             const controlFreqInput = document.getElementById('controlFrequency');
             
@@ -181,9 +184,8 @@
                 lengthGroup.style.display = 'block';
                 lengthInput.required = true;
                 
-                // Приховати поля частот
-                videoFreqGroup.style.display = 'none';
-                controlFreqGroup.style.display = 'none';
+                // Приховати весь рядок з частотами
+                frequencyRow.style.display = 'none';
                 videoFreqInput.required = false;
                 controlFreqInput.required = false;
                 videoFreqInput.value = '';
@@ -194,9 +196,8 @@
                 lengthInput.required = false;
                 lengthInput.value = '';
                 
-                // Показати поля частот
-                videoFreqGroup.style.display = 'block';
-                controlFreqGroup.style.display = 'block';
+                // Показати рядок з частотами
+                frequencyRow.style.display = 'flex';
                 videoFreqInput.required = true;
                 controlFreqInput.required = true;
             }

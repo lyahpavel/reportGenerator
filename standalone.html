@@ -28,34 +28,36 @@
                 </select>
             </div>
 
-            <!-- Дрон: три окремі поля -->
-            <div class="form-group">
-                <label for="droneName">Назва дрону:</label>
-                <select id="droneName" name="droneName" required>
-                    <option value="">Оберіть назву дрону...</option>
-                    <option value="DJI Mavic 3">DJI Mavic 3</option>
-                    <option value="DJI Air 2S">DJI Air 2S</option>
-                    <option value="Autel EVO II">Autel EVO II</option>
-                    <option value="DJI Mini 3 Pro">DJI Mini 3 Pro</option>
-                    <option value="Skydio 2+">Skydio 2+</option>
-                    <option value="DJI Phantom 4 Pro">DJI Phantom 4 Pro</option>
-                    <option value="Parrot Anafi">Parrot Anafi</option>
-                    <option value="DJI Matrice 300">DJI Matrice 300</option>
-                    <option value="DJI FPV">DJI FPV</option>
-                    <option value="Інший">Інший</option>
-                </select>
-            </div>
+            <!-- Дрон: назва і розмір в одному рядку -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="droneName">Назва дрону:</label>
+                    <select id="droneName" name="droneName" required>
+                        <option value="">Оберіть назву дрону...</option>
+                        <option value="DJI Mavic 3">DJI Mavic 3</option>
+                        <option value="DJI Air 2S">DJI Air 2S</option>
+                        <option value="Autel EVO II">Autel EVO II</option>
+                        <option value="DJI Mini 3 Pro">DJI Mini 3 Pro</option>
+                        <option value="Skydio 2+">Skydio 2+</option>
+                        <option value="DJI Phantom 4 Pro">DJI Phantom 4 Pro</option>
+                        <option value="Parrot Anafi">Parrot Anafi</option>
+                        <option value="DJI Matrice 300">DJI Matrice 300</option>
+                        <option value="DJI FPV">DJI FPV</option>
+                        <option value="Інший">Інший</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label for="droneSize">Розмір дрону:</label>
-                <select id="droneSize" name="droneSize" required>
-                    <option value="">Оберіть розмір дрону...</option>
-                    <option value="Мікро">Мікро (< 250г)</option>
-                    <option value="Міні">Міні (250г - 2кг)</option>
-                    <option value="Малий">Малий (2кг - 25кг)</option>
-                    <option value="Середній">Середній (25кг - 150кг)</option>
-                    <option value="Великий">Великий (> 150кг)</option>
-                </select>
+                <div class="form-group">
+                    <label for="droneSize">Розмір дрону:</label>
+                    <select id="droneSize" name="droneSize" required>
+                        <option value="">Оберіть розмір дрону...</option>
+                        <option value="Мікро">Мікро (< 250г)</option>
+                        <option value="Міні">Міні (250г - 2кг)</option>
+                        <option value="Малий">Малий (2кг - 25кг)</option>
+                        <option value="Середній">Середній (25кг - 150кг)</option>
+                        <option value="Великий">Великий (> 150кг)</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
@@ -73,30 +75,32 @@
                 </select>
             </div>
 
-            <!-- Частоти: два окремі поля -->
-            <div class="form-group">
-                <label for="videoFrequency">Частота відео:</label>
-                <select id="videoFrequency" name="videoFrequency" required>
-                    <option value="">Оберіть частоту відео...</option>
-                    <option value="2.4 ГГц" title="Стандартна частота відеопередачі">2.4 ГГц</option>
-                    <option value="5.8 ГГц" title="Висока частота з меншими перешкодами">5.8 ГГц</option>
-                    <option value="1.2 ГГц" title="Професійна відеопередача">1.2 ГГц</option>
-                    <option value="900 МГц" title="Дальня відеопередача">900 МГц</option>
-                    <option value="Аналогова 5.8 ГГц" title="FPV аналогова передача">Аналогова 5.8 ГГц</option>
-                </select>
-            </div>
+            <!-- Частоти: відео і керування в одному рядку -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="videoFrequency">Частота відео:</label>
+                    <select id="videoFrequency" name="videoFrequency" required>
+                        <option value="">Оберіть частоту відео...</option>
+                        <option value="2.4 ГГц" title="Стандартна частота відеопередачі">2.4 ГГц</option>
+                        <option value="5.8 ГГц" title="Висока частота з меншими перешкодами">5.8 ГГц</option>
+                        <option value="1.2 ГГц" title="Професійна відеопередача">1.2 ГГц</option>
+                        <option value="900 МГц" title="Дальня відеопередача">900 МГц</option>
+                        <option value="Аналогова 5.8 ГГц" title="FPV аналогова передача">Аналогова 5.8 ГГц</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label for="controlFrequency">Частота керування:</label>
-                <select id="controlFrequency" name="controlFrequency" required>
-                    <option value="">Оберіть частоту керування...</option>
-                    <option value="2.4 ГГц" title="Стандартне керування">2.4 ГГц</option>
-                    <option value="433 МГц" title="Дальнього радіуса дії">433 МГц</option>
-                    <option value="868 МГц" title="Європейський стандарт">868 МГц</option>
-                    <option value="915 МГц" title="Американський стандарт">915 МГц</option>
-                    <option value="Crossfire (868/915 МГц)" title="Надійне керування">Crossfire (868/915 МГц)</option>
-                    <option value="ExpressLRS" title="Низька затримка">ExpressLRS</option>
-                </select>
+                <div class="form-group">
+                    <label for="controlFrequency">Частота керування:</label>
+                    <select id="controlFrequency" name="controlFrequency" required>
+                        <option value="">Оберіть частоту керування...</option>
+                        <option value="2.4 ГГц" title="Стандартне керування">2.4 ГГц</option>
+                        <option value="433 МГц" title="Дальнього радіуса дії">433 МГц</option>
+                        <option value="868 МГц" title="Європейський стандарт">868 МГц</option>
+                        <option value="915 МГц" title="Американський стандарт">915 МГц</option>
+                        <option value="Crossfire (868/915 МГц)" title="Надійне керування">Crossfire (868/915 МГц)</option>
+                        <option value="ExpressLRS" title="Низька затримка">ExpressLRS</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Оптоволоконний кабель -->
@@ -486,8 +490,7 @@
             const checkbox = document.getElementById('fiberOptic');
             const lengthGroup = document.getElementById('fiberLengthGroup');
             const lengthInput = document.getElementById('fiberLength');
-            const videoFreqGroup = document.getElementById('videoFrequency').parentElement;
-            const controlFreqGroup = document.getElementById('controlFrequency').parentElement;
+            const frequencyRow = document.getElementById('videoFrequency').parentElement.parentElement;
             const videoFreqInput = document.getElementById('videoFrequency');
             const controlFreqInput = document.getElementById('controlFrequency');
             
@@ -496,9 +499,8 @@
                 lengthGroup.style.display = 'block';
                 lengthInput.required = true;
                 
-                // Приховати поля частот
-                videoFreqGroup.style.display = 'none';
-                controlFreqGroup.style.display = 'none';
+                // Приховати весь рядок з частотами
+                frequencyRow.style.display = 'none';
                 videoFreqInput.required = false;
                 controlFreqInput.required = false;
                 videoFreqInput.value = '';
@@ -509,9 +511,8 @@
                 lengthInput.required = false;
                 lengthInput.value = '';
                 
-                // Показати поля частот
-                videoFreqGroup.style.display = 'block';
-                controlFreqGroup.style.display = 'block';
+                // Показати рядок з частотами
+                frequencyRow.style.display = 'flex';
                 videoFreqInput.required = true;
                 controlFreqInput.required = true;
             }
