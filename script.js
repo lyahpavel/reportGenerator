@@ -401,7 +401,7 @@ function generateReport(data) {
         ${data.fiberOptic ? `
         <div class="report-item">
             <span class="report-label">Тип зв'язку:</span>
-            <span class="report-value">Оптоволоконний кабель (${data.fiberLength} м)</span>
+            <span class="report-value">Оптоволоконний кабель (${data.fiberLength} км)</span>
         </div>
         ` : `
         <div class="report-item">
