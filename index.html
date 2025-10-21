@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Генератор звітів про дрони</title>
+    <meta name="description" content="Застосунок для генерації звітів про дрони">
+    <meta name="theme-color" content="#4facfe">
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
     <div class="container">
@@ -250,6 +254,51 @@
                 videoFreqInput.required = true;
                 controlFreqInput.required = true;
             }
+        }
+    </script>
+    <script>
+        // Реєстрація Service Worker для PWA з автоматичним оновленням
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('[App] Service Worker зареєстровано:', registration);
+                        
+                        // Перевірка оновлень кожні 60 секунд
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000);
+                        
+                        // Відстежування оновлень
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('[App] Знайдено оновлення Service Worker');
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'activated') {
+                                    console.log('[App] Новий Service Worker активовано');
+                                    // Можна показати повідомлення користувачу
+                                    if (confirm('Доступна нова версія додатку. Перезавантажити сторінку?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.log('[App] Помилка реєстрації Service Worker:', error);
+                    });
+                
+                // Автоматичне оновлення при активації нового Service Worker
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        console.log('[App] Оновлення контролера, перезавантаження...');
+                        window.location.reload();
+                    }
+                });
+            });
         }
     </script>
 </body>
