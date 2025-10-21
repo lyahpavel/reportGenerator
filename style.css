@@ -93,6 +93,19 @@ textarea {
     background-color: #fff;
 }
 
+/* Вирівнювання поля "Інший" для "Сумісно з" */
+#customJointWith {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    box-sizing: border-box;
+    margin-top: 8px;
+}
+
 select:focus,
 input[type="date"]:focus,
 input[type="time"]:focus,
