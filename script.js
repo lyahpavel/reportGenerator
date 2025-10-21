@@ -196,13 +196,40 @@ function populateSelects() {
         subdivisionSelect.value = 'ВБпАК 1б ТрО 101 обр ТрО';
     }
     
-        // Додаємо фільтрацію для БК
+        // Додаємо фільтрацію для БК (залишаються тільки ті, що підходять)
         const bkFilterInput = document.getElementById('bkFilter');
-        if (bkFilterInput) {
+        const bkSelect = document.getElementById('bk');
+        if (bkFilterInput && bkSelect) {
             bkFilterInput.addEventListener('input', function() {
                 const filterValue = bkFilterInput.value.toLowerCase();
-                const filteredOptions = appData.bkOptions.filter(opt => opt.label.toLowerCase().includes(filterValue));
-                populateSelect('bk', filteredOptions);
+                const currentValue = bkSelect.value;
+                // Зберігаємо перший option ("Оберіть БК...")
+                const firstOption = bkSelect.querySelector('option');
+                // Видаляємо всі опції крім першої
+                while (bkSelect.children.length > 1) {
+                    bkSelect.removeChild(bkSelect.lastChild);
+                }
+                // Додаємо тільки ті, що підходять
+                appData.bkOptions.forEach(option => {
+                    if (option.label.toLowerCase().includes(filterValue)) {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = option.value;
+                        optionElement.textContent = option.label;
+                        if (option.description) {
+                            optionElement.title = option.description;
+                        } else if (option.range) {
+                            optionElement.title = option.range;
+                        }
+                        bkSelect.appendChild(optionElement);
+                    }
+                });
+                // Повертаємо попереднє значення, якщо воно залишилось у списку
+                const stillExists = Array.from(bkSelect.options).some(opt => opt.value === currentValue);
+                if (stillExists) {
+                    bkSelect.value = currentValue;
+                } else {
+                    bkSelect.value = '';
+                }
             });
         }
 }
