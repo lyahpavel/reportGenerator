@@ -1,3 +1,64 @@
+/* Кастомний дропдаун для БК */
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+    font-size: 1rem;
+}
+.dropdown-selected {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 20px;
+}
+.dropdown-selected:after {
+    content: '\25BC';
+    float: right;
+    margin-left: 8px;
+    color: #888;
+    font-size: 0.9em;
+    pointer-events: none;
+}
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 2px solid #e1e5e9;
+    border-radius: 0 0 8px 8px;
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    max-height: 260px;
+    overflow-y: auto;
+    margin-top: 2px;
+}
+.dropdown-list input[type="text"] {
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 1rem;
+}
+.dropdown-list ul {
+    padding: 0;
+    margin: 0;
+}
+.dropdown-list li {
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 4px;
+}
+.dropdown-list li:hover, .dropdown-list li.active {
+    background: #f0f4fa;
+}
+.dropdown-list li.selected {
+    background: #e1e5e9;
+    font-weight: 600;
+}
 * {
     margin: 0;
     padding: 0;
