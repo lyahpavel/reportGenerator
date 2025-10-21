@@ -13,12 +13,12 @@ let appData = null;
 // Fallback дані на випадок, якщо JSON не завантажиться
 const fallbackData = {
     "subdivisions": [
-        {"value": "1-й батальйон", "label": "1-й батальйон"},
-        {"value": "2-й батальйон", "label": "2-й батальйон"},
-        {"value": "3-й батальйон", "label": "3-й батальйон"},
-        {"value": "Розвідувальна рота", "label": "Розвідувальна рота"},
-        {"value": "Штабна рота", "label": "Штабна рота"},
-        {"value": "Рота забезпечення", "label": "Рота забезпечення"}
+        {"value": "1-й батальйон", "label": "1-й батальйон", "code": "1Б"},
+        {"value": "2-й батальйон", "label": "2-й батальйон", "code": "2Б"},
+        {"value": "3-й батальйон", "label": "3-й батальйон", "code": "3Б"},
+        {"value": "Розвідувальна рота", "label": "Розвідувальна рота", "code": "РР"},
+        {"value": "Штабна рота", "label": "Штабна рота", "code": "ШР"},
+        {"value": "Рота забезпечення", "label": "Рота забезпечення", "code": "РЗ"}
     ],
     "jointWithOptions": [
         {"value": "1-й батальйон", "label": "1-й батальйон"},
@@ -369,7 +369,7 @@ function validateForm(data) {
 
 // Функція генерації звіту
 function generateReport(data) {
-    const reportNumber = generateReportNumber();
+    const reportNumber = generateReportNumber(data);
     const formattedDate = formatDate(data.date);
     const formattedTime = formatTime(data.time);
     
@@ -484,17 +484,50 @@ function generateReport(data) {
     reportContent.innerHTML = reportHTML;
 }
 
-// Функція генерації номера звіту
-function generateReportNumber() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
+// Функція генерації номера звіту на основі коду підрозділу та дати/часу
+function generateReportNumber(data) {
+    // Отримуємо код підрозділу
+    let subdivisionCode = '';
+    if (data.subdivision) {
+        const subdivisionOption = appData.subdivisions.find(s => s.value === data.subdivision);
+        if (subdivisionOption && subdivisionOption.code) {
+            subdivisionCode = subdivisionOption.code;
+        }
+    }
     
-    return `DR-${year}${month}${day}-${hours}${minutes}${seconds}`;
+    // Якщо немає коду, використовуємо "DR" за замовчуванням
+    if (!subdivisionCode) {
+        subdivisionCode = 'DR';
+    }
+    
+    // Формуємо дату та час без розділових знаків
+    let dateTimeString = '';
+    if (data.date) {
+        // Дата у форматі YYYY-MM-DD -> DDMMYYYY
+        const dateParts = data.date.split('-');
+        if (dateParts.length === 3) {
+            dateTimeString = dateParts[2] + dateParts[1] + dateParts[0];
+        }
+    }
+    
+    if (data.time) {
+        // Час у форматі HH:MM -> HHMM
+        dateTimeString += data.time.replace(':', '');
+    }
+    
+    // Якщо немає дати/часу, використовуємо поточні
+    if (!dateTimeString) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        dateTimeString = day + month + year + hours + minutes;
+    }
+    
+    // Формат: ПРЕФІКС + ДАТА/ЧАС (наприклад: ВБ211020251430)
+    return `${subdivisionCode}${dateTimeString}`;
 }
 
 // Функція форматування дати
