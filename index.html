@@ -16,10 +16,11 @@
         <form id="reportForm" class="report-form">
             <div class="form-group">
                 <label for="subdivision">Підрозділ:</label>
-                <select id="subdivision" name="subdivision" required>
+                <select id="subdivision" name="subdivision" required onchange="toggleCustomSubdivision()">
                     <option value="">Оберіть підрозділ...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
+                    <input type="text" id="customSubdivision" name="customSubdivision" placeholder="Введіть підрозділ..." style="display: none;">
             </div>
 
             <div class="form-group">

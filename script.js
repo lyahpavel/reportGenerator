@@ -264,7 +264,7 @@ reportForm.addEventListener('submit', function(e) {
     
     // Збір даних з форми
     const formData = {
-        subdivision: document.getElementById('subdivision').value,
+        subdivision: document.getElementById('subdivision').value === 'Інший' ? document.getElementById('customSubdivision').value : document.getElementById('subdivision').value,
         jointWith: document.getElementById('jointWith').value === 'Інший' ? document.getElementById('customJointWith').value : document.getElementById('jointWith').value,
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
         droneSize: document.getElementById('droneSize').value === 'Інший' ? document.getElementById('customDroneSize').value : document.getElementById('droneSize').value,
