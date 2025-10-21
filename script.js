@@ -20,6 +20,15 @@ const fallbackData = {
         {"value": "Штабна рота", "label": "Штабна рота"},
         {"value": "Рота забезпечення", "label": "Рота забезпечення"}
     ],
+    "jointWithOptions": [
+        {"value": "1-й батальйон", "label": "1-й батальйон"},
+        {"value": "2-й батальйон", "label": "2-й батальйон"},
+        {"value": "3-й батальйон", "label": "3-й батальйон"},
+        {"value": "Розвідувальна рота", "label": "Розвідувальна рота"},
+        {"value": "Штабна рота", "label": "Штабна рота"},
+        {"value": "Рота забезпечення", "label": "Рота забезпечення"},
+        {"value": "Інший", "label": "Інший"}
+    ],
     "droneNames": [
         {"value": "DJI Mavic 3", "label": "DJI Mavic 3"},
         {"value": "DJI Air 2S", "label": "DJI Air 2S"},
@@ -159,6 +168,7 @@ function populateSelects() {
     
     // Заповнення підрозділів
     populateSelect('subdivision', appData.subdivisions);
+    populateSelect('jointWith', appData.jointWithOptions || appData.subdivisions);
     
     // Заповнення дронів (три окремі поля)
     populateSelect('droneName', appData.droneNames);
@@ -249,6 +259,7 @@ reportForm.addEventListener('submit', function(e) {
     // Збір даних з форми
     const formData = {
         subdivision: document.getElementById('subdivision').value,
+        jointWith: document.getElementById('jointWith').value === 'Інший' ? document.getElementById('customJointWith').value : document.getElementById('jointWith').value,
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
         droneSize: document.getElementById('droneSize').value === 'Інший' ? document.getElementById('customDroneSize').value : document.getElementById('droneSize').value,
         cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
@@ -365,6 +376,13 @@ function generateReport(data) {
             <span class="report-label">Підрозділ:</span>
             <span class="report-value">${data.subdivision}</span>
         </div>
+        
+        ${data.jointWith && data.jointWith !== '' && data.jointWith !== '—' ? `
+        <div class="report-item">
+            <span class="report-label">Сумісно з:</span>
+            <span class="report-value">${data.jointWith}</span>
+        </div>
+        ` : ''}
         
         <div class="report-item">
             <span class="report-label">Дрон:</span>
@@ -905,6 +923,21 @@ function toggleCustomReason() {
     if (select.value === 'Інша') {
         customInput.style.display = 'block';
         customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення сумісно з
+function toggleCustomJointWith() {
+    const select = document.getElementById('jointWith');
+    const customInput = document.getElementById('customJointWith');
+    
+    if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = false; // Поле не обов'язкове
     } else {
         customInput.style.display = 'none';
         customInput.required = false;

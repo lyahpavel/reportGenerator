@@ -22,6 +22,15 @@
                 </select>
             </div>
 
+            <div class="form-group">
+                <label for="jointWith">Сумісно з:</label>
+                <select id="jointWith" name="jointWith" onchange="toggleCustomJointWith()">
+                    <option value="">—</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+                <input type="text" id="customJointWith" name="customJointWith" placeholder="Введіть підрозділ..." style="display: none;">
+            </div>
+
             <!-- Дрон: назва, розмір і тип камери в одному рядку -->
             <div class="form-row">
                 <div class="form-group">
