@@ -189,6 +189,12 @@ function populateSelects() {
     populateSelect('reason', appData.reasonOptions);
     populateSelect('losses', appData.lossOptions);
     populateSelect('operator', appData.operatorOptions);
+    
+    // Встановлення підрозділу за замовчуванням
+    const subdivisionSelect = document.getElementById('subdivision');
+    if (subdivisionSelect && subdivisionSelect.value === '') {
+        subdivisionSelect.value = 'ВБпАК 1б ТрО 101 обр ТрО';
+    }
 }
 
 // Універсальна функція заповнення селекту
@@ -955,5 +961,8 @@ reportForm.addEventListener('reset', function() {
         
         document.getElementById('date').value = today;
         document.getElementById('time').value = currentTime;
+        
+        // Встановлення підрозділу за замовчуванням після скидання
+        document.getElementById('subdivision').value = 'ВБпАК 1б ТрО 101 обр ТрО';
     }, 10);
 });
