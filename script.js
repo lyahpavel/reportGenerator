@@ -195,6 +195,16 @@ function populateSelects() {
     if (subdivisionSelect && subdivisionSelect.value === '') {
         subdivisionSelect.value = 'ВБпАК 1б ТрО 101 обр ТрО';
     }
+    
+        // Додаємо фільтрацію для БК
+        const bkFilterInput = document.getElementById('bkFilter');
+        if (bkFilterInput) {
+            bkFilterInput.addEventListener('input', function() {
+                const filterValue = bkFilterInput.value.toLowerCase();
+                const filteredOptions = appData.bkOptions.filter(opt => opt.label.toLowerCase().includes(filterValue));
+                populateSelect('bk', filteredOptions);
+            });
+        }
 }
 
 // Універсальна функція заповнення селекту

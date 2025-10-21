@@ -101,12 +101,13 @@
 
             <!-- Додаткові поля -->
             <div class="form-group">
-                <label for="bk">БК:</label>
-                <select id="bk" name="bk" onchange="toggleCustomBk()">
-                    <option value="">Оберіть БК...</option>
-                    <!-- Опції заповнюються динамічно з data.json -->
-                </select>
-                <input type="text" id="customBk" name="customBk" placeholder="Введіть БК..." style="display: none;">
+                    <label for="bk">БК:</label>
+                    <input type="text" id="bkFilter" placeholder="🔎 Фільтрувати БК..." style="margin-bottom:8px;">
+                    <select id="bk" name="bk" onchange="toggleCustomBk()">
+                        <option value="">Оберіть БК...</option>
+                        <!-- Опції заповнюються динамічно з data.json -->
+                    </select>
+                    <input type="text" id="customBk" name="customBk" placeholder="Введіть БК..." style="display: none;">
             </div>
 
             <!-- Ціль розділена на три поля в одному рядку -->
