@@ -101,15 +101,11 @@
 
             <!-- Додаткові поля -->
             <div class="form-group">
-                <label for="bkCustomDropdown">БК:</label>
-                <div class="custom-dropdown" id="bkCustomDropdown">
-                    <div class="dropdown-selected" id="bkDropdownSelected">Оберіть БК...</div>
-                    <div class="dropdown-list" id="bkDropdownList" style="display:none;">
-                        <input type="text" id="bkDropdownFilter" placeholder="🔎 Фільтрувати БК..." autocomplete="off" style="width:100%;box-sizing:border-box;padding:8px 12px;margin-bottom:6px;">
-                        <ul id="bkDropdownOptions" style="list-style:none;padding:0;margin:0;max-height:180px;overflow-y:auto;"></ul>
-                    </div>
-                </div>
-                <input type="hidden" id="bk" name="bk">
+                <label for="bk">БК:</label>
+                <select id="bk" name="bk" onchange="toggleCustomBk()">
+                    <option value="">Оберіть БК...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
                 <input type="text" id="customBk" name="customBk" placeholder="Введіть БК..." style="display: none;">
             </div>
 

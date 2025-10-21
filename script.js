@@ -182,8 +182,7 @@ function populateSelects() {
     // Поле 'Тип місії' видалено
     
     // Заповнення нових полів
-    // Кастомний дропдаун для БК
-    setupBkCustomDropdown();
+    populateSelect('bk', appData.bkOptions);
     populateSelect('targetType', appData.targetTypeOptions);
     populateSelect('settlement', appData.settlementOptions);
     populateSelect('status', appData.statusOptions);
@@ -198,114 +197,6 @@ function populateSelects() {
     }
     
 
-// Кастомний дропдаун для БК
-function setupBkCustomDropdown() {
-    const dropdown = document.getElementById('bkCustomDropdown');
-    const selected = document.getElementById('bkDropdownSelected');
-    const list = document.getElementById('bkDropdownList');
-    const filterInput = document.getElementById('bkDropdownFilter');
-    const optionsUl = document.getElementById('bkDropdownOptions');
-    const hiddenInput = document.getElementById('bk');
-    const customBkInput = document.getElementById('customBk');
-    if (!dropdown || !selected || !list || !filterInput || !optionsUl || !hiddenInput) return;
-
-    let options = (appData && appData.bkOptions) ? appData.bkOptions : [];
-    let isOpen = false;
-
-    function renderOptions(filter = '') {
-        optionsUl.innerHTML = '';
-        const filtered = options.filter(opt => opt.label.toLowerCase().includes(filter.toLowerCase()));
-        filtered.forEach(opt => {
-            const li = document.createElement('li');
-            li.textContent = opt.label;
-            li.dataset.value = opt.value;
-            if (hiddenInput.value === opt.value) li.classList.add('selected');
-            li.onclick = function(e) {
-                hiddenInput.value = opt.value;
-                selected.textContent = opt.label;
-                closeDropdown();
-                // Показати/сховати поле "Інший"
-                if (opt.value === 'Інший') {
-                    customBkInput.style.display = 'block';
-                    customBkInput.required = true;
-                } else {
-                    customBkInput.style.display = 'none';
-                    customBkInput.required = false;
-                    customBkInput.value = '';
-                }
-            };
-            optionsUl.appendChild(li);
-        });
-        if (filtered.length === 0) {
-            const li = document.createElement('li');
-            li.textContent = 'Нічого не знайдено';
-            li.style.color = '#888';
-            li.style.cursor = 'default';
-            optionsUl.appendChild(li);
-        }
-    }
-
-    function openDropdown() {
-        list.style.display = 'block';
-        isOpen = true;
-        filterInput.value = '';
-        renderOptions();
-        filterInput.focus();
-    }
-    function closeDropdown() {
-        list.style.display = 'none';
-        isOpen = false;
-    }
-
-    selected.onclick = function(e) {
-        if (isOpen) {
-            closeDropdown();
-        } else {
-            openDropdown();
-        }
-    };
-    filterInput.oninput = function(e) {
-        renderOptions(filterInput.value);
-    };
-    // Закриття при кліку поза дропдауном
-    document.addEventListener('mousedown', function(e) {
-        if (!dropdown.contains(e.target)) {
-            closeDropdown();
-        }
-    });
-    // Вибір першого варіанту Enter, навігація стрілками
-    filterInput.addEventListener('keydown', function(e) {
-        const items = Array.from(optionsUl.querySelectorAll('li'));
-        let idx = items.findIndex(li => li.classList.contains('active'));
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (idx < items.length - 1) idx++;
-            else idx = 0;
-            items.forEach(li => li.classList.remove('active'));
-            if (items[idx]) items[idx].classList.add('active');
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (idx > 0) idx--;
-            else idx = items.length - 1;
-            items.forEach(li => li.classList.remove('active'));
-            if (items[idx]) items[idx].classList.add('active');
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (idx >= 0 && items[idx] && !items[idx].style.color) {
-                items[idx].click();
-            } else if (items.length > 0 && !items[0].style.color) {
-                items[0].click();
-            }
-        }
-    });
-    // Ініціалізація
-    renderOptions();
-    // Якщо вже вибрано значення (наприклад, при reset)
-    if (hiddenInput.value) {
-        const found = options.find(opt => opt.value === hiddenInput.value);
-        if (found) selected.textContent = found.label;
-    }
-}
 }
 
 // Універсальна функція заповнення селекту
