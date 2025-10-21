@@ -58,12 +58,15 @@
     {"value": "Інший", "label": "Інший", "coordinates": null}
   ],
   "bkOptions": [
-    {"value": "БК-1", "label": "БК-1"},
-    {"value": "БК-2", "label": "БК-2"},
-    {"value": "БК-3", "label": "БК-3"},
-    {"value": "БК-4", "label": "БК-4"},
-    {"value": "БК-5", "label": "БК-5"},
-    {"value": "Немає", "label": "Немає"},
+    {"value": "РКГ-3ЕМ", "label": "РКГ-3ЕМ"},
+    {"value": "МОА-120", "label": "МОА-120"},
+    {"value": "МОА-400", "label": "МОА-400"},
+    {"value": "ОГ-Б1", "label": "ОГ-Б1"},
+    {"value": "УАБК-1,5-А", "label": "УАБК-1,5-А"},
+    {"value": "УБК-2,5-А", "label": "УБК-2,5-А"},
+    {"value": "БНПП-40М", "label": "БНПП-40М"},
+    {"value": "БПБПЛА-ОФ-500", "label": "БПБПЛА-ОФ-500"},
+    {"value": "HFB-0600-F", "label": "HFB-0600-F"},
     {"value": "Інший", "label": "Інший"}
   ],
   "statusOptions": [
