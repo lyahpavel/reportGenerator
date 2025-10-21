@@ -744,13 +744,13 @@ function toggleCustomSettlement() {
         customSettlementInput.required = false;
         customSettlementInput.value = '';
         
-        // Автоматично підставити координати та заблокувати поле
+        // Автоматично підставити координати (але дозволити редагування)
         const selectedOption = appData.settlementOptions.find(option => option.value === settlementSelect.value);
         if (selectedOption && selectedOption.coordinates) {
             coordinatesInput.value = selectedOption.coordinates;
-            coordinatesInput.readOnly = true;
-            coordinatesInput.style.backgroundColor = '#f8f9fa';
-            coordinatesInput.placeholder = 'Координати підставлені автоматично';
+            coordinatesInput.readOnly = false;
+            coordinatesInput.style.backgroundColor = '#fff';
+            coordinatesInput.placeholder = 'Координати підставлені автоматично (можна редагувати)';
         }
     }
 }
