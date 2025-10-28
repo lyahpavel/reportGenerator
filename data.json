@@ -71,8 +71,8 @@
   ],
   "initiationBoardOptions": [
     {"value": "Вуса", "label": "Вуса"},
-    {"value": "плата ін Шаман", "label": "лата ін Шаман"},
-    {"value": "лата ін FCAT", "label": "лата ін FCAT"},
+    {"value": "Плата ін. Шаман", "label": "Плата ін. Шаман"},
+    {"value": "Плата ін. FCAT", "label": "Плата ін. FCAT"},
     {"value": "Інший", "label": "Інший"}
   ],
   "statusOptions": [
