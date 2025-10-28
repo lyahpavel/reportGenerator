@@ -70,9 +70,9 @@
     {"value": "Інший", "label": "Інший"}
   ],
   "initiationBoardOptions": [
-    {"value": "КД-8А", "label": "КД-8А"},
-    {"value": "КД-8Б", "label": "КД-8Б"},
-    {"value": "МСА-Ф", "label": "МСА-Ф"},
+    {"value": "Вуса", "label": "Вуса"},
+    {"value": "плата ін Шаман", "label": "лата ін Шаман"},
+    {"value": "лата ін FCAT", "label": "лата ін FCAT"},
     {"value": "Інший", "label": "Інший"}
   ],
   "statusOptions": [
