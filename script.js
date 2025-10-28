@@ -374,8 +374,6 @@ function generateReport(data) {
     const formattedTime = formatTime(data.time);
     
     const reportHTML = `
-        <h3>ЗВІТ ПРО ВИКОРИСТАННЯ ДРОНУ №${reportNumber}</h3>
-        
         <div class="report-item">
             <span class="report-label">Підрозділ:</span>
             <span class="report-value">${data.subdivision}</span>
