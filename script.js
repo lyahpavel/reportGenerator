@@ -106,6 +106,12 @@ const fallbackData = {
         {"value": "Немає", "label": "Немає"},
         {"value": "Інший", "label": "Інший"}
     ],
+    "initiationBoardOptions": [
+        {"value": "КД-8А", "label": "КД-8А"},
+        {"value": "КД-8Б", "label": "КД-8Б"},
+        {"value": "МСА-Ф", "label": "МСА-Ф"},
+        {"value": "Інший", "label": "Інший"}
+    ],
     "statusOptions": [
         {"value": "Уражено", "label": "Уражено"},
         {"value": "Пошкоджено", "label": "Пошкоджено"},
@@ -183,6 +189,7 @@ function populateSelects() {
     
     // Заповнення нових полів
     populateSelect('bk', appData.bkOptions);
+    populateSelect('initiationBoard', appData.initiationBoardOptions);
     populateSelect('targetType', appData.targetTypeOptions);
     populateSelect('settlement', appData.settlementOptions);
     populateSelect('status', appData.statusOptions);
@@ -277,6 +284,7 @@ reportForm.addEventListener('submit', function(e) {
         fiberOptic: document.getElementById('fiberOptic').checked,
         fiberLength: document.getElementById('fiberLength').value,
         bk: bkValue === 'Інший' ? document.getElementById('customBk').value : bkValue,
+        initiationBoard: document.getElementById('initiationBoard').value === 'Інший' ? document.getElementById('customInitiationBoard').value : document.getElementById('initiationBoard').value,
         targetType: document.getElementById('targetType').value === 'Інше' ? document.getElementById('customTargetType').value : document.getElementById('targetType').value,
         settlement: document.getElementById('settlement').value === 'Інший' ? document.getElementById('customSettlement').value : document.getElementById('settlement').value,
         coordinates: document.getElementById('coordinates').value,
@@ -412,6 +420,13 @@ function generateReport(data) {
         <div class="report-item">
             <span class="report-label">БК:</span>
             <span class="report-value">${data.bk}</span>
+        </div>
+        ` : ''}
+        
+        ${data.initiationBoard ? `
+        <div class="report-item">
+            <span class="report-label">Плата Ініціації:</span>
+            <span class="report-value">${data.initiationBoard}</span>
         </div>
         ` : ''}
         
@@ -903,6 +918,21 @@ function toggleCustomControlFrequency() {
 function toggleCustomBk() {
     const select = document.getElementById('bk');
     const customInput = document.getElementById('customBk');
+    
+    if (select.value === 'Інший') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
+// Функція для показу/приховування поля ручного введення Плати Ініціації
+function toggleCustomInitiationBoard() {
+    const select = document.getElementById('initiationBoard');
+    const customInput = document.getElementById('customInitiationBoard');
     
     if (select.value === 'Інший') {
         customInput.style.display = 'block';

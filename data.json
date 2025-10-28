@@ -69,6 +69,12 @@
     {"value": "HFB-0600-F + КД-8А", "label": "HFB-0600-F + КД-8А"},
     {"value": "Інший", "label": "Інший"}
   ],
+  "initiationBoardOptions": [
+    {"value": "КД-8А", "label": "КД-8А"},
+    {"value": "КД-8Б", "label": "КД-8Б"},
+    {"value": "МСА-Ф", "label": "МСА-Ф"},
+    {"value": "Інший", "label": "Інший"}
+  ],
   "statusOptions": [
     {"value": "Уражено", "label": "Уражено"},
     {"value": "Пошкоджено", "label": "Пошкоджено"},

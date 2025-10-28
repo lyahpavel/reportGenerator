@@ -113,6 +113,15 @@
                 <input type="text" id="customBk" name="customBk" placeholder="Введіть БК..." style="display: none;">
             </div>
 
+            <div class="form-group">
+                <label for="initiationBoard">Плата Ініціації:</label>
+                <select id="initiationBoard" name="initiationBoard" onchange="toggleCustomInitiationBoard()">
+                    <option value="">Оберіть плату...</option>
+                    <!-- Опції заповнюються динамічно з data.json -->
+                </select>
+                <input type="text" id="customInitiationBoard" name="customInitiationBoard" placeholder="Введіть плату..." style="display: none;">
+            </div>
+
             <!-- Ціль розділена на три поля в одному рядку -->
             <div class="form-row">
                 <div class="form-group">
