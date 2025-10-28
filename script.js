@@ -377,11 +377,6 @@ function generateReport(data) {
         <h3>ЗВІТ ПРО ВИКОРИСТАННЯ ДРОНУ №${reportNumber}</h3>
         
         <div class="report-item">
-            <span class="report-label">Номер звіту:</span>
-            <span class="report-value">${reportNumber}</span>
-        </div>
-        
-        <div class="report-item">
             <span class="report-label">Підрозділ:</span>
             <span class="report-value">${data.subdivision}</span>
         </div>
@@ -474,11 +469,6 @@ function generateReport(data) {
             <span class="report-value">${data.mission}</span>
         </div>
         ` : ''}
-        
-        <div class="report-item">
-            <span class="report-label">Час створення:</span>
-            <span class="report-value">${new Date().toLocaleString('uk-UA')}</span>
-        </div>
     `;
     
     reportContent.innerHTML = reportHTML;
@@ -650,7 +640,10 @@ function getReportAsText() {
 // Завантаження звіту як файл
 downloadButton.addEventListener('click', function() {
     const reportText = getReportAsText();
-    const reportNumber = reportContent.querySelector('.report-value').textContent;
+    
+    // Генеруємо ім'я файлу на основі поточної дати
+    const now = new Date();
+    const fileName = `Звіт_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}.txt`;
     
     const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
     const link = document.createElement('a');
@@ -658,7 +651,7 @@ downloadButton.addEventListener('click', function() {
     if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `Звіт_${reportNumber}.txt`);
+        link.setAttribute('download', fileName);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
