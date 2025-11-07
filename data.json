@@ -94,7 +94,7 @@
 
   "lossOptions": [
     {"value": "Невідомо", "label": "Невідомо"},
-    {"value": "Інша", "label": "Інша"}
+    {"value": "Інше", "label": "Інше"}
   ],
 
   "operatorOptions": [

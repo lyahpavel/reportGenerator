@@ -637,9 +637,14 @@ function fallbackCopyTextToClipboard(text) {
 // Отримання тексту звіту
 function getReportAsText() {
     const reportItems = reportContent.querySelectorAll('.report-item');
-    const reportTitle = reportContent.querySelector('h3').textContent;
+    const reportTitle = reportContent.querySelector('h3');
     
-    let text = reportTitle + '\n' + '='.repeat(reportTitle.length) + '\n\n';
+    let text = '';
+    
+    // Додаємо заголовок, якщо він є
+    if (reportTitle) {
+        text = reportTitle.textContent + '\n' + '='.repeat(reportTitle.textContent.length) + '\n\n';
+    }
     
     reportItems.forEach(item => {
         const label = item.querySelector('.report-label').textContent;
