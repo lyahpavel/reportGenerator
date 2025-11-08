@@ -1443,10 +1443,6 @@ async function handleDeleteSelectedOption(selectId) {
 
 // Функція видалення користувацької опції
 async function deleteCustomOption(selectId, optionValue) {
-    if (!confirm(`Видалити опцію "${optionValue}"?`)) {
-        return;
-    }
-    
     const optionTypeMap = {
         'subdivision': 'subdivisions',
         'jointWith': 'jointWithOptions',
