@@ -15,10 +15,68 @@
     <script src="supabase-config.js"></script>
 </head>
 <body>
-    <div class="container">
+    <!-- Форма логіна/реєстрації -->
+    <div id="authSection" class="auth-section">
+        <div class="auth-container">
+            <h1>🚁 Генератор звітів про дрони</h1>
+            
+            <!-- Форма логіна -->
+            <div id="loginForm" class="auth-form">
+                <h2>Вхід</h2>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email:</label>
+                        <input type="email" id="loginEmail" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Пароль:</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Увійти</button>
+                    <p class="auth-switch">Немає акаунту? <a href="#" id="showRegister">Зареєструватися</a></p>
+                </form>
+            </div>
+
+            <!-- Форма реєстрації -->
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <h2>Реєстрація</h2>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerName">Ім'я:</label>
+                        <input type="text" id="registerName" required placeholder="Ваше ім'я">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Пароль:</label>
+                        <input type="password" id="registerPassword" required placeholder="Мінімум 6 символів">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm">Підтвердіть пароль:</label>
+                        <input type="password" id="registerPasswordConfirm" required placeholder="Повторіть пароль">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зареєструватися</button>
+                    <p class="auth-switch">Вже є акаунт? <a href="#" id="showLogin">Увійти</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Головний додаток (показується після логіна) -->
+    <div id="appSection" class="container" style="display: none;">
         <header>
-            <h1>Генератор звітів про дрони</h1>
-            <p>Заповніть форму для створення звіту</p>
+            <div class="header-content">
+                <div>
+                    <h1>Генератор звітів про дрони</h1>
+                    <p>Заповніть форму для створення звіту</p>
+                </div>
+                <div class="user-info">
+                    <span id="userEmailDisplay"></span>
+                    <button id="logoutBtn" class="btn btn-outline btn-small">Вийти</button>
+                </div>
+            </div>
         </header>
 
         <form id="reportForm" class="report-form">
@@ -260,6 +318,7 @@
     </div>
 
     <script src="supabase-functions.js"></script>
+    <script src="auth.js"></script>
     <script src="script.js"></script>
     <script src="reports-history.js"></script>
     <script>
@@ -341,5 +400,6 @@
             });
         }
     </script>
+    </div> <!-- End of appSection -->
 </body>
 </html>

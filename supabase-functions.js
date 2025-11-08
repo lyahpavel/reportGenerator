@@ -94,8 +94,12 @@ async function saveReportToSupabase(reportData) {
             throw new Error('Supabase client не ініціалізовано');
         }
 
+        // Отримати поточного користувача
+        const { data: { user } } = await supabase.auth.getUser();
+        
         // Підготовка даних для збереження
         const reportToSave = {
+            user_id: user ? user.id : null,
             report_number: reportData.reportNumber,
             subdivision: reportData.subdivision,
             joint_with: reportData.jointWith,
