@@ -873,30 +873,32 @@ textarea {
 
 /* Стилі для кнопки збереження кастомних опцій */
 .custom-input-wrapper {
-    display: none;
-    align-items: center;
+    display: flex;
+    align-items: stretch;
     gap: 8px;
-    margin-top: 8px;
+    width: 100%;
 }
 
 .custom-input-wrapper input {
     flex: 1;
+    margin: 0;
 }
 
 .save-option-btn {
     background: #e2e8f0;
     border: 2px solid #cbd5e0;
     border-radius: 8px;
-    padding: 10px 14px;
+    padding: 0;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    height: 44px;
+    min-width: 48px;
+    width: 48px;
+    flex-shrink: 0;
 }
 
 .save-option-btn:hover {
