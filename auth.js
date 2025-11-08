@@ -194,6 +194,17 @@ async function handleUserLogin() {
 
     // Завантажити кастомні опції користувача
     await loadUserCustomOptions();
+    
+    // Приховати поля "Інше" якщо розширений режим вимкнений
+    const advancedModeSwitch = document.getElementById('advancedModeSwitch');
+    if (advancedModeSwitch && !advancedModeSwitch.checked) {
+        // Викликаємо функцію з script.js через setTimeout щоб дати час DOM оновитися
+        setTimeout(() => {
+            if (typeof window.showCustomInputs === 'function') {
+                window.showCustomInputs(false);
+            }
+        }, 100);
+    }
 }
 
 // Обробка виходу користувача

@@ -1369,6 +1369,9 @@ function showCustomInputs(show) {
     });
 }
 
+// Експортувати для використання з auth.js
+window.showCustomInputs = showCustomInputs;
+
 // Оновлення тексту користувацьких опцій (тільки іконка користувача)
 function updateUserOptionsText(showDelete) {
     const allSelects = document.querySelectorAll('select');
