@@ -796,12 +796,13 @@ function reloadData() {
 // Функція для показу/приховування поля ручного введення населеного пункту та керування координатами
 function toggleCustomSettlement() {
     const settlementSelect = document.getElementById('settlement');
+    const wrapper = document.getElementById('customSettlement').parentElement;
     const customSettlementInput = document.getElementById('customSettlement');
     const coordinatesInput = document.getElementById('coordinates');
     
     if (settlementSelect.value === 'Інший') {
         // Показати поле для введення назви
-        customSettlementInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customSettlementInput.required = true;
         
         // Дозволити ручне введення координат
@@ -811,9 +812,10 @@ function toggleCustomSettlement() {
         coordinatesInput.style.backgroundColor = '#fff';
     } else if (settlementSelect.value === '') {
         // Якщо нічого не вибрано
-        customSettlementInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customSettlementInput.required = false;
         customSettlementInput.value = '';
+        customSettlementInput.setAttribute('data-save-option', 'false');
         
         coordinatesInput.readOnly = false;
         coordinatesInput.value = '';
@@ -821,9 +823,10 @@ function toggleCustomSettlement() {
         coordinatesInput.style.backgroundColor = '#fff';
     } else {
         // Вибрано конкретне місто
-        customSettlementInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customSettlementInput.required = false;
         customSettlementInput.value = '';
+        customSettlementInput.setAttribute('data-save-option', 'false');
         
         // Автоматично підставити координати (але дозволити редагування)
         const selectedOption = appData.settlementOptions.find(option => option.value === settlementSelect.value);
@@ -839,60 +842,68 @@ function toggleCustomSettlement() {
 // Функція для показу/приховування поля ручного введення назви дрону
 function toggleCustomDroneName() {
     const select = document.getElementById('droneName');
+    const wrapper = document.getElementById('customDroneName').parentElement;
     const customInput = document.getElementById('customDroneName');
     
     if (select.value === 'Інший') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення розміру дрону
 function toggleCustomDroneSize() {
     const select = document.getElementById('droneSize');
+    const wrapper = document.getElementById('customDroneSize').parentElement;
     const customInput = document.getElementById('customDroneSize');
     
     if (select.value === 'Інший') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення типу цілі
 function toggleCustomTargetType() {
     const select = document.getElementById('targetType');
+    const wrapper = document.getElementById('customTargetType').parentElement;
     const customInput = document.getElementById('customTargetType');
     
     if (select.value === 'Інше') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення втрат
 function toggleCustomLosses() {
     const select = document.getElementById('losses');
+    const wrapper = document.getElementById('customLosses').parentElement;
     const customInput = document.getElementById('customLosses');
     
     if (select.value === 'Інше') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
@@ -1047,6 +1058,27 @@ function toggleCustomJointWith() {
         customInput.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+    }
+}
+
+// Функція для перемикання збереження кастомної опції
+function toggleSaveOption(inputId) {
+    const input = document.getElementById(inputId);
+    const button = input.nextElementSibling;
+    const icon = button.querySelector('.save-icon');
+    
+    const currentValue = input.getAttribute('data-save-option');
+    const newValue = currentValue === 'true' ? 'false' : 'true';
+    
+    input.setAttribute('data-save-option', newValue);
+    
+    // Змінити вигляд кнопки
+    if (newValue === 'true') {
+        button.classList.add('active');
+        icon.textContent = '✅';
+    } else {
+        button.classList.remove('active');
+        icon.textContent = '💾';
     }
 }
 

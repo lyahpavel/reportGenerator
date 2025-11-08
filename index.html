@@ -106,7 +106,12 @@
                         <option value="">Оберіть назву дрону...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
-                    <input type="text" id="customDroneName" name="customDroneName" placeholder="Введіть назву дрону..." style="display: none;">
+                    <div class="custom-input-wrapper" style="display: none;">
+                        <input type="text" id="customDroneName" name="customDroneName" placeholder="Введіть назву дрону..." data-save-option="false">
+                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customDroneName')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -115,7 +120,12 @@
                         <option value="">Оберіть розмір дрону...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
-                    <input type="text" id="customDroneSize" name="customDroneSize" placeholder="Введіть розмір дрону..." style="display: none;">
+                    <div class="custom-input-wrapper" style="display: none;">
+                        <input type="text" id="customDroneSize" name="customDroneSize" placeholder="Введіть розмір дрону..." data-save-option="false">
+                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customDroneSize')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -192,7 +202,12 @@
                         <option value="">Оберіть тип цілі...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
-                    <input type="text" id="customTargetType" name="customTargetType" placeholder="Введіть тип цілі..." style="display: none;">
+                    <div class="custom-input-wrapper" style="display: none;">
+                        <input type="text" id="customTargetType" name="customTargetType" placeholder="Введіть тип цілі..." data-save-option="false">
+                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customTargetType')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -201,7 +216,12 @@
                         <option value="">Оберіть населений пункт...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
-                    <input type="text" id="customSettlement" name="customSettlement" placeholder="Введіть назву населеного пункту..." style="display: none;">
+                    <div class="custom-input-wrapper" style="display: none;">
+                        <input type="text" id="customSettlement" name="customSettlement" placeholder="Введіть назву населеного пункту..." data-save-option="false">
+                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customSettlement')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -234,7 +254,12 @@
                     <option value="">Оберіть втрати...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                <input type="text" id="customLosses" name="customLosses" placeholder="Введіть тип втрат..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customLosses" name="customLosses" placeholder="Введіть тип втрат..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customLosses')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <div class="form-group">

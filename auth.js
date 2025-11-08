@@ -406,12 +406,16 @@ async function saveCustomOptionsFromForm(formData) {
             }
             
             const customValue = customInputElement.value.trim();
+            const shouldSave = customInputElement.getAttribute('data-save-option') === 'true';
             console.log(`  ✏️ Значення custom input: "${customValue}"`);
+            console.log(`  💾 Чи потрібно зберігати? ${shouldSave}`);
             
-            if (customValue) {
+            if (customValue && shouldSave) {
                 console.log(`  💾 Зберігаю кастомну опцію: ${custom.type} = "${customValue}"`);
                 const result = await saveUserCustomOption(custom.type, customValue, customValue);
                 console.log(`  ${result ? '✅' : '❌'} Результат збереження: ${result}`);
+            } else if (customValue && !shouldSave) {
+                console.log(`  ℹ️ Опція не буде збережена (користувач не натиснув кнопку)`);
             } else {
                 console.log(`  ⚠️ Custom input порожній`);
             }

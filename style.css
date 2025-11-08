@@ -870,3 +870,64 @@ textarea {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Стилі для кнопки збереження кастомних опцій */
+.custom-input-wrapper {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.custom-input-wrapper input {
+    flex: 1;
+}
+
+.save-option-btn {
+    background: #e2e8f0;
+    border: 2px solid #cbd5e0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+}
+
+.save-option-btn:hover {
+    background: #cbd5e0;
+    border-color: #a0aec0;
+    transform: scale(1.05);
+}
+
+.save-option-btn.active {
+    background: #48bb78;
+    border-color: #38a169;
+    color: white;
+}
+
+.save-option-btn.active:hover {
+    background: #38a169;
+    border-color: #2f855a;
+}
+
+.save-option-btn .save-icon {
+    display: block;
+}
+
+/* Адаптивність для маленьких екранів */
+@media (max-width: 480px) {
+    .custom-input-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .save-option-btn {
+        width: 100%;
+    }
+}
