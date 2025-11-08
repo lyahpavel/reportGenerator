@@ -1,6 +1,3 @@
-# Supabase configuration (містить API ключі)
-supabase-config.js
-
 # Backup конфігурації
 supabase-config.js.backup
 
