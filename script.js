@@ -910,15 +910,17 @@ function toggleCustomLosses() {
 // Функція для показу/приховування поля ручного введення оператора
 function toggleCustomOperator() {
     const select = document.getElementById('operator');
+    const wrapper = document.getElementById('customOperator').parentElement;
     const customInput = document.getElementById('customOperator');
     
     if (select.value === 'Інший') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 

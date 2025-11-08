@@ -303,7 +303,12 @@
                     <option value="">Оберіть оператора...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                <input type="text" id="customOperator" name="customOperator" placeholder="Введіть ім'я оператора..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customOperator" name="customOperator" placeholder="Введіть ім'я оператора..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customOperator')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Чекбокс стрім -->
