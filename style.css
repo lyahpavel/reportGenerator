@@ -103,6 +103,101 @@
     font-size: 0.9rem;
 }
 
+/* Перемикач розширеного режиму */
+.advanced-mode-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+}
+
+.switch-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.switch-label input[type="checkbox"] {
+    display: none;
+}
+
+.switch-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: #e2e8f0;
+    border-radius: 24px;
+    transition: background 0.3s ease;
+}
+
+.switch-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.switch-label input[type="checkbox"]:checked + .switch-slider {
+    background: #4facfe;
+}
+
+.switch-label input[type="checkbox"]:checked + .switch-slider::before {
+    transform: translateX(20px);
+}
+
+.switch-text {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* Обгортка для селекта з кнопкою видалення */
+.select-with-delete {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.select-with-delete select {
+    flex: 1;
+}
+
+.delete-selected-option-btn {
+    display: none;
+    padding: 8px 12px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.delete-selected-option-btn:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+
+.delete-selected-option-btn:active {
+    transform: scale(0.95);
+}
+
+/* Показувати кнопку тільки в розширеному режимі та коли вибрана користувацька опція */
+.advanced-mode .delete-selected-option-btn[data-show="true"] {
+    display: block;
+}
+
 /* Кастомний дропдаун для БК */
 .custom-dropdown {
     position: relative;
@@ -433,6 +528,7 @@ textarea {
     
     header {
         padding: 20px;
+        position: relative;
     }
     
     header h1 {
@@ -441,6 +537,24 @@ textarea {
     
     .report-form {
         padding: 20px;
+    }
+    
+    .advanced-mode-toggle {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .switch-text {
+        font-size: 0.8rem;
+    }
+    
+    .select-with-delete {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .delete-selected-option-btn {
+        width: 100%;
     }
     
     .form-actions,

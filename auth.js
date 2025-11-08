@@ -245,6 +245,13 @@ async function loadUserCustomOptions() {
 
         // Додати кастомні опції до селектів
         addUserCustomOptionsToSelects();
+        
+        // Оновити кнопки видалення після додавання опцій
+        if (window.scriptFunctions && window.scriptFunctions.updateDeleteButtons) {
+            setTimeout(() => {
+                window.scriptFunctions.updateDeleteButtons();
+            }, 100);
+        }
 
     } catch (error) {
         console.error('❌ Помилка завантаження кастомних опцій:', error);
@@ -291,6 +298,8 @@ function addUserCustomOptionsToSelects() {
                     const option = document.createElement('option');
                     option.value = customOpt.value;
                     option.textContent = customOpt.label + ' 👤';
+                    option.setAttribute('data-user-option', 'true');
+                    option.setAttribute('data-select-id', selectId);
                     
                     // Зберігаємо координати в data-атрибут для населених пунктів
                     if (customOpt.coordinates) {
@@ -457,11 +466,55 @@ async function saveCustomOptionsFromForm(formData) {
     console.log('✅ Перевірка кастомних опцій завершена');
 }
 
+// Функція видалення користувацької опції
+async function deleteUserCustomOption(optionType, value) {
+    const supabase = window.supabaseClient;
+    
+    if (!supabase) {
+        console.warn('⚠️ Supabase client не ініціалізовано');
+        return false;
+    }
+    
+    if (!currentUser) {
+        console.warn('⚠️ Користувач не авторизований');
+        return false;
+    }
+
+    console.log(`🗑️ Видалення опції: ${optionType} = "${value}"`);
+
+    try {
+        const { error } = await supabase
+            .from('user_custom_options')
+            .delete()
+            .eq('user_id', currentUser.id)
+            .eq('option_type', optionType)
+            .eq('value', value);
+
+        if (error) {
+            console.error('❌ Помилка видалення:', error);
+            return false;
+        }
+
+        console.log('✅ Опцію видалено з БД');
+
+        // Видалити з локального кешу
+        if (userCustomOptions[optionType]) {
+            userCustomOptions[optionType] = userCustomOptions[optionType].filter(opt => opt.value !== value);
+        }
+
+        return true;
+    } catch (error) {
+        console.error('❌ Помилка:', error);
+        return false;
+    }
+}
+
 // Експорт функцій
 window.authFunctions = {
     initAuth,
     getCurrentUser: () => currentUser,
     saveUserCustomOption,
+    deleteUserCustomOption,
     loadUserCustomOptions,
     saveCustomOptionsFromForm
 };

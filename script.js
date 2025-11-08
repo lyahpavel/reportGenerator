@@ -1274,6 +1274,8 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     const option = document.createElement('option');
     option.value = value;
     option.textContent = value + ' 👤';
+    option.setAttribute('data-user-option', 'true');
+    option.setAttribute('data-select-id', selectId);
     
     if (coordinates) {
         option.setAttribute('data-coordinates', coordinates);
@@ -1287,6 +1289,9 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     
     // Вибрати нову опцію
     select.value = value;
+    
+    // Оновити кнопку видалення
+    updateDeleteButton(selectId);
 }
 
 // Обробка скидання форми
@@ -1304,3 +1309,160 @@ reportForm.addEventListener('reset', function() {
         document.getElementById('subdivision').value = 'ВБпАК 1б ТрО 101 обр ТрО';
     }, 10);
 });
+
+// Розширений режим - показ кнопок видалення
+document.addEventListener('DOMContentLoaded', function() {
+    const advancedModeSwitch = document.getElementById('advancedModeSwitch');
+    const appSection = document.getElementById('appSection');
+    
+    if (advancedModeSwitch && appSection) {
+        advancedModeSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                appSection.classList.add('advanced-mode');
+            } else {
+                appSection.classList.remove('advanced-mode');
+            }
+            // Оновити стан кнопок видалення
+            updateDeleteButtons();
+        });
+    }
+    
+    // Додати обробники для всіх селектів
+    setupDeleteButtons();
+});
+
+// Налаштування кнопок видалення для всіх селектів
+function setupDeleteButtons() {
+    const selectIds = [
+        'subdivision', 'jointWith', 'droneName', 'droneSize', 'cameraType',
+        'videoFrequency', 'controlFrequency', 'bk', 'initiationBoard',
+        'targetType', 'settlement', 'status', 'reason', 'losses', 'operator'
+    ];
+    
+    selectIds.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        // Перевірити чи вже обгорнутий
+        if (select.parentElement.classList.contains('select-with-delete')) {
+            return;
+        }
+        
+        // Обгортка для селекта
+        const wrapper = document.createElement('div');
+        wrapper.className = 'select-with-delete';
+        select.parentNode.insertBefore(wrapper, select);
+        wrapper.appendChild(select);
+        
+        // Кнопка видалення
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'delete-selected-option-btn';
+        deleteBtn.textContent = '🗑️ Видалити';
+        deleteBtn.setAttribute('data-show', 'false');
+        deleteBtn.onclick = () => handleDeleteSelectedOption(selectId);
+        wrapper.appendChild(deleteBtn);
+        
+        // Відстежування зміни вибору
+        select.addEventListener('change', () => updateDeleteButton(selectId));
+    });
+}
+
+// Оновлення стану кнопки видалення для конкретного селекта
+function updateDeleteButton(selectId) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    const deleteBtn = select.parentElement.querySelector('.delete-selected-option-btn');
+    if (!deleteBtn) return;
+    
+    const selectedOption = select.options[select.selectedIndex];
+    const isUserOption = selectedOption && selectedOption.getAttribute('data-user-option') === 'true';
+    
+    deleteBtn.setAttribute('data-show', isUserOption ? 'true' : 'false');
+}
+
+// Оновлення всіх кнопок видалення
+function updateDeleteButtons() {
+    const selectIds = [
+        'subdivision', 'jointWith', 'droneName', 'droneSize', 'cameraType',
+        'videoFrequency', 'controlFrequency', 'bk', 'initiationBoard',
+        'targetType', 'settlement', 'status', 'reason', 'losses', 'operator'
+    ];
+    
+    selectIds.forEach(updateDeleteButton);
+}
+
+// Обробка видалення вибраної опції
+async function handleDeleteSelectedOption(selectId) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    const selectedOption = select.options[select.selectedIndex];
+    if (!selectedOption || selectedOption.getAttribute('data-user-option') !== 'true') {
+        return;
+    }
+    
+    const optionValue = selectedOption.value;
+    await deleteCustomOption(selectId, optionValue);
+    
+    // Скинути вибір на перший елемент
+    select.selectedIndex = 0;
+    updateDeleteButton(selectId);
+}
+
+// Функція видалення користувацької опції
+async function deleteCustomOption(selectId, optionValue) {
+    if (!confirm(`Видалити опцію "${optionValue}"?`)) {
+        return;
+    }
+    
+    const optionTypeMap = {
+        'subdivision': 'subdivisions',
+        'jointWith': 'jointWithOptions',
+        'droneName': 'droneNames',
+        'droneSize': 'droneSizes',
+        'cameraType': 'cameraTypes',
+        'videoFrequency': 'videoFrequencies',
+        'controlFrequency': 'controlFrequencies',
+        'bk': 'bkOptions',
+        'initiationBoard': 'initiationBoardOptions',
+        'targetType': 'targetTypeOptions',
+        'settlement': 'settlementOptions',
+        'status': 'statusOptions',
+        'reason': 'reasonOptions',
+        'losses': 'lossOptions',
+        'operator': 'operatorOptions'
+    };
+    
+    const optionType = optionTypeMap[selectId];
+    if (!optionType) {
+        console.error('❌ Невідомий тип опції:', selectId);
+        return;
+    }
+    
+    if (window.authFunctions && window.authFunctions.deleteUserCustomOption) {
+        const success = await window.authFunctions.deleteUserCustomOption(optionType, optionValue);
+        
+        if (success) {
+            // Видалити опцію з селекта
+            const select = document.getElementById(selectId);
+            if (select) {
+                const option = Array.from(select.options).find(opt => opt.value === optionValue);
+                if (option) {
+                    option.remove();
+                }
+            }
+            
+            console.log(`✅ Видалено опцію: ${optionValue}`);
+        } else {
+            alert('❌ Помилка видалення опції');
+        }
+    }
+}
+
+// Експорт функцій для використання в auth.js
+window.scriptFunctions = {
+    setupDeleteButtons,
+    updateDeleteButtons
+};
