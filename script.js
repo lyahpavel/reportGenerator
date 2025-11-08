@@ -1376,20 +1376,35 @@ function setupDeleteButtons() {
         select.parentNode.insertBefore(wrapper, select);
         wrapper.appendChild(select);
         
-        // Додати обробник зміни для показу діалогу видалення
-        select.addEventListener('change', (e) => {
+        // Змінна для відслідковування подвійного кліку
+        let clickTimer = null;
+        let clickCount = 0;
+        
+        // Додати обробник подвійного кліку на опціях (для видалення)
+        select.addEventListener('click', (e) => {
             const advancedMode = document.getElementById('advancedModeSwitch');
             if (!advancedMode || !advancedMode.checked) return;
             
             const selectedOption = select.options[select.selectedIndex];
             if (!selectedOption || selectedOption.getAttribute('data-user-option') !== 'true') return;
             
-            // Показати діалог про видалення
-            const userText = selectedOption.textContent;
-            if (userText.includes('🗑️')) {
-                setTimeout(() => {
-                    handleDeleteSelectedOption(selectId);
-                }, 100);
+            clickCount++;
+            
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => {
+                    // Одиночний клік - просто вибір опції (нічого не робимо)
+                    clickCount = 0;
+                }, 300);
+            } else if (clickCount === 2) {
+                // Подвійний клік - видалення
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                const userText = selectedOption.textContent;
+                if (userText.includes('🗑️')) {
+                    setTimeout(() => {
+                        handleDeleteSelectedOption(selectId);
+                    }, 100);
+                }
             }
         });
         
