@@ -925,90 +925,102 @@ function toggleCustomOperator() {
 // Функція для показу/приховування поля ручного введення типу камери
 function toggleCustomCameraType() {
     const select = document.getElementById('cameraType');
+    const wrapper = document.getElementById('customCameraType').parentElement;
     const customInput = document.getElementById('customCameraType');
     
     if (select.value === 'Інша') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення частоти відео
 function toggleCustomVideoFrequency() {
     const select = document.getElementById('videoFrequency');
+    const wrapper = document.getElementById('customVideoFrequency').parentElement;
     const customInput = document.getElementById('customVideoFrequency');
     
     if (select.value === 'Інша') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення частоти керування
 function toggleCustomControlFrequency() {
     const select = document.getElementById('controlFrequency');
+    const wrapper = document.getElementById('customControlFrequency').parentElement;
     const customInput = document.getElementById('customControlFrequency');
     
     if (select.value === 'Інша') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення БК
 function toggleCustomBk() {
     const select = document.getElementById('bk');
+    const wrapper = document.getElementById('customBk').parentElement;
     const customInput = document.getElementById('customBk');
     
     if (select.value === 'Інший') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення Плати Ініціації
 function toggleCustomInitiationBoard() {
     const select = document.getElementById('initiationBoard');
+    const wrapper = document.getElementById('customInitiationBoard').parentElement;
     const customInput = document.getElementById('customInitiationBoard');
     
     if (select.value === 'Інший') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
 // Функція для показу/приховування поля ручного введення статусу
 function toggleCustomStatus() {
     const select = document.getElementById('status');
+    const wrapper = document.getElementById('customStatus').parentElement;
     const customInput = document.getElementById('customStatus');
     
     if (select.value === 'Інший') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 
@@ -1034,15 +1046,17 @@ function toggleReasonField() {
 // Функція для показу/приховування поля ручного введення причини
 function toggleCustomReason() {
     const select = document.getElementById('reason');
+    const wrapper = document.getElementById('customReason').parentElement;
     const customInput = document.getElementById('customReason');
     
     if (select.value === 'Інша') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = true;
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 

@@ -134,7 +134,12 @@
                         <option value="">Оберіть тип камери...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
-                    <input type="text" id="customCameraType" name="customCameraType" placeholder="Введіть тип камери..." style="display: none;">
+                    <div class="custom-input-wrapper" style="display: none;">
+                        <input type="text" id="customCameraType" name="customCameraType" placeholder="Введіть тип камери..." data-save-option="false">
+                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customCameraType')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -146,7 +151,12 @@
                         <option value="">Оберіть частоту відео...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
-                    <input type="text" id="customVideoFrequency" name="customVideoFrequency" placeholder="Введіть частоту відео..." style="display: none;">
+                    <div class="custom-input-wrapper" style="display: none;">
+                        <input type="text" id="customVideoFrequency" name="customVideoFrequency" placeholder="Введіть частоту відео..." data-save-option="false">
+                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customVideoFrequency')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -155,7 +165,12 @@
                         <option value="">Оберіть частоту керування...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
-                    <input type="text" id="customControlFrequency" name="customControlFrequency" placeholder="Введіть частоту керування..." style="display: none;">
+                    <div class="custom-input-wrapper" style="display: none;">
+                        <input type="text" id="customControlFrequency" name="customControlFrequency" placeholder="Введіть частоту керування..." data-save-option="false">
+                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customControlFrequency')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -182,7 +197,12 @@
                     <option value="">Оберіть БК...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                <input type="text" id="customBk" name="customBk" placeholder="Введіть БК..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customBk" name="customBk" placeholder="Введіть БК..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customBk')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -191,7 +211,12 @@
                     <option value="">Оберіть плату...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                <input type="text" id="customInitiationBoard" name="customInitiationBoard" placeholder="Введіть плату..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customInitiationBoard" name="customInitiationBoard" placeholder="Введіть плату..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customInitiationBoard')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Ціль розділена на три поля в одному рядку -->
@@ -236,7 +261,12 @@
                     <option value="">Оберіть статус...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                <input type="text" id="customStatus" name="customStatus" placeholder="Введіть статус..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customStatus" name="customStatus" placeholder="Введіть статус..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customStatus')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <div class="form-group" id="reasonGroup" style="display: none;">
@@ -245,7 +275,12 @@
                     <option value="">Оберіть причину...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                <input type="text" id="customReason" name="customReason" placeholder="Введіть причину..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customReason" name="customReason" placeholder="Введіть причину..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customReason')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <div class="form-group">
