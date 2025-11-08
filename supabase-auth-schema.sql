@@ -1,15 +1,21 @@
 -- SQL скрипт для додавання автентифікації та користувацьких опцій
 -- Виконайте після supabase-schema.sql
 
+-- Спочатку видаляємо старі тригери якщо є
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
 -- Таблиця для профілів користувачів (розширення auth.users)
 CREATE TABLE IF NOT EXISTS user_profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE,
+    username TEXT UNIQUE,
     email TEXT NOT NULL,
     full_name TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Створюємо індекс для username
+CREATE INDEX IF NOT EXISTS idx_user_profiles_username ON user_profiles(username);
 
 -- Таблиця для користувацьких опцій (коли вибирають "Інший")
 CREATE TABLE IF NOT EXISTS user_custom_options (
@@ -46,20 +52,36 @@ FOR EACH ROW EXECUTE FUNCTION update_user_profiles_updated_at();
 -- Функція для автоматичного створення профілю при реєстрації
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+    user_username TEXT;
 BEGIN
-    INSERT INTO user_profiles (id, username, email, full_name)
+    -- Витягуємо username з metadata або з email
+    user_username := COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1));
+    
+    -- Створюємо профіль з обробкою помилок
+    INSERT INTO public.user_profiles (id, username, email, full_name)
     VALUES (
         NEW.id,
-        COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1)),
+        user_username,
         NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1))
-    );
+        COALESCE(NEW.raw_user_meta_data->>'full_name', user_username)
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        username = EXCLUDED.username,
+        email = EXCLUDED.email,
+        full_name = EXCLUDED.full_name,
+        updated_at = NOW();
+    
     RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Логуємо помилку але не блокуємо створення користувача
+        RAISE WARNING 'Error creating user profile: %', SQLERRM;
+        RETURN NEW;
 END;
 $$ language 'plpgsql' SECURITY DEFINER;
 
 -- Тригер на створення нового користувача
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION handle_new_user();
