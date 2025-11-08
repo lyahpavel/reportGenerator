@@ -1310,7 +1310,7 @@ reportForm.addEventListener('reset', function() {
     }, 10);
 });
 
-// Розширений режим - показ кнопок видалення
+// Розширений режим - показ кнопок видалення та полів "Інше"
 document.addEventListener('DOMContentLoaded', function() {
     const advancedModeSwitch = document.getElementById('advancedModeSwitch');
     const appSection = document.getElementById('appSection');
@@ -1320,18 +1320,54 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.checked) {
                 appSection.classList.add('advanced-mode');
                 updateUserOptionsText(true);
+                showCustomInputs(true);
             } else {
                 appSection.classList.remove('advanced-mode');
                 updateUserOptionsText(false);
+                showCustomInputs(false);
             }
             // Оновити стан кнопок видалення
             updateDeleteButtons();
         });
+        
+        // Початково приховати custom inputs якщо режим вимкнений
+        if (!advancedModeSwitch.checked) {
+            showCustomInputs(false);
+        }
     }
     
     // Додати обробники для всіх селектів
     setupDeleteButtons();
 });
+
+// Показати/приховати всі поля "Інше" та їх кнопки збереження
+function showCustomInputs(show) {
+    // Знайти всі custom-input-wrapper (обгортки з полями "Інше" та кнопками 💾)
+    const customWrappers = document.querySelectorAll('.custom-input-wrapper');
+    customWrappers.forEach(wrapper => {
+        wrapper.style.display = show ? 'flex' : 'none';
+    });
+    
+    // Приховати/показати опції "Інший/Інша/Інше" в селектах
+    const allSelects = document.querySelectorAll('select');
+    allSelects.forEach(select => {
+        const options = Array.from(select.options);
+        options.forEach(option => {
+            if (option.value === 'Інший' || option.value === 'Інша' || option.value === 'Інше') {
+                option.style.display = show ? '' : 'none';
+                option.disabled = !show;
+            }
+        });
+        
+        // Якщо ховаємо і вибрана опція "Інше" - скинути на перший елемент
+        if (!show) {
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption && (selectedOption.value === 'Інший' || selectedOption.value === 'Інша' || selectedOption.value === 'Інше')) {
+                select.selectedIndex = 0;
+            }
+        }
+    });
+}
 
 // Оновлення тексту користувацьких опцій (тільки іконка користувача)
 function updateUserOptionsText(showDelete) {
