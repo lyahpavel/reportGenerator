@@ -169,18 +169,6 @@
     width: 100%;
 }
 
-/* Стилі для кастомних option з можливістю видалення */
-select option[data-user-option="true"] {
-    position: relative;
-}
-
-/* Іконка видалення в option - показується тільки в розширеному режимі */
-.advanced-mode select option[data-user-option="true"]::after {
-    content: ' 🗑️';
-    margin-left: 8px;
-    opacity: 0.7;
-}
-
 /* Кастомний дропдаун для БК */
 .custom-dropdown {
     position: relative;

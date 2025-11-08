@@ -297,9 +297,12 @@ function addUserCustomOptionsToSelects() {
                 if (!exists) {
                     const option = document.createElement('option');
                     option.value = customOpt.value;
-                    option.textContent = customOpt.label + ' 👤';
                     option.setAttribute('data-user-option', 'true');
                     option.setAttribute('data-select-id', selectId);
+                    option.setAttribute('data-label', customOpt.label);
+                    
+                    // Текст опції - буде оновлюватися при зміні режиму
+                    option.textContent = customOpt.label + ' 👤';
                     
                     // Зберігаємо координати в data-атрибут для населених пунктів
                     if (customOpt.coordinates) {

@@ -1273,9 +1273,14 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     
     const option = document.createElement('option');
     option.value = value;
-    option.textContent = value + ' 👤';
     option.setAttribute('data-user-option', 'true');
     option.setAttribute('data-select-id', selectId);
+    option.setAttribute('data-label', value);
+    
+    // Перевірити чи увімкнений розширений режим
+    const advancedMode = document.getElementById('advancedModeSwitch');
+    const showDelete = advancedMode && advancedMode.checked;
+    option.textContent = value + ' 👤' + (showDelete ? '🗑️' : '');
     
     if (coordinates) {
         option.setAttribute('data-coordinates', coordinates);
@@ -1316,8 +1321,10 @@ document.addEventListener('DOMContentLoaded', function() {
         advancedModeSwitch.addEventListener('change', function() {
             if (this.checked) {
                 appSection.classList.add('advanced-mode');
+                updateUserOptionsText(true);
             } else {
                 appSection.classList.remove('advanced-mode');
+                updateUserOptionsText(false);
             }
             // Оновити стан кнопок видалення
             updateDeleteButtons();
@@ -1327,6 +1334,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Додати обробники для всіх селектів
     setupDeleteButtons();
 });
+
+// Оновлення тексту користувацьких опцій (додавання/видалення іконки корзини)
+function updateUserOptionsText(showDelete) {
+    const allSelects = document.querySelectorAll('select');
+    allSelects.forEach(select => {
+        const userOptions = select.querySelectorAll('option[data-user-option="true"]');
+        userOptions.forEach(option => {
+            const label = option.getAttribute('data-label');
+            if (label) {
+                if (showDelete) {
+                    option.textContent = label + ' 👤🗑️';
+                } else {
+                    option.textContent = label + ' 👤';
+                }
+            }
+        });
+    });
+}
 
 // Налаштування кнопок видалення для всіх селектів
 function setupDeleteButtons() {
