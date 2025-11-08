@@ -1376,14 +1376,23 @@ function setupDeleteButtons() {
         select.parentNode.insertBefore(wrapper, select);
         wrapper.appendChild(select);
         
-        // Додати обробник подвійного кліку для видалення
-        select.addEventListener('dblclick', (e) => {
+        // Додати обробник зміни для показу діалогу видалення
+        select.addEventListener('change', (e) => {
             const advancedMode = document.getElementById('advancedModeSwitch');
             if (!advancedMode || !advancedMode.checked) return;
             
             const selectedOption = select.options[select.selectedIndex];
-            if (selectedOption && selectedOption.getAttribute('data-user-option') === 'true') {
-                handleDeleteSelectedOption(selectId);
+            if (!selectedOption || selectedOption.getAttribute('data-user-option') !== 'true') return;
+            
+            // Показати підказку про видалення
+            const userText = selectedOption.textContent;
+            if (userText.includes('🗑️')) {
+                // Запитати чи користувач хоче видалити
+                setTimeout(() => {
+                    if (confirm(`Видалити збережену опцію "${selectedOption.getAttribute('data-label') || selectedOption.value}"?\n\nНатисніть "OK" для видалення або "Скасувати" щоб залишити.`)) {
+                        handleDeleteSelectedOption(selectId);
+                    }
+                }, 100);
             }
         });
         
