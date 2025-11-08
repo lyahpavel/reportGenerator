@@ -301,8 +301,10 @@ function addUserCustomOptionsToSelects() {
                     option.setAttribute('data-select-id', selectId);
                     option.setAttribute('data-label', customOpt.label);
                     
-                    // Текст опції - буде оновлюватися при зміні режиму
-                    option.textContent = customOpt.label + ' 👤';
+                    // Текст опції з вирівнюванням іконок
+                    const maxLength = 40; // Максимальна довжина назви
+                    const padding = '\u00A0'.repeat(Math.max(0, maxLength - customOpt.label.length));
+                    option.textContent = customOpt.label + padding + ' 👤';
                     
                     // Зберігаємо координати в data-атрибут для населених пунктів
                     if (customOpt.coordinates) {

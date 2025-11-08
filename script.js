@@ -1277,10 +1277,12 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     option.setAttribute('data-select-id', selectId);
     option.setAttribute('data-label', value);
     
-    // Перевірити чи увімкнений розширений режим
+    // Перевірити чи увімкнений розширений режим та додати padding
+    const maxLength = 40;
+    const padding = '\u00A0'.repeat(Math.max(0, maxLength - value.length));
     const advancedMode = document.getElementById('advancedModeSwitch');
     const showDelete = advancedMode && advancedMode.checked;
-    option.textContent = value + ' 👤' + (showDelete ? '🗑️' : '');
+    option.textContent = value + padding + ' 👤' + (showDelete ? '🗑️' : '');
     
     if (coordinates) {
         option.setAttribute('data-coordinates', coordinates);
@@ -1337,16 +1339,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Оновлення тексту користувацьких опцій (додавання/видалення іконки корзини)
 function updateUserOptionsText(showDelete) {
+    const maxLength = 40; // Максимальна довжина назви
     const allSelects = document.querySelectorAll('select');
     allSelects.forEach(select => {
         const userOptions = select.querySelectorAll('option[data-user-option="true"]');
         userOptions.forEach(option => {
             const label = option.getAttribute('data-label');
             if (label) {
+                const padding = '\u00A0'.repeat(Math.max(0, maxLength - label.length));
                 if (showDelete) {
-                    option.textContent = label + ' 👤🗑️';
+                    option.textContent = label + padding + ' 👤🗑️';
                 } else {
-                    option.textContent = label + ' 👤';
+                    option.textContent = label + padding + ' 👤';
                 }
             }
         });
@@ -1384,14 +1388,11 @@ function setupDeleteButtons() {
             const selectedOption = select.options[select.selectedIndex];
             if (!selectedOption || selectedOption.getAttribute('data-user-option') !== 'true') return;
             
-            // Показати підказку про видалення
+            // Показати діалог про видалення
             const userText = selectedOption.textContent;
             if (userText.includes('🗑️')) {
-                // Запитати чи користувач хоче видалити
                 setTimeout(() => {
-                    if (confirm(`Видалити збережену опцію "${selectedOption.getAttribute('data-label') || selectedOption.value}"?\n\nНатисніть "OK" для видалення або "Скасувати" щоб залишити.`)) {
-                        handleDeleteSelectedOption(selectId);
-                    }
+                    handleDeleteSelectedOption(selectId);
                 }, 100);
             }
         });
@@ -1422,6 +1423,15 @@ async function handleDeleteSelectedOption(selectId) {
     
     const selectedOption = select.options[select.selectedIndex];
     if (!selectedOption || selectedOption.getAttribute('data-user-option') !== 'true') {
+        return;
+    }
+    
+    const optionLabel = selectedOption.getAttribute('data-label') || selectedOption.value;
+    
+    // Підтвердження видалення
+    if (!confirm(`Видалити збережену опцію "${optionLabel}"?`)) {
+        // Якщо користувач скасував - скинути вибір
+        select.selectedIndex = 0;
         return;
     }
     
