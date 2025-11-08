@@ -1376,43 +1376,58 @@ function setupDeleteButtons() {
         select.parentNode.insertBefore(wrapper, select);
         wrapper.appendChild(select);
         
-        // Змінна для відслідковування подвійного кліку
-        let clickTimer = null;
-        let clickCount = 0;
-        
-        // Додати обробник подвійного кліку на опціях (для видалення)
-        select.addEventListener('click', (e) => {
-            const advancedMode = document.getElementById('advancedModeSwitch');
-            if (!advancedMode || !advancedMode.checked) return;
-            
+        // Додати кнопку видалення в обгортку (клац на іконці видаляє, на тексті селект працює як зазвичай)
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'delete-icon';
+        deleteBtn.title = 'Видалити збережену опцію';
+        deleteBtn.textContent = '🗑️';
+        // Прихована за замовчуванням
+        deleteBtn.style.display = 'none';
+        // Не дозволяти кнопці знімати фокус селекта при кліку
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.background = 'transparent';
+        deleteBtn.style.padding = '0 6px';
+        deleteBtn.style.fontSize = '16px';
+
+        // Клік по іконці - видалити опцію (з підтвердженням)
+        deleteBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
             const selectedOption = select.options[select.selectedIndex];
             if (!selectedOption || selectedOption.getAttribute('data-user-option') !== 'true') return;
-            
-            clickCount++;
-            
-            if (clickCount === 1) {
-                clickTimer = setTimeout(() => {
-                    // Одиночний клік - просто вибір опції (нічого не робимо)
-                    clickCount = 0;
-                }, 300);
-            } else if (clickCount === 2) {
-                // Подвійний клік - видалення
-                clearTimeout(clickTimer);
-                clickCount = 0;
-                const userText = selectedOption.textContent;
-                if (userText.includes('🗑️')) {
-                    setTimeout(() => {
-                        handleDeleteSelectedOption(selectId);
-                    }, 100);
-                }
-            }
+            const optionValue = selectedOption.value;
+            const optionLabel = selectedOption.getAttribute('data-label') || optionValue;
+            if (!confirm(`Видалити збережену опцію "${optionLabel}"?`)) return;
+            deleteCustomOption(selectId, optionValue);
+            // скинути вибір
+            select.selectedIndex = 0;
+            // оновити стан кнопки
+            updateDeleteBtnVisibility();
         });
-        
+
+        wrapper.appendChild(deleteBtn);
+
+        // Оновлення видимості кнопки видалення
+        function updateDeleteBtnVisibility() {
+            const advancedMode = document.getElementById('advancedModeSwitch');
+            const selectedOption = select.options[select.selectedIndex];
+            if (advancedMode && advancedMode.checked && selectedOption && selectedOption.getAttribute('data-user-option') === 'true') {
+                deleteBtn.style.display = 'inline-flex';
+            } else {
+                deleteBtn.style.display = 'none';
+            }
+        }
+
+        // Початкове оновлення та реакція на зміну
+        updateDeleteBtnVisibility();
+        select.addEventListener('change', () => setTimeout(updateDeleteBtnVisibility, 0));
+
         // Додати контекстне меню для швидкого видалення (правий клік - без підтвердження)
         select.addEventListener('contextmenu', (e) => {
             const advancedMode = document.getElementById('advancedModeSwitch');
             if (!advancedMode || !advancedMode.checked) return;
-            
+
             const selectedOption = select.options[select.selectedIndex];
             if (selectedOption && selectedOption.getAttribute('data-user-option') === 'true') {
                 e.preventDefault();
@@ -1420,6 +1435,7 @@ function setupDeleteButtons() {
                 const optionValue = selectedOption.value;
                 deleteCustomOption(selectId, optionValue);
                 select.selectedIndex = 0;
+                updateDeleteBtnVisibility();
             }
         });
     });
