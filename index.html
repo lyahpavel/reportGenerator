@@ -162,7 +162,7 @@
             </div>
 
             <!-- Частоти: відео і керування в одному рядку -->
-            <div class="form-row">
+            <div class="form-row" id="frequencyRow">
                 <div class="form-group">
                     <label for="videoFrequency">Частота відео:</label>
                     <select id="videoFrequency" name="videoFrequency" required onchange="toggleCustomVideoFrequency()">
@@ -410,7 +410,7 @@
             const checkbox = document.getElementById('fiberOptic');
             const lengthGroup = document.getElementById('fiberLengthGroup');
             const lengthInput = document.getElementById('fiberLength');
-            const frequencyRow = document.getElementById('videoFrequency').parentElement.parentElement;
+            const frequencyRow = document.getElementById('frequencyRow');
             const videoFreqInput = document.getElementById('videoFrequency');
             const controlFreqInput = document.getElementById('controlFrequency');
             
@@ -420,7 +420,9 @@
                 lengthInput.required = true;
                 
                 // Приховати весь рядок з частотами (і відео і керування)
-                frequencyRow.style.display = 'none';
+                if (frequencyRow) {
+                    frequencyRow.style.display = 'none';
+                }
                 videoFreqInput.required = false;
                 controlFreqInput.required = false;
                 videoFreqInput.value = '';
@@ -431,8 +433,10 @@
                 lengthInput.required = false;
                 lengthInput.value = '';
                 
-                // Показати рядок з частотами
-                frequencyRow.style.display = 'flex';
+                // Показати рядок з частотами (використовуємо '' щоб відновити CSS клас)
+                if (frequencyRow) {
+                    frequencyRow.style.display = '';
+                }
                 videoFreqInput.required = true;
                 controlFreqInput.required = true;
             }
