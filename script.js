@@ -1358,8 +1358,9 @@ function setupDeleteButtons() {
         const deleteBtn = document.createElement('button');
         deleteBtn.type = 'button';
         deleteBtn.className = 'delete-selected-option-btn';
-        deleteBtn.textContent = '🗑️ Видалити';
+        deleteBtn.innerHTML = '<span class="delete-icon">🗑️</span>';
         deleteBtn.setAttribute('data-show', 'false');
+        deleteBtn.setAttribute('title', 'Видалити збережену опцію');
         deleteBtn.onclick = () => handleDeleteSelectedOption(selectId);
         wrapper.appendChild(deleteBtn);
         

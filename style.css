@@ -162,40 +162,51 @@
 /* Обгортка для селекта з кнопкою видалення */
 .select-with-delete {
     position: relative;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    width: 100%;
 }
 
 .select-with-delete select {
-    flex: 1;
+    width: 100%;
+    padding-right: 50px; /* Місце для кнопки */
 }
 
 .delete-selected-option-btn {
     display: none;
-    padding: 8px 12px;
-    background: #ef4444;
-    color: white;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
     border: none;
-    border-radius: 6px;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
+    opacity: 0.6;
     transition: all 0.2s ease;
-    white-space: nowrap;
+    pointer-events: none;
 }
 
 .delete-selected-option-btn:hover {
-    background: #dc2626;
-    transform: scale(1.05);
+    opacity: 1;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 50%;
 }
 
 .delete-selected-option-btn:active {
-    transform: scale(0.95);
+    transform: translateY(-50%) scale(0.9);
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.delete-icon {
+    pointer-events: none;
+    display: block;
 }
 
 /* Показувати кнопку тільки в розширеному режимі та коли вибрана користувацька опція */
 .advanced-mode .delete-selected-option-btn[data-show="true"] {
     display: block;
+    pointer-events: auto;
 }
 
 /* Кастомний дропдаун для БК */
@@ -548,13 +559,9 @@ textarea {
         font-size: 0.8rem;
     }
     
-    .select-with-delete {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
     .delete-selected-option-btn {
-        width: 100%;
+        right: 4px;
+        font-size: 1rem;
     }
     
     .form-actions,
