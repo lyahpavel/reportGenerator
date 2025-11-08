@@ -1062,18 +1062,37 @@ function toggleCustomReason() {
     }
 }
 
+// Функція для показу/приховування поля ручного введення підрозділу
+function toggleCustomSubdivision() {
+    const select = document.getElementById('subdivision');
+    const wrapper = document.getElementById('customSubdivision').parentElement;
+    const customInput = document.getElementById('customSubdivision');
+    
+    if (select.value === 'Інший') {
+        wrapper.style.display = 'flex';
+        customInput.required = true;
+    } else {
+        wrapper.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
+    }
+}
+
 // Функція для показу/приховування поля ручного введення сумісно з
 function toggleCustomJointWith() {
     const select = document.getElementById('jointWith');
+    const wrapper = document.getElementById('customJointWith').parentElement;
     const customInput = document.getElementById('customJointWith');
     
     if (select.value === 'Інший') {
-        customInput.style.display = 'block';
+        wrapper.style.display = 'flex';
         customInput.required = false; // Поле не обов'язкове
     } else {
-        customInput.style.display = 'none';
+        wrapper.style.display = 'none';
         customInput.required = false;
         customInput.value = '';
+        customInput.setAttribute('data-save-option', 'false');
     }
 }
 

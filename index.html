@@ -86,7 +86,12 @@
                     <option value="">Оберіть підрозділ...</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                    <input type="text" id="customSubdivision" name="customSubdivision" placeholder="Введіть підрозділ..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customSubdivision" name="customSubdivision" placeholder="Введіть підрозділ..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customSubdivision')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -95,7 +100,12 @@
                     <option value="">—</option>
                     <!-- Опції заповнюються динамічно з data.json -->
                 </select>
-                <input type="text" id="customJointWith" name="customJointWith" placeholder="Введіть підрозділ..." style="display: none;">
+                <div class="custom-input-wrapper" style="display: none;">
+                    <input type="text" id="customJointWith" name="customJointWith" placeholder="Введіть підрозділ..." data-save-option="false">
+                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('customJointWith')" title="Зберегти в мої опції">
+                        <span class="save-icon">💾</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Дрон: назва, розмір і тип камери в одному рядку -->
