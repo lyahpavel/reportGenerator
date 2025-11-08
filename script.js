@@ -1277,12 +1277,10 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     option.setAttribute('data-select-id', selectId);
     option.setAttribute('data-label', value);
     
-    // Перевірити чи увімкнений розширений режим та додати padding
-    const maxLength = 40;
-    const padding = '\u00A0'.repeat(Math.max(0, maxLength - value.length));
+    // Перевірити чи увімкнений розширений режим
     const advancedMode = document.getElementById('advancedModeSwitch');
     const showDelete = advancedMode && advancedMode.checked;
-    option.textContent = value + padding + ' 👤' + (showDelete ? '🗑️' : '');
+    option.textContent = (showDelete ? '👤🗑️ ' : '👤 ') + value;
     
     if (coordinates) {
         option.setAttribute('data-coordinates', coordinates);
@@ -1339,18 +1337,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Оновлення тексту користувацьких опцій (додавання/видалення іконки корзини)
 function updateUserOptionsText(showDelete) {
-    const maxLength = 40; // Максимальна довжина назви
     const allSelects = document.querySelectorAll('select');
     allSelects.forEach(select => {
         const userOptions = select.querySelectorAll('option[data-user-option="true"]');
         userOptions.forEach(option => {
             const label = option.getAttribute('data-label');
             if (label) {
-                const padding = '\u00A0'.repeat(Math.max(0, maxLength - label.length));
                 if (showDelete) {
-                    option.textContent = label + padding + ' 👤🗑️';
+                    option.textContent = '👤🗑️ ' + label;
                 } else {
-                    option.textContent = label + padding + ' 👤';
+                    option.textContent = '👤 ' + label;
                 }
             }
         });
@@ -1397,7 +1393,7 @@ function setupDeleteButtons() {
             }
         });
         
-        // Додати контекстне меню для видалення (правий клік)
+        // Додати контекстне меню для швидкого видалення (правий клік - без підтвердження)
         select.addEventListener('contextmenu', (e) => {
             const advancedMode = document.getElementById('advancedModeSwitch');
             if (!advancedMode || !advancedMode.checked) return;
@@ -1405,7 +1401,10 @@ function setupDeleteButtons() {
             const selectedOption = select.options[select.selectedIndex];
             if (selectedOption && selectedOption.getAttribute('data-user-option') === 'true') {
                 e.preventDefault();
-                handleDeleteSelectedOption(selectId);
+                // Швидке видалення без додаткового підтвердження
+                const optionValue = selectedOption.value;
+                deleteCustomOption(selectId, optionValue);
+                select.selectedIndex = 0;
             }
         });
     });
