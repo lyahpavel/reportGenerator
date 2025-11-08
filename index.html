@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
 </head>
 <body>
     <div class="container">
@@ -228,9 +232,36 @@
                 <button id="newReport" class="btn btn-primary">Новий звіт</button>
             </div>
         </div>
+
+        <!-- Секція історії звітів -->
+        <div id="reportsHistory" class="reports-history" style="display: none;">
+            <h2>Історія звітів</h2>
+            <div class="history-controls">
+                <button id="toggleHistory" class="btn btn-secondary">Показати історію</button>
+                <button id="refreshHistory" class="btn btn-outline" style="display: none;">Оновити</button>
+            </div>
+            <div id="historyContent" class="history-content" style="display: none;">
+                <div class="history-filters">
+                    <input type="text" id="searchReports" placeholder="Пошук за номером звіту, підрозділом..." class="search-input">
+                    <select id="filterBySubdivision" class="filter-select">
+                        <option value="">Всі підрозділи</option>
+                    </select>
+                </div>
+                <div id="reportsList" class="reports-list">
+                    <!-- Список звітів буде тут -->
+                </div>
+                <div class="pagination">
+                    <button id="prevPage" class="btn btn-outline">← Попередня</button>
+                    <span id="pageInfo">Сторінка 1</span>
+                    <button id="nextPage" class="btn btn-outline">Наступна →</button>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="supabase-functions.js"></script>
     <script src="script.js"></script>
+    <script src="reports-history.js"></script>
     <script>
         // Функція для показу/приховування поля довжини котушки та частот
         function toggleFiberLength() {

@@ -1,0 +1,16 @@
+# Supabase configuration (містить API ключі)
+supabase-config.js
+
+# Backup конфігурації
+supabase-config.js.backup
+
+# Node modules (якщо будуть використовуватись)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

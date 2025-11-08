@@ -1,0 +1,17 @@
+// Supabase Configuration Template
+// Скопіюйте цей файл як supabase-config.js та замініть значення на свої власні
+
+const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Наприклад: 'https://xxxxx.supabase.co'
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Anon/Public key з Settings > API
+
+// Ініціалізація Supabase клієнта (перевіряємо, чи завантажена бібліотека)
+if (typeof supabase !== 'undefined' && supabase.createClient) {
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Експорт для використання в інших файлах
+    window.supabaseClient = supabaseClient;
+    console.log('✅ Supabase client ініціалізовано');
+} else {
+    console.warn('⚠️ Supabase бібліотека не завантажена');
+    window.supabaseClient = null;
+}

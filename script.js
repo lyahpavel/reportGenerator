@@ -148,20 +148,33 @@ const fallbackData = {
     ]
 };
 
-// Завантаження даних з JSON файлу або використання fallback
+// Завантаження даних з Supabase або JSON файлу
 async function loadData() {
     try {
-        // Спроба завантажити дані з JSON файлу
-        const response = await fetch('data.json');
-        if (!response.ok) {
-            throw new Error('Не вдалося завантажити дані з файлу');
+        // Спробуємо завантажити з Supabase
+        if (window.supabaseFunctions && window.supabaseClient) {
+            console.log('🔄 Завантаження даних з Supabase...');
+            appData = await window.supabaseFunctions.loadDataFromSupabase();
+            console.log('✅ Дані завантажено з Supabase');
+        } else {
+            throw new Error('Supabase не налаштовано');
         }
-        appData = await response.json();
-        console.log('Дані успішно завантажено з data.json');
-    } catch (error) {
-        console.warn('Використовуємо fallback дані:', error.message);
-        // Використовуємо fallback дані
-        appData = fallbackData;
+    } catch (supabaseError) {
+        console.warn('⚠️ Не вдалося завантажити з Supabase:', supabaseError.message);
+        
+        try {
+            // Спроба завантажити дані з JSON файлу (fallback)
+            const response = await fetch('data.json');
+            if (!response.ok) {
+                throw new Error('Не вдалося завантажити дані з файлу');
+            }
+            appData = await response.json();
+            console.log('📄 Дані завантажено з data.json');
+        } catch (jsonError) {
+            console.warn('⚠️ Використовуємо вбудовані дані:', jsonError.message);
+            // Використовуємо fallback дані
+            appData = fallbackData;
+        }
     }
     
     // В будь-якому випадку заповнюємо селекти
@@ -303,12 +316,25 @@ reportForm.addEventListener('submit', function(e) {
         return;
     }
     
+    // Генерація номера звіту
+    const reportNumber = generateReportNumber(formData);
+    formData.reportNumber = reportNumber;
+    
     // Генерація звіту
     generateReport(formData);
     
     // Показати блок звіту
     reportOutput.classList.remove('hidden');
     reportOutput.scrollIntoView({ behavior: 'smooth' });
+    
+    // Зберегти звіт у Supabase (асинхронно, не блокуємо UI)
+    if (window.supabaseFunctions && window.supabaseClient) {
+        window.supabaseFunctions.saveReportToSupabase(formData).catch(error => {
+            console.error('Не вдалося зберегти звіт:', error);
+            // Не показуємо помилку користувачу, якщо збереження не вдалося
+            // Звіт все одно буде доступний локально
+        });
+    }
 });
 
 // Функція валідації форми
