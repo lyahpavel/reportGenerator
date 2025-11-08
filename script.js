@@ -1144,7 +1144,7 @@ function toggleCustomJointWith() {
 }
 
 // Функція для перемикання збереження кастомної опції
-function toggleSaveOption(inputId) {
+async function toggleSaveOption(inputId) {
     const input = document.getElementById(inputId);
     const button = input.nextElementSibling;
     const icon = button.querySelector('.save-icon');
@@ -1152,16 +1152,141 @@ function toggleSaveOption(inputId) {
     const currentValue = input.getAttribute('data-save-option');
     const newValue = currentValue === 'true' ? 'false' : 'true';
     
-    input.setAttribute('data-save-option', newValue);
-    
-    // Змінити вигляд кнопки
+    // Якщо користувач хоче зберегти - зберігаємо відразу
     if (newValue === 'true') {
-        button.classList.add('active');
-        icon.textContent = '✅';
+        const customValue = input.value.trim();
+        
+        if (!customValue) {
+            alert('⚠️ Спочатку введіть значення');
+            return;
+        }
+        
+        // Визначаємо тип опції за ID інпута
+        const optionTypeMap = {
+            'customSubdivision': { type: 'subdivisions', label: 'Підрозділ' },
+            'customJointWith': { type: 'jointWithOptions', label: 'Сумісно з' },
+            'customDroneName': { type: 'droneNames', label: 'Назва дрону' },
+            'customDroneSize': { type: 'droneSizes', label: 'Розмір дрону' },
+            'customCameraType': { type: 'cameraTypes', label: 'Тип камери' },
+            'customVideoFrequency': { type: 'videoFrequencies', label: 'Частота відео' },
+            'customControlFrequency': { type: 'controlFrequencies', label: 'Частота керування' },
+            'customBk': { type: 'bkOptions', label: 'БК' },
+            'customInitiationBoard': { type: 'initiationBoardOptions', label: 'Плата ініціації' },
+            'customTargetType': { type: 'targetTypeOptions', label: 'Тип цілі' },
+            'customSettlement': { type: 'settlementOptions', label: 'Населений пункт' },
+            'customStatus': { type: 'statusOptions', label: 'Статус' },
+            'customReason': { type: 'reasonOptions', label: 'Причина' },
+            'customLosses': { type: 'lossOptions', label: 'Втрати' },
+            'customOperator': { type: 'operatorOptions', label: 'Оператор' }
+        };
+        
+        const optionInfo = optionTypeMap[inputId];
+        if (!optionInfo) {
+            console.error('❌ Невідомий тип опції:', inputId);
+            return;
+        }
+        
+        // Для населеного пункту беремо координати
+        let coordinates = null;
+        if (inputId === 'customSettlement') {
+            const coordinatesInput = document.getElementById('coordinates');
+            if (coordinatesInput && coordinatesInput.value.trim()) {
+                coordinates = coordinatesInput.value.trim();
+            } else {
+                alert('⚠️ Для нового населеного пункту потрібно вказати координати');
+                return;
+            }
+        }
+        
+        // Зберігаємо через auth.js
+        if (window.authFunctions && window.authFunctions.saveUserCustomOption) {
+            button.disabled = true;
+            icon.textContent = '⏳';
+            
+            const success = await window.authFunctions.saveUserCustomOption(
+                optionInfo.type, 
+                customValue, 
+                customValue,
+                coordinates
+            );
+            
+            if (success) {
+                input.setAttribute('data-save-option', 'true');
+                button.classList.add('active');
+                icon.textContent = '✅';
+                
+                // Додати до селекта
+                await addSavedOptionToSelect(inputId, customValue, coordinates);
+                
+                console.log(`✅ Збережено: ${optionInfo.label} = "${customValue}"`);
+            } else {
+                icon.textContent = '💾';
+                alert('❌ Помилка збереження. Перевірте підключення до Supabase.');
+            }
+            
+            button.disabled = false;
+        } else {
+            alert('⚠️ Для збереження потрібно увійти в систему');
+        }
     } else {
+        // Скасування збереження
+        input.setAttribute('data-save-option', 'false');
         button.classList.remove('active');
         icon.textContent = '💾';
     }
+}
+
+// Функція для додавання збереженої опції до селекта
+async function addSavedOptionToSelect(inputId, value, coordinates = null) {
+    const selectMap = {
+        'customSubdivision': 'subdivision',
+        'customJointWith': 'jointWith',
+        'customDroneName': 'droneName',
+        'customDroneSize': 'droneSize',
+        'customCameraType': 'cameraType',
+        'customVideoFrequency': 'videoFrequency',
+        'customControlFrequency': 'controlFrequency',
+        'customBk': 'bk',
+        'customInitiationBoard': 'initiationBoard',
+        'customTargetType': 'targetType',
+        'customSettlement': 'settlement',
+        'customStatus': 'status',
+        'customReason': 'reason',
+        'customLosses': 'losses',
+        'customOperator': 'operator'
+    };
+    
+    const selectId = selectMap[inputId];
+    if (!selectId) return;
+    
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    // Перевірити чи вже є така опція
+    const exists = Array.from(select.options).some(opt => opt.value === value);
+    if (exists) return;
+    
+    // Знайти опцію "Інший" та вставити перед нею
+    const otherOption = Array.from(select.options).find(opt => 
+        opt.value === 'Інший' || opt.value === 'Інша' || opt.value === 'Інше'
+    );
+    
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value + ' 👤';
+    
+    if (coordinates) {
+        option.setAttribute('data-coordinates', coordinates);
+    }
+    
+    if (otherOption) {
+        select.insertBefore(option, otherOption);
+    } else {
+        select.appendChild(option);
+    }
+    
+    // Вибрати нову опцію
+    select.value = value;
 }
 
 // Обробка скидання форми
