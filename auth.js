@@ -281,7 +281,17 @@ function addUserCustomOptionsToSelects() {
 async function saveUserCustomOption(optionType, value, label) {
     const supabase = window.supabaseClient;
     
-    if (!supabase || !currentUser) return false;
+    if (!supabase) {
+        console.warn('⚠️ Supabase client не ініціалізовано');
+        return false;
+    }
+    
+    if (!currentUser) {
+        console.warn('⚠️ Користувач не авторизований, currentUser:', currentUser);
+        return false;
+    }
+
+    console.log(`📝 Спроба збереження: ${optionType} = "${value}"`);
 
     try {
         const { data, error } = await supabase
@@ -297,9 +307,10 @@ async function saveUserCustomOption(optionType, value, label) {
         if (error) {
             // Якщо опція вже існує, це нормально
             if (error.code === '23505') {
-                console.log('ℹ️ Опція вже існує');
+                console.log('ℹ️ Опція вже існує:', optionType, value);
                 return true;
             }
+            console.error('❌ Помилка SQL:', error);
             throw error;
         }
 
@@ -354,15 +365,35 @@ async function saveCustomOptionsFromForm(formData) {
         const selectElement = document.getElementById(custom.selectId);
         const customInputElement = document.getElementById(custom.customId);
         
-        if (!selectElement) continue;
+        console.log(`🔎 Перевіряю поле: ${custom.selectId}`);
+        
+        if (!selectElement) {
+            console.log(`  ⚠️ Select елемент не знайдено: ${custom.selectId}`);
+            continue;
+        }
 
         const selectValue = selectElement.value;
-        const isCustom = selectValue === 'Інший' || selectValue === 'Інша' || selectValue === 'Інше';
+        console.log(`  📋 Значення select: "${selectValue}"`);
         
-        if (isCustom && customInputElement && customInputElement.value.trim()) {
+        const isCustom = selectValue === 'Інший' || selectValue === 'Інша' || selectValue === 'Інше';
+        console.log(`  🔍 Чи це кастомне значення? ${isCustom}`);
+        
+        if (isCustom) {
+            if (!customInputElement) {
+                console.log(`  ⚠️ Custom input елемент не знайдено: ${custom.customId}`);
+                continue;
+            }
+            
             const customValue = customInputElement.value.trim();
-            console.log(`💾 Зберігаю кастомну опцію: ${custom.type} = "${customValue}"`);
-            await saveUserCustomOption(custom.type, customValue, customValue);
+            console.log(`  ✏️ Значення custom input: "${customValue}"`);
+            
+            if (customValue) {
+                console.log(`  💾 Зберігаю кастомну опцію: ${custom.type} = "${customValue}"`);
+                const result = await saveUserCustomOption(custom.type, customValue, customValue);
+                console.log(`  ${result ? '✅' : '❌'} Результат збереження: ${result}`);
+            } else {
+                console.log(`  ⚠️ Custom input порожній`);
+            }
         }
     }
 

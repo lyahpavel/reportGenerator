@@ -328,10 +328,14 @@ reportForm.addEventListener('submit', function(e) {
     reportOutput.scrollIntoView({ behavior: 'smooth' });
     
     // Зберегти кастомні опції користувача (якщо авторизований)
-    if (window.authFunctions && window.authFunctions.saveCustomOptionsFromForm) {
+    console.log('🔍 Перевірка authFunctions:', window.authFunctions);
+    if (window.authFunctions && typeof window.authFunctions.saveCustomOptionsFromForm === 'function') {
+        console.log('🚀 Викликаємо saveCustomOptionsFromForm');
         window.authFunctions.saveCustomOptionsFromForm(formData).catch(error => {
-            console.error('Помилка збереження кастомних опцій:', error);
+            console.error('❌ Помилка збереження кастомних опцій:', error);
         });
+    } else {
+        console.warn('⚠️ authFunctions.saveCustomOptionsFromForm не знайдено');
     }
     
     // Зберегти звіт у Supabase (асинхронно, не блокуємо UI)
