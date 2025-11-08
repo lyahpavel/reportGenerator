@@ -1277,10 +1277,8 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     option.setAttribute('data-select-id', selectId);
     option.setAttribute('data-label', value);
     
-    // Перевірити чи увімкнений розширений режим
-    const advancedMode = document.getElementById('advancedModeSwitch');
-    const showDelete = advancedMode && advancedMode.checked;
-    option.textContent = (showDelete ? '👤🗑️ ' : '👤 ') + value;
+    // Завжди тільки іконка користувача (окрема кнопка для видалення)
+    option.textContent = '👤 ' + value;
     
     if (coordinates) {
         option.setAttribute('data-coordinates', coordinates);
@@ -1335,7 +1333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupDeleteButtons();
 });
 
-// Оновлення тексту користувацьких опцій (додавання/видалення іконки корзини)
+// Оновлення тексту користувацьких опцій (тільки іконка користувача)
 function updateUserOptionsText(showDelete) {
     const allSelects = document.querySelectorAll('select');
     allSelects.forEach(select => {
@@ -1343,11 +1341,8 @@ function updateUserOptionsText(showDelete) {
         userOptions.forEach(option => {
             const label = option.getAttribute('data-label');
             if (label) {
-                if (showDelete) {
-                    option.textContent = '👤🗑️ ' + label;
-                } else {
-                    option.textContent = '👤 ' + label;
-                }
+                // Завжди тільки 👤, бо окрема кнопка видалення
+                option.textContent = '👤 ' + label;
             }
         });
     });
