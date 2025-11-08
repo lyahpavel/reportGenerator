@@ -159,7 +159,7 @@
     font-weight: 500;
 }
 
-/* Обгортка для селекта з кнопкою видалення */
+/* Обгортка для селекта */
 .select-with-delete {
     position: relative;
     width: 100%;
@@ -167,46 +167,18 @@
 
 .select-with-delete select {
     width: 100%;
-    padding-right: 50px; /* Місце для кнопки */
 }
 
-.delete-selected-option-btn {
-    display: none;
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    opacity: 0.6;
-    transition: all 0.2s ease;
-    pointer-events: none;
+/* Стилі для кастомних option з можливістю видалення */
+select option[data-user-option="true"] {
+    position: relative;
 }
 
-.delete-selected-option-btn:hover {
-    opacity: 1;
-    background: rgba(239, 68, 68, 0.1);
-    border-radius: 50%;
-}
-
-.delete-selected-option-btn:active {
-    transform: translateY(-50%) scale(0.9);
-    background: rgba(239, 68, 68, 0.2);
-}
-
-.delete-icon {
-    pointer-events: none;
-    display: block;
-}
-
-/* Показувати кнопку тільки в розширеному режимі та коли вибрана користувацька опція */
-.advanced-mode .delete-selected-option-btn[data-show="true"] {
-    display: block;
-    pointer-events: auto;
+/* Іконка видалення в option - показується тільки в розширеному режимі */
+.advanced-mode select option[data-user-option="true"]::after {
+    content: ' 🗑️';
+    margin-left: 8px;
+    opacity: 0.7;
 }
 
 /* Кастомний дропдаун для БК */
@@ -557,11 +529,6 @@ textarea {
     
     .switch-text {
         font-size: 0.8rem;
-    }
-    
-    .delete-selected-option-btn {
-        right: 4px;
-        font-size: 1rem;
     }
     
     .form-actions,

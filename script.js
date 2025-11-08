@@ -1289,9 +1289,6 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     
     // Вибрати нову опцію
     select.value = value;
-    
-    // Оновити кнопку видалення
-    updateDeleteButton(selectId);
 }
 
 // Обробка скидання форми
@@ -1354,44 +1351,34 @@ function setupDeleteButtons() {
         select.parentNode.insertBefore(wrapper, select);
         wrapper.appendChild(select);
         
-        // Кнопка видалення
-        const deleteBtn = document.createElement('button');
-        deleteBtn.type = 'button';
-        deleteBtn.className = 'delete-selected-option-btn';
-        deleteBtn.innerHTML = '<span class="delete-icon">🗑️</span>';
-        deleteBtn.setAttribute('data-show', 'false');
-        deleteBtn.setAttribute('title', 'Видалити збережену опцію');
-        deleteBtn.onclick = () => handleDeleteSelectedOption(selectId);
-        wrapper.appendChild(deleteBtn);
+        // Додати обробник подвійного кліку для видалення
+        select.addEventListener('dblclick', (e) => {
+            const advancedMode = document.getElementById('advancedModeSwitch');
+            if (!advancedMode || !advancedMode.checked) return;
+            
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption && selectedOption.getAttribute('data-user-option') === 'true') {
+                handleDeleteSelectedOption(selectId);
+            }
+        });
         
-        // Відстежування зміни вибору
-        select.addEventListener('change', () => updateDeleteButton(selectId));
+        // Додати контекстне меню для видалення (правий клік)
+        select.addEventListener('contextmenu', (e) => {
+            const advancedMode = document.getElementById('advancedModeSwitch');
+            if (!advancedMode || !advancedMode.checked) return;
+            
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption && selectedOption.getAttribute('data-user-option') === 'true') {
+                e.preventDefault();
+                handleDeleteSelectedOption(selectId);
+            }
+        });
     });
 }
 
-// Оновлення стану кнопки видалення для конкретного селекта
-function updateDeleteButton(selectId) {
-    const select = document.getElementById(selectId);
-    if (!select) return;
-    
-    const deleteBtn = select.parentElement.querySelector('.delete-selected-option-btn');
-    if (!deleteBtn) return;
-    
-    const selectedOption = select.options[select.selectedIndex];
-    const isUserOption = selectedOption && selectedOption.getAttribute('data-user-option') === 'true';
-    
-    deleteBtn.setAttribute('data-show', isUserOption ? 'true' : 'false');
-}
-
-// Оновлення всіх кнопок видалення
+// Оновлення всіх кнопок видалення (заглушка для сумісності)
 function updateDeleteButtons() {
-    const selectIds = [
-        'subdivision', 'jointWith', 'droneName', 'droneSize', 'cameraType',
-        'videoFrequency', 'controlFrequency', 'bk', 'initiationBoard',
-        'targetType', 'settlement', 'status', 'reason', 'losses', 'operator'
-    ];
-    
-    selectIds.forEach(updateDeleteButton);
+    // Більше не потрібно - іконки відображаються через CSS
 }
 
 // Обробка видалення вибраної опції
@@ -1409,7 +1396,6 @@ async function handleDeleteSelectedOption(selectId) {
     
     // Скинути вибір на перший елемент
     select.selectedIndex = 0;
-    updateDeleteButton(selectId);
 }
 
 // Функція видалення користувацької опції
