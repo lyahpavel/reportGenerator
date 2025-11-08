@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS user_custom_options (
     option_type TEXT NOT NULL, -- 'subdivision', 'jointWith', 'droneName', 'bk', etc.
     value TEXT NOT NULL,
     label TEXT NOT NULL,
+    coordinates TEXT, -- Координати для населених пунктів
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(user_id, option_type, value)
 );

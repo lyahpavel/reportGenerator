@@ -391,6 +391,12 @@ function validateForm(data) {
         errors.push('Вкажіть час');
     }
     
+    // Перевірка координат для "Інший" населений пункт
+    const settlementSelect = document.getElementById('settlement');
+    if (settlementSelect.value === 'Інший' && !data.coordinates) {
+        errors.push('Для нового населеного пункту обов\'язково вкажіть координати');
+    }
+    
     // Перевірка дати (дозволено сьогодні і минулі дати)
     if (data.date) {
         const selectedDate = new Date(data.date);
@@ -799,17 +805,25 @@ function toggleCustomSettlement() {
     const wrapper = document.getElementById('customSettlement').parentElement;
     const customSettlementInput = document.getElementById('customSettlement');
     const coordinatesInput = document.getElementById('coordinates');
+    const coordinatesGroup = document.getElementById('coordinatesGroup');
+    const coordinatesRequired = document.getElementById('coordinatesRequired');
     
     if (settlementSelect.value === 'Інший') {
         // Показати поле для введення назви
         wrapper.style.display = 'flex';
         customSettlementInput.required = true;
         
-        // Дозволити ручне введення координат
+        // Зробити координати обов'язковими і виділити
+        coordinatesInput.required = true;
         coordinatesInput.readOnly = false;
         coordinatesInput.value = '';
-        coordinatesInput.placeholder = 'Введіть координати вручну...';
-        coordinatesInput.style.backgroundColor = '#fff';
+        coordinatesInput.placeholder = 'Введіть координати для нового населеного пункту...';
+        coordinatesInput.style.backgroundColor = '#fffbe6';
+        coordinatesInput.style.borderColor = '#ff9800';
+        coordinatesRequired.style.display = 'inline';
+        coordinatesGroup.style.backgroundColor = '#fffbe6';
+        coordinatesGroup.style.padding = '8px';
+        coordinatesGroup.style.borderRadius = '4px';
     } else if (settlementSelect.value === '') {
         // Якщо нічого не вибрано
         wrapper.style.display = 'none';
@@ -817,10 +831,16 @@ function toggleCustomSettlement() {
         customSettlementInput.value = '';
         customSettlementInput.setAttribute('data-save-option', 'false');
         
+        coordinatesInput.required = false;
         coordinatesInput.readOnly = false;
         coordinatesInput.value = '';
         coordinatesInput.placeholder = 'Наприклад: 50.4501, 30.5234';
-        coordinatesInput.style.backgroundColor = '#fff';
+        coordinatesInput.style.backgroundColor = '';
+        coordinatesInput.style.borderColor = '';
+        coordinatesRequired.style.display = 'none';
+        coordinatesGroup.style.backgroundColor = '';
+        coordinatesGroup.style.padding = '';
+        coordinatesGroup.style.borderRadius = '';
     } else {
         // Вибрано конкретне місто
         wrapper.style.display = 'none';
@@ -828,13 +848,40 @@ function toggleCustomSettlement() {
         customSettlementInput.value = '';
         customSettlementInput.setAttribute('data-save-option', 'false');
         
-        // Автоматично підставити координати (але дозволити редагування)
-        const selectedOption = appData.settlementOptions.find(option => option.value === settlementSelect.value);
-        if (selectedOption && selectedOption.coordinates) {
-            coordinatesInput.value = selectedOption.coordinates;
+        // Координати не обов'язкові, але підставляються автоматично
+        coordinatesInput.required = false;
+        coordinatesRequired.style.display = 'none';
+        coordinatesGroup.style.backgroundColor = '';
+        coordinatesGroup.style.padding = '';
+        coordinatesGroup.style.borderRadius = '';
+        
+        // Спочатку шукаємо в користувацьких опціях (з data-coordinates)
+        const selectedOptionElement = settlementSelect.options[settlementSelect.selectedIndex];
+        const customCoordinates = selectedOptionElement.getAttribute('data-coordinates');
+        
+        if (customCoordinates) {
+            // Координати зі збереженої користувацької опції
+            coordinatesInput.value = customCoordinates;
             coordinatesInput.readOnly = false;
-            coordinatesInput.style.backgroundColor = '#fff';
-            coordinatesInput.placeholder = 'Координати підставлені автоматично (можна редагувати)';
+            coordinatesInput.style.backgroundColor = '#f0f8ff';
+            coordinatesInput.style.borderColor = '';
+            coordinatesInput.placeholder = 'Координати з вашої збереженої опції (можна редагувати)';
+        } else {
+            // Автоматично підставити координати з appData (але дозволити редагування)
+            const selectedOption = appData.settlementOptions.find(option => option.value === settlementSelect.value);
+            if (selectedOption && selectedOption.coordinates) {
+                coordinatesInput.value = selectedOption.coordinates;
+                coordinatesInput.readOnly = false;
+                coordinatesInput.style.backgroundColor = '#f0f8ff';
+                coordinatesInput.style.borderColor = '';
+                coordinatesInput.placeholder = 'Координати підставлені автоматично (можна редагувати)';
+            } else {
+                coordinatesInput.readOnly = false;
+                coordinatesInput.value = '';
+                coordinatesInput.style.backgroundColor = '';
+                coordinatesInput.style.borderColor = '';
+                coordinatesInput.placeholder = 'Наприклад: 50.4501, 30.5234';
+            }
         }
     }
 }

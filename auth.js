@@ -230,10 +230,15 @@ async function loadUserCustomOptions() {
             if (!userCustomOptions[option.option_type]) {
                 userCustomOptions[option.option_type] = [];
             }
-            userCustomOptions[option.option_type].push({
+            const optionData = {
                 value: option.value,
                 label: option.label
-            });
+            };
+            // Додаємо координати якщо є
+            if (option.coordinates) {
+                optionData.coordinates = option.coordinates;
+            }
+            userCustomOptions[option.option_type].push(optionData);
         });
 
         console.log('✅ Завантажено кастомні опції користувача:', userCustomOptions);
@@ -287,6 +292,11 @@ function addUserCustomOptionsToSelects() {
                     option.value = customOpt.value;
                     option.textContent = customOpt.label + ' 👤';
                     
+                    // Зберігаємо координати в data-атрибут для населених пунктів
+                    if (customOpt.coordinates) {
+                        option.setAttribute('data-coordinates', customOpt.coordinates);
+                    }
+                    
                     if (otherOption) {
                         select.insertBefore(option, otherOption);
                     } else {
@@ -299,7 +309,7 @@ function addUserCustomOptionsToSelects() {
 }
 
 // Збереження кастомної опції
-async function saveUserCustomOption(optionType, value, label) {
+async function saveUserCustomOption(optionType, value, label, coordinates = null) {
     const supabase = window.supabaseClient;
     
     if (!supabase) {
@@ -312,17 +322,24 @@ async function saveUserCustomOption(optionType, value, label) {
         return false;
     }
 
-    console.log(`📝 Спроба збереження: ${optionType} = "${value}"`);
+    console.log(`📝 Спроба збереження: ${optionType} = "${value}"${coordinates ? ` (координати: ${coordinates})` : ''}`);
 
     try {
+        const insertData = {
+            user_id: currentUser.id,
+            option_type: optionType,
+            value: value,
+            label: label
+        };
+        
+        // Додаємо координати якщо вони є
+        if (coordinates) {
+            insertData.coordinates = coordinates;
+        }
+
         const { data, error } = await supabase
             .from('user_custom_options')
-            .insert([{
-                user_id: currentUser.id,
-                option_type: optionType,
-                value: value,
-                label: label
-            }])
+            .insert([insertData])
             .select();
 
         if (error) {
@@ -344,7 +361,11 @@ async function saveUserCustomOption(optionType, value, label) {
         
         const exists = userCustomOptions[optionType].some(opt => opt.value === value);
         if (!exists) {
-            userCustomOptions[optionType].push({ value, label });
+            const optionData = { value, label };
+            if (coordinates) {
+                optionData.coordinates = coordinates;
+            }
+            userCustomOptions[optionType].push(optionData);
         }
 
         return true;
@@ -412,7 +433,18 @@ async function saveCustomOptionsFromForm(formData) {
             
             if (customValue && shouldSave) {
                 console.log(`  💾 Зберігаю кастомну опцію: ${custom.type} = "${customValue}"`);
-                const result = await saveUserCustomOption(custom.type, customValue, customValue);
+                
+                // Для населених пунктів додаємо координати
+                let coordinates = null;
+                if (custom.type === 'settlementOptions') {
+                    const coordinatesInput = document.getElementById('coordinates');
+                    if (coordinatesInput && coordinatesInput.value.trim()) {
+                        coordinates = coordinatesInput.value.trim();
+                        console.log(`  📍 З координатами: ${coordinates}`);
+                    }
+                }
+                
+                const result = await saveUserCustomOption(custom.type, customValue, customValue, coordinates);
                 console.log(`  ${result ? '✅' : '❌'} Результат збереження: ${result}`);
             } else if (customValue && !shouldSave) {
                 console.log(`  ℹ️ Опція не буде збережена (користувач не натиснув кнопку)`);
