@@ -77,9 +77,12 @@ function setupAuthForms() {
 
 // Обробка логіна
 async function handleLogin() {
-    const email = document.getElementById('loginEmail').value;
+    const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
     const supabase = window.supabaseClient;
+
+    // Конвертуємо username в email формат для Supabase
+    const email = `${username}@local.app`;
 
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -100,8 +103,8 @@ async function handleLogin() {
 
 // Обробка реєстрації
 async function handleRegister() {
+    const username = document.getElementById('registerUsername').value;
     const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
     const password = document.getElementById('registerPassword').value;
     const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
     const supabase = window.supabaseClient;
@@ -116,13 +119,24 @@ async function handleRegister() {
         return;
     }
 
+    // Перевірка формату username
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+    if (!usernameRegex.test(username)) {
+        showError('Логін має містити 3-20 символів: літери, цифри, _ або -');
+        return;
+    }
+
+    // Конвертуємо username в email формат для Supabase
+    const email = `${username}@local.app`;
+
     try {
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
-                    full_name: name
+                    username: username,
+                    full_name: name || username
                 }
             }
         });
@@ -130,11 +144,17 @@ async function handleRegister() {
         if (error) throw error;
 
         console.log('✅ Успішна реєстрація');
-        showSuccess('Реєстрація успішна! Перевірте email для підтвердження.');
+        showSuccess('Реєстрація успішна! Можете увійти з вашим логіном.');
         
         // Перемкнути на форму логіна
         document.getElementById('registerForm').style.display = 'none';
         document.getElementById('loginForm').style.display = 'block';
+        
+        // Очистити поля
+        document.getElementById('registerUsername').value = '';
+        document.getElementById('registerName').value = '';
+        document.getElementById('registerPassword').value = '';
+        document.getElementById('registerPasswordConfirm').value = '';
 
     } catch (error) {
         console.error('❌ Помилка реєстрації:', error);
@@ -165,8 +185,9 @@ async function handleUserLogin() {
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('appSection').style.display = 'block';
 
-    // Показати email користувача
-    document.getElementById('userEmailDisplay').textContent = currentUser.email;
+    // Показати username або email користувача
+    const username = currentUser.user_metadata?.username || currentUser.email.replace('@local.app', '');
+    document.getElementById('userEmailDisplay').textContent = username;
 
     // Завантажити дані
     await loadData();

@@ -4,6 +4,7 @@
 -- Таблиця для профілів користувачів (розширення auth.users)
 CREATE TABLE IF NOT EXISTS user_profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL,
     full_name TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -46,11 +47,12 @@ FOR EACH ROW EXECUTE FUNCTION update_user_profiles_updated_at();
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO user_profiles (id, email, full_name)
+    INSERT INTO user_profiles (id, username, email, full_name)
     VALUES (
         NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1)),
         NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email)
+        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1))
     );
     RETURN NEW;
 END;

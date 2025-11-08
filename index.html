@@ -25,8 +25,8 @@
                 <h2>Вхід</h2>
                 <form id="loginFormElement">
                     <div class="form-group">
-                        <label for="loginEmail">Email:</label>
-                        <input type="email" id="loginEmail" required placeholder="your@email.com">
+                        <label for="loginUsername">Логін:</label>
+                        <input type="text" id="loginUsername" required placeholder="Ваш логін">
                     </div>
                     <div class="form-group">
                         <label for="loginPassword">Пароль:</label>
@@ -42,12 +42,12 @@
                 <h2>Реєстрація</h2>
                 <form id="registerFormElement">
                     <div class="form-group">
-                        <label for="registerName">Ім'я:</label>
-                        <input type="text" id="registerName" required placeholder="Ваше ім'я">
+                        <label for="registerUsername">Логін:</label>
+                        <input type="text" id="registerUsername" required placeholder="Ваш логін" pattern="[a-zA-Z0-9_-]{3,20}" title="3-20 символів: літери, цифри, _ або -">
                     </div>
                     <div class="form-group">
-                        <label for="registerEmail">Email:</label>
-                        <input type="email" id="registerEmail" required placeholder="your@email.com">
+                        <label for="registerName">Ім'я (необов'язково):</label>
+                        <input type="text" id="registerName" placeholder="Ваше ім'я">
                     </div>
                     <div class="form-group">
                         <label for="registerPassword">Пароль:</label>
