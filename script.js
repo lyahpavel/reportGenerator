@@ -327,6 +327,13 @@ reportForm.addEventListener('submit', function(e) {
     reportOutput.classList.remove('hidden');
     reportOutput.scrollIntoView({ behavior: 'smooth' });
     
+    // Зберегти кастомні опції користувача (якщо авторизований)
+    if (window.authFunctions && window.authFunctions.saveCustomOptionsFromForm) {
+        window.authFunctions.saveCustomOptionsFromForm(formData).catch(error => {
+            console.error('Помилка збереження кастомних опцій:', error);
+        });
+    }
+    
     // Зберегти звіт у Supabase (асинхронно, не блокуємо UI)
     if (window.supabaseFunctions && window.supabaseClient) {
         window.supabaseFunctions.saveReportToSupabase(formData).catch(error => {

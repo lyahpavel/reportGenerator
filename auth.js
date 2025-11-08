@@ -323,43 +323,50 @@ async function saveUserCustomOption(optionType, value, label) {
     }
 }
 
-// Оновлення функції generateReport для збереження з user_id
-const originalGenerateReport = window.generateReport;
-if (originalGenerateReport) {
-    window.generateReport = async function(data) {
-        // Викликати оригінальну функцію
-        originalGenerateReport(data);
-        
-        // Зберегти кастомні опції, якщо користувач ввів "Інший"
-        if (currentUser && window.supabaseClient) {
-            const customFields = [
-                { type: 'subdivisions', field: 'subdivision', selectId: 'subdivision' },
-                { type: 'jointWithOptions', field: 'jointWith', selectId: 'jointWith' },
-                { type: 'droneNames', field: 'droneName', selectId: 'droneName' },
-                { type: 'droneSizes', field: 'droneSize', selectId: 'droneSize' },
-                { type: 'cameraTypes', field: 'cameraType', selectId: 'cameraType' },
-                { type: 'videoFrequencies', field: 'videoFrequency', selectId: 'videoFrequency' },
-                { type: 'controlFrequencies', field: 'controlFrequency', selectId: 'controlFrequency' },
-                { type: 'bkOptions', field: 'bk', selectId: 'bk' },
-                { type: 'initiationBoardOptions', field: 'initiationBoard', selectId: 'initiationBoard' },
-                { type: 'targetTypeOptions', field: 'targetType', selectId: 'targetType' },
-                { type: 'settlementOptions', field: 'settlement', selectId: 'settlement' },
-                { type: 'statusOptions', field: 'status', selectId: 'status' },
-                { type: 'reasonOptions', field: 'reason', selectId: 'reason' },
-                { type: 'lossOptions', field: 'losses', selectId: 'losses' },
-                { type: 'operatorOptions', field: 'operator', selectId: 'operator' }
-            ];
+// Функція для збереження кастомних опцій після відправки форми
+async function saveCustomOptionsFromForm(formData) {
+    if (!currentUser || !window.supabaseClient) {
+        console.log('ℹ️ Користувач не авторизований, кастомні опції не зберігаються');
+        return;
+    }
 
-            for (const custom of customFields) {
-                const selectValue = document.getElementById(custom.selectId)?.value;
-                const isCustom = selectValue === 'Інший' || selectValue === 'Інша' || selectValue === 'Інше';
-                
-                if (isCustom && data[custom.field]) {
-                    await saveUserCustomOption(custom.type, data[custom.field], data[custom.field]);
-                }
-            }
+    console.log('🔄 Перевірка кастомних опцій для збереження...');
+
+    const customFields = [
+        { type: 'subdivisions', field: 'subdivision', selectId: 'subdivision', customId: 'customSubdivision' },
+        { type: 'jointWithOptions', field: 'jointWith', selectId: 'jointWith', customId: 'customJointWith' },
+        { type: 'droneNames', field: 'droneName', selectId: 'droneName', customId: 'customDroneName' },
+        { type: 'droneSizes', field: 'droneSize', selectId: 'droneSize', customId: 'customDroneSize' },
+        { type: 'cameraTypes', field: 'cameraType', selectId: 'cameraType', customId: 'customCameraType' },
+        { type: 'videoFrequencies', field: 'videoFrequency', selectId: 'videoFrequency', customId: 'customVideoFrequency' },
+        { type: 'controlFrequencies', field: 'controlFrequency', selectId: 'controlFrequency', customId: 'customControlFrequency' },
+        { type: 'bkOptions', field: 'bk', selectId: 'bk', customId: 'customBk' },
+        { type: 'initiationBoardOptions', field: 'initiationBoard', selectId: 'initiationBoard', customId: 'customInitiationBoard' },
+        { type: 'targetTypeOptions', field: 'targetType', selectId: 'targetType', customId: 'customTargetType' },
+        { type: 'settlementOptions', field: 'settlement', selectId: 'settlement', customId: 'customSettlement' },
+        { type: 'statusOptions', field: 'status', selectId: 'status', customId: 'customStatus' },
+        { type: 'reasonOptions', field: 'reason', selectId: 'reason', customId: 'customReason' },
+        { type: 'lossOptions', field: 'losses', selectId: 'losses', customId: 'customLosses' },
+        { type: 'operatorOptions', field: 'operator', selectId: 'operator', customId: 'customOperator' }
+    ];
+
+    for (const custom of customFields) {
+        const selectElement = document.getElementById(custom.selectId);
+        const customInputElement = document.getElementById(custom.customId);
+        
+        if (!selectElement) continue;
+
+        const selectValue = selectElement.value;
+        const isCustom = selectValue === 'Інший' || selectValue === 'Інша' || selectValue === 'Інше';
+        
+        if (isCustom && customInputElement && customInputElement.value.trim()) {
+            const customValue = customInputElement.value.trim();
+            console.log(`💾 Зберігаю кастомну опцію: ${custom.type} = "${customValue}"`);
+            await saveUserCustomOption(custom.type, customValue, customValue);
         }
-    };
+    }
+
+    console.log('✅ Перевірка кастомних опцій завершена');
 }
 
 // Експорт функцій
@@ -367,7 +374,8 @@ window.authFunctions = {
     initAuth,
     getCurrentUser: () => currentUser,
     saveUserCustomOption,
-    loadUserCustomOptions
+    loadUserCustomOptions,
+    saveCustomOptionsFromForm
 };
 
 // Автоматична ініціалізація при завантаженні
