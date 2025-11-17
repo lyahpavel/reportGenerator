@@ -205,6 +205,17 @@ async function handleUserLogin() {
             }
         }, 100);
     }
+    
+    // Відновити збережені дані форми (якщо є)
+    setTimeout(() => {
+        if (typeof window.restoreFormState === 'function') {
+            window.restoreFormState();
+        }
+        // Ініціалізувати автозбереження
+        if (typeof window.initAutoSave === 'function') {
+            window.initAutoSave();
+        }
+    }, 300);
 }
 
 // Обробка виходу користувача

@@ -466,22 +466,33 @@
         function saveFormState() {
             try {
                 const fields = getFormFields();
+                if (fields.length === 0) {
+                    console.warn('[AutoSave] Немає полів для збереження');
+                    return;
+                }
+                
                 const formData = {};
+                let savedCount = 0;
                 
                 fields.forEach(field => {
                     if (field.type === 'checkbox') {
                         formData[field.id] = field.checked;
+                        savedCount++;
                     } else if (field.type === 'radio') {
                         if (field.checked) {
                             formData[field.name] = field.value;
+                            savedCount++;
                         }
-                    } else {
+                    } else if (field.value && field.value.trim() !== '') {
                         formData[field.id] = field.value;
+                        savedCount++;
                     }
                 });
                 
-                localStorage.setItem(FORM_SAVE_KEY, JSON.stringify(formData));
-                console.log('[AutoSave] Форму збережено');
+                if (savedCount > 0) {
+                    localStorage.setItem(FORM_SAVE_KEY, JSON.stringify(formData));
+                    console.log(`[AutoSave] Форму збережено (${savedCount} полів)`);
+                }
             } catch (error) {
                 console.error('[AutoSave] Помилка збереження:', error);
             }
@@ -492,12 +503,19 @@
             try {
                 const savedData = localStorage.getItem(FORM_SAVE_KEY);
                 if (!savedData) {
-                    console.log('[AutoSave] Немає збережених даних');
+                    console.log('[AutoSave] Немає збережених даних для відновлення');
                     return;
                 }
                 
                 const formData = JSON.parse(savedData);
                 const fields = getFormFields();
+                
+                if (fields.length === 0) {
+                    console.warn('[AutoSave] Поля форми не знайдено для відновлення');
+                    return;
+                }
+                
+                let restoredCount = 0;
                 
                 fields.forEach(field => {
                     const savedValue = formData[field.id] || formData[field.name];
@@ -505,21 +523,36 @@
                     if (savedValue !== undefined && savedValue !== null) {
                         if (field.type === 'checkbox') {
                             field.checked = savedValue;
+                            restoredCount++;
                             // Викликати onChange для чекбоксів (для toggleFiberLength та інших)
-                            if (field.onchange) field.onchange();
+                            if (field.onchange) {
+                                try {
+                                    field.onchange();
+                                } catch (e) {
+                                    console.warn('[AutoSave] Помилка виклику onchange для', field.id, e);
+                                }
+                            }
                         } else if (field.type === 'radio') {
                             if (field.value === savedValue) {
                                 field.checked = true;
+                                restoredCount++;
                             }
                         } else {
                             field.value = savedValue;
+                            restoredCount++;
                             // Викликати onChange для селектів (для toggleCustom функцій)
-                            if (field.onchange) field.onchange();
+                            if (field.onchange) {
+                                try {
+                                    field.onchange();
+                                } catch (e) {
+                                    console.warn('[AutoSave] Помилка виклику onchange для', field.id, e);
+                                }
+                            }
                         }
                     }
                 });
                 
-                console.log('[AutoSave] Форму відновлено');
+                console.log(`[AutoSave] Форму відновлено (${restoredCount} полів)`);
             } catch (error) {
                 console.error('[AutoSave] Помилка відновлення:', error);
             }
@@ -535,22 +568,26 @@
             }
         }
         
-        // Ініціалізація автозбереження
-        window.addEventListener('load', () => {
-            // Відновити форму при завантаженні
-            setTimeout(() => {
-                restoreFormState();
-            }, 500);
+        // Ініціалізація автозбереження (викликається після логіна)
+        window.initAutoSave = function() {
+            console.log('[AutoSave] Ініціалізація автозбереження');
             
             // Автозбереження при введенні
             const fields = getFormFields();
+            if (fields.length === 0) {
+                console.warn('[AutoSave] Поля форми не знайдено');
+                return;
+            }
+            
+            console.log('[AutoSave] Знайдено полів:', fields.length);
+            
             fields.forEach(field => {
                 field.addEventListener('input', () => {
                     saveFormState();
-                });
+                }, { once: false });
                 field.addEventListener('change', () => {
                     saveFormState();
-                });
+                }, { once: false });
             });
             
             // Додаткове автозбереження кожні N секунд
@@ -568,10 +605,14 @@
             window.addEventListener('beforeunload', () => {
                 saveFormState();
             });
-        });
+            
+            console.log('[AutoSave] Автозбереження налаштовано');
+        };
         
-        // Інтеграція з generateReport - очищення після успішної генерації
-        // Це буде додано до існуючої функції generateReport в script.js
+        // Експортуємо функції для використання в інших скриптах
+        window.saveFormState = saveFormState;
+        window.restoreFormState = restoreFormState;
+        window.clearSavedFormState = clearSavedFormState;
     </script>
     
     <script>
