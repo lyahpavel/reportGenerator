@@ -44,18 +44,21 @@ async function initAuth() {
 
 // Налаштування форм автентифікації
 function setupAuthForms() {
+    // Реєстрація вимкнена - форми закоментовані в HTML
+    /*
     // Перемикання між формами
-    document.getElementById('showRegister').addEventListener('click', (e) => {
+    document.getElementById('showRegister')?.addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('registerForm').style.display = 'block';
     });
 
-    document.getElementById('showLogin').addEventListener('click', (e) => {
+    document.getElementById('showLogin')?.addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('registerForm').style.display = 'none';
         document.getElementById('loginForm').style.display = 'block';
     });
+    */
 
     // Форма логіна
     document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
@@ -63,11 +66,14 @@ function setupAuthForms() {
         await handleLogin();
     });
 
+    // Реєстрація вимкнена
+    /*
     // Форма реєстрації
-    document.getElementById('registerFormElement').addEventListener('submit', async (e) => {
+    document.getElementById('registerFormElement')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await handleRegister();
     });
+    */
 
     // Кнопка виходу
     document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -101,6 +107,8 @@ async function handleLogin() {
     }
 }
 
+// Реєстрація вимкнена - користувачі створюються через БД
+/*
 // Обробка реєстрації
 async function handleRegister() {
     const username = document.getElementById('registerUsername').value;
@@ -161,6 +169,7 @@ async function handleRegister() {
         showError('Помилка реєстрації: ' + error.message);
     }
 }
+*/
 
 // Обробка виходу
 async function handleLogout() {
