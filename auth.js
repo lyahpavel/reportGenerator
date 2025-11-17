@@ -176,15 +176,30 @@ async function handleLogout() {
     const supabase = window.supabaseClient;
 
     try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
+        // Перевіряємо чи є активна сесія
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+            // Якщо є сесія - виходимо
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+        } else {
+            console.log('ℹ️ Сесія вже закрита');
+        }
 
         console.log('✅ Вихід з системи');
         showSuccess('Ви вийшли з системи');
 
     } catch (error) {
         console.error('❌ Помилка виходу:', error);
-        showError('Помилка виходу: ' + error.message);
+        
+        // Ігноруємо помилку "Auth session missing" - це нормально
+        if (error.message && error.message.includes('Auth session missing')) {
+            console.log('ℹ️ Сесія вже була закрита раніше');
+            showSuccess('Ви вийшли з системи');
+        } else {
+            showError('Помилка виходу: ' + error.message);
+        }
     }
 }
 
