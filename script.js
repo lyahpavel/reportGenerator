@@ -346,6 +346,12 @@ reportForm.addEventListener('submit', function(e) {
             // Звіт все одно буде доступний локально
         });
     }
+    
+    // Очистити збережені дані форми після успішної генерації
+    if (typeof window.clearSavedFormState === 'function') {
+        window.clearSavedFormState();
+        console.log('[AutoSave] Збережені дані очищено після генерації звіту');
+    }
 });
 
 // Функція валідації форми

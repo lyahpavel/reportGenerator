@@ -442,6 +442,138 @@
             }
         }
     </script>
+    
+    <script>
+        // ============================================
+        // АВТОЗБЕРЕЖЕННЯ ФОРМИ В LOCALSTORAGE
+        // ============================================
+        
+        const FORM_SAVE_KEY = 'droneReportFormData';
+        const FORM_SAVE_INTERVAL = 2000; // Автозбереження кожні 2 секунди
+        
+        // Отримати всі поля форми
+        function getFormFields() {
+            const form = document.getElementById('reportForm');
+            if (!form) return [];
+            
+            return Array.from(form.querySelectorAll('input, select, textarea')).filter(field => {
+                // Пропускаємо поля пароля та інші чутливі дані
+                return field.type !== 'password' && field.id !== 'loginPassword' && field.id !== 'registerPassword';
+            });
+        }
+        
+        // Зберегти стан форми
+        function saveFormState() {
+            try {
+                const fields = getFormFields();
+                const formData = {};
+                
+                fields.forEach(field => {
+                    if (field.type === 'checkbox') {
+                        formData[field.id] = field.checked;
+                    } else if (field.type === 'radio') {
+                        if (field.checked) {
+                            formData[field.name] = field.value;
+                        }
+                    } else {
+                        formData[field.id] = field.value;
+                    }
+                });
+                
+                localStorage.setItem(FORM_SAVE_KEY, JSON.stringify(formData));
+                console.log('[AutoSave] Форму збережено');
+            } catch (error) {
+                console.error('[AutoSave] Помилка збереження:', error);
+            }
+        }
+        
+        // Відновити стан форми
+        function restoreFormState() {
+            try {
+                const savedData = localStorage.getItem(FORM_SAVE_KEY);
+                if (!savedData) {
+                    console.log('[AutoSave] Немає збережених даних');
+                    return;
+                }
+                
+                const formData = JSON.parse(savedData);
+                const fields = getFormFields();
+                
+                fields.forEach(field => {
+                    const savedValue = formData[field.id] || formData[field.name];
+                    
+                    if (savedValue !== undefined && savedValue !== null) {
+                        if (field.type === 'checkbox') {
+                            field.checked = savedValue;
+                            // Викликати onChange для чекбоксів (для toggleFiberLength та інших)
+                            if (field.onchange) field.onchange();
+                        } else if (field.type === 'radio') {
+                            if (field.value === savedValue) {
+                                field.checked = true;
+                            }
+                        } else {
+                            field.value = savedValue;
+                            // Викликати onChange для селектів (для toggleCustom функцій)
+                            if (field.onchange) field.onchange();
+                        }
+                    }
+                });
+                
+                console.log('[AutoSave] Форму відновлено');
+            } catch (error) {
+                console.error('[AutoSave] Помилка відновлення:', error);
+            }
+        }
+        
+        // Очистити збережені дані після успішної генерації звіту
+        function clearSavedFormState() {
+            try {
+                localStorage.removeItem(FORM_SAVE_KEY);
+                console.log('[AutoSave] Збережені дані очищено');
+            } catch (error) {
+                console.error('[AutoSave] Помилка очищення:', error);
+            }
+        }
+        
+        // Ініціалізація автозбереження
+        window.addEventListener('load', () => {
+            // Відновити форму при завантаженні
+            setTimeout(() => {
+                restoreFormState();
+            }, 500);
+            
+            // Автозбереження при введенні
+            const fields = getFormFields();
+            fields.forEach(field => {
+                field.addEventListener('input', () => {
+                    saveFormState();
+                });
+                field.addEventListener('change', () => {
+                    saveFormState();
+                });
+            });
+            
+            // Додаткове автозбереження кожні N секунд
+            setInterval(saveFormState, FORM_SAVE_INTERVAL);
+            
+            // Збереження при згортанні додатку
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    saveFormState();
+                    console.log('[AutoSave] Додаток згорнуто - форму збережено');
+                }
+            });
+            
+            // Збереження перед закриттям
+            window.addEventListener('beforeunload', () => {
+                saveFormState();
+            });
+        });
+        
+        // Інтеграція з generateReport - очищення після успішної генерації
+        // Це буде додано до існуючої функції generateReport в script.js
+    </script>
+    
     <script>
         // Реєстрація Service Worker для PWA з автоматичним оновленням
         if ('serviceWorker' in navigator) {
