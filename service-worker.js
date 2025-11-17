@@ -1,5 +1,5 @@
 // Змінюй цю версію при кожному оновленні додатку!
-const CACHE_VERSION = 'v1.4';
+const CACHE_VERSION = 'v1.5';
 const CACHE_NAME = `drone-reports-${CACHE_VERSION}`;
 const urlsToCache = [
   './',
@@ -10,7 +10,8 @@ const urlsToCache = [
   './supabase-functions.js',
   './reports-history.js',
   './data.json',
-  './manifest.json'
+  './manifest.json',
+  './version-info.json'
 ];
 
 // Обробка повідомлень (для примусового оновлення)
