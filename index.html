@@ -616,48 +616,158 @@
     </script>
     
     <script>
-        // Реєстрація Service Worker для PWA з автоматичним оновленням
+        // ============================================
+        // SERVICE WORKER З АВТОМАТИЧНИМ ОНОВЛЕННЯМ
+        // ============================================
+        
         if ('serviceWorker' in navigator) {
+            let newWorkerWaiting = null;
+            
+            // Показати повідомлення про оновлення
+            function showUpdateNotification() {
+                // Створюємо стильне повідомлення
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    animation: slideDown 0.3s ease-out;
+                `;
+                
+                notification.innerHTML = `
+                    <span style="font-size: 16px;">🎉 Нова версія доступна!</span>
+                    <button id="updateBtn" style="
+                        background: white;
+                        color: #667eea;
+                        border: none;
+                        padding: 8px 20px;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        font-size: 14px;
+                    ">Оновити</button>
+                    <button id="dismissBtn" style="
+                        background: transparent;
+                        color: white;
+                        border: 1px solid white;
+                        padding: 8px 15px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 14px;
+                    ">Пізніше</button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Обробники кнопок
+                document.getElementById('updateBtn').addEventListener('click', () => {
+                    if (newWorkerWaiting) {
+                        newWorkerWaiting.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                    notification.remove();
+                });
+                
+                document.getElementById('dismissBtn').addEventListener('click', () => {
+                    notification.remove();
+                });
+                
+                console.log('[App] 🎉 Показано повідомлення про оновлення');
+            }
+            
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./service-worker.js')
                     .then(registration => {
-                        console.log('[App] Service Worker зареєстровано:', registration);
+                        console.log('[App] ✅ Service Worker зареєстровано');
                         
-                        // Перевірка оновлень кожні 60 секунд
+                        // Перевірка оновлень при фокусі на вкладку
+                        document.addEventListener('visibilitychange', () => {
+                            if (!document.hidden) {
+                                console.log('[App] 🔍 Перевірка оновлень (вкладка активна)');
+                                registration.update();
+                            }
+                        });
+                        
+                        // Перевірка оновлень кожні 30 секунд (частіше!)
                         setInterval(() => {
+                            console.log('[App] 🔍 Періодична перевірка оновлень');
                             registration.update();
-                        }, 60000);
+                        }, 30000);
                         
                         // Відстежування оновлень
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
-                            console.log('[App] Знайдено оновлення Service Worker');
+                            console.log('[App] 📥 Знайдено оновлення, завантаження...');
+                            
+                            newWorkerWaiting = newWorker;
                             
                             newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'activated') {
-                                    console.log('[App] Новий Service Worker активовано');
-                                    // Можна показати повідомлення користувачу
-                                    if (confirm('Доступна нова версія додатку. Перезавантажити сторінку?')) {
-                                        window.location.reload();
-                                    }
+                                console.log('[App] SW State:', newWorker.state);
+                                
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Новий Service Worker встановлено, показуємо повідомлення
+                                    console.log('[App] ✨ Нова версія готова!');
+                                    showUpdateNotification();
                                 }
                             });
                         });
+                        
+                        // Якщо є Service Worker, що чекає
+                        if (registration.waiting) {
+                            newWorkerWaiting = registration.waiting;
+                            showUpdateNotification();
+                        }
+                        
+                        // Одразу перевіряємо оновлення
+                        registration.update();
                     })
                     .catch(error => {
-                        console.log('[App] Помилка реєстрації Service Worker:', error);
+                        console.error('[App] ❌ Помилка реєстрації Service Worker:', error);
                     });
                 
-                // Автоматичне оновлення при активації нового Service Worker
+                // Автоматичне оновлення при зміні контролера
                 let refreshing = false;
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
                     if (!refreshing) {
                         refreshing = true;
-                        console.log('[App] Оновлення контролера, перезавантаження...');
+                        console.log('[App] 🔄 Перезавантаження додатку...');
+                        window.location.reload();
+                    }
+                });
+                
+                // Додаємо обробник повідомлень від Service Worker
+                navigator.serviceWorker.addEventListener('message', event => {
+                    if (event.data && event.data.type === 'RELOAD_PAGE') {
                         window.location.reload();
                     }
                 });
             });
+            
+            // CSS анімація для повідомлення
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from {
+                        transform: translate(-50%, -100px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translate(-50%, 0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         }
     </script>
     </div> <!-- End of appSection -->
