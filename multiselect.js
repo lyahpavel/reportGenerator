@@ -39,16 +39,18 @@ class CustomMultiSelect {
         this.button = document.createElement('div');
         this.button.className = 'multiselect-trigger';
         this.button.style.cssText = `
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             background: white;
             cursor: pointer;
             min-height: 42px;
             display: flex;
             align-items: center;
-            font-size: 14px;
+            font-size: 1rem;
             color: #666;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
         `;
         this.button.innerHTML = `<span class="multiselect-text">${this.placeholder}</span>`;
         
