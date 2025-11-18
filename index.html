@@ -492,26 +492,59 @@
             }
         }
         
-        // Покращене автодоповнення для модифікацій
-        document.addEventListener('DOMContentLoaded', function() {
-            const modificationsInput = document.getElementById('modifications');
-            if (modificationsInput) {
-                modificationsInput.addEventListener('input', function(e) {
-                    // Отримуємо поточне значення і позицію курсора
-                    const value = e.target.value;
-                    const cursorPos = e.target.selectionStart;
-                    
-                    // Знаходимо поточний елемент (після останньої коми перед курсором)
-                    const beforeCursor = value.substring(0, cursorPos);
-                    const lastCommaIndex = beforeCursor.lastIndexOf(',');
-                    const currentItem = beforeCursor.substring(lastCommaIndex + 1).trim();
-                    
-                    // Логування для дебагу
-                    if (currentItem) {
-                        console.log('🔍 Автодоповнення для:', currentItem);
+        // Покращене автодоповнення для полів з комами (модифікації, канали)
+        // Зберігаємо оригінальні datalist опції
+        window.originalDatalistOptions = {};
+        
+        function setupCommaAutocomplete(inputId, datalistId) {
+            const input = document.getElementById(inputId);
+            const datalist = document.getElementById(datalistId);
+            
+            if (!input || !datalist) return;
+            
+            // Зберігаємо оригінальні опції при першому завантаженні
+            function saveOriginalOptions() {
+                if (!window.originalDatalistOptions[datalistId]) {
+                    window.originalDatalistOptions[datalistId] = Array.from(datalist.options).map(opt => opt.value);
+                }
+            }
+            
+            // Оновлюємо datalist на основі вже введених значень
+            function updateDatalist() {
+                saveOriginalOptions();
+                
+                const value = input.value;
+                const cursorPos = input.selectionStart;
+                
+                // Знаходимо вже введені елементи (розділені комами)
+                const items = value.split(',').map(item => item.trim()).filter(item => item !== '');
+                
+                // Фільтруємо datalist - приховуємо вже введені
+                const originalOptions = window.originalDatalistOptions[datalistId] || [];
+                
+                datalist.innerHTML = '';
+                originalOptions.forEach(optValue => {
+                    if (!items.includes(optValue)) {
+                        const option = document.createElement('option');
+                        option.value = optValue;
+                        datalist.appendChild(option);
                     }
                 });
             }
+            
+            input.addEventListener('input', updateDatalist);
+            input.addEventListener('focus', updateDatalist);
+            
+            // При завантаженні сторінки зберігаємо опції
+            setTimeout(saveOriginalOptions, 500);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Налаштовуємо автодоповнення для модифікацій та каналів
+            setTimeout(() => {
+                setupCommaAutocomplete('modifications', 'modificationsList');
+                setupCommaAutocomplete('channel', 'channelList');
+            }, 1000);
         });
     </script>
     
