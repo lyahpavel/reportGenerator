@@ -295,6 +295,7 @@ reportForm.addEventListener('submit', function(e) {
         factoryConfig: document.getElementById('factoryConfig').checked,
         modifications: document.getElementById('modifications').value,
         videoFrequency: document.getElementById('videoFrequency').value === 'Інша' ? document.getElementById('customVideoFrequency').value : document.getElementById('videoFrequency').value,
+        channel: document.getElementById('channel').value,
         controlFrequency: document.getElementById('controlFrequency').value === 'Інша' ? document.getElementById('customControlFrequency').value : document.getElementById('controlFrequency').value,
         fiberOptic: document.getElementById('fiberOptic').checked,
         fiberLength: document.getElementById('fiberLength').value,
@@ -473,6 +474,13 @@ function generateReport(data) {
             <span class="report-value">Відео: ${data.videoFrequency} | Керування: ${data.controlFrequency}</span>
         </div>
         `}
+        
+        ${data.channel ? `
+        <div class="report-item">
+            <span class="report-label">Канал:</span>
+            <span class="report-value">${data.channel}</span>
+        </div>
+        ` : ''}
         
         <div class="report-item">
             <span class="report-label">Дата та час:</span>
@@ -1169,20 +1177,14 @@ async function toggleSaveOption(inputId) {
     const button = input.nextElementSibling;
     const icon = button.querySelector('.save-icon') || button;
     
-    // Окрема логіка для модифікацій - завжди зберігаємо при натисканні
-    if (inputId === 'modifications') {
+    // Окрема логіка для модифікацій і каналу - завжди зберігаємо при натисканні
+    if (inputId === 'modifications' || inputId === 'channel') {
         const customValue = input.value.trim();
+        const fieldName = inputId === 'modifications' ? 'модифікації' : 'канал';
+        const optionType = inputId === 'modifications' ? 'modifications' : 'channels';
         
         if (!customValue) {
-            alert('⚠️ Спочатку введіть модифікації');
-            return;
-        }
-        
-        // Модифікації можуть бути через кому
-        const modifications = customValue.split(',').map(m => m.trim()).filter(m => m !== '');
-        
-        if (modifications.length === 0) {
-            alert('⚠️ Спочатку введіть модифікації');
+            alert(`⚠️ Спочатку введіть ${fieldName}`);
             return;
         }
         
@@ -1190,15 +1192,29 @@ async function toggleSaveOption(inputId) {
             button.disabled = true;
             icon.textContent = '⏳';
             
+            // Для модифікацій - можуть бути через кому, для каналу - одне значення
+            let items = [];
+            if (inputId === 'modifications') {
+                items = customValue.split(',').map(m => m.trim()).filter(m => m !== '');
+            } else {
+                items = [customValue];
+            }
+            
+            if (items.length === 0) {
+                alert(`⚠️ Спочатку введіть ${fieldName}`);
+                button.disabled = false;
+                return;
+            }
+            
             let allSuccess = true;
             let savedCount = 0;
             
-            for (const modification of modifications) {
-                console.log(`💾 Зберігаю модифікацію: "${modification}"`);
+            for (const item of items) {
+                console.log(`💾 Зберігаю ${fieldName}: "${item}"`);
                 const success = await window.authFunctions.saveUserCustomOption(
-                    'modifications',
-                    modification,
-                    modification,
+                    optionType,
+                    item,
+                    item,
                     null
                 );
                 if (success) {
@@ -1210,7 +1226,7 @@ async function toggleSaveOption(inputId) {
             
             if (allSuccess) {
                 icon.textContent = '✅';
-                console.log(`✅ Збережено ${savedCount} модифікацій`);
+                console.log(`✅ Збережено ${savedCount} ${items.length > 1 ? 'записів' : 'запис'}`);
                 
                 // Оновлюємо datalist
                 if (window.authFunctions.loadUserCustomOptions) {
@@ -1223,7 +1239,7 @@ async function toggleSaveOption(inputId) {
                 }, 1500);
             } else {
                 icon.textContent = '❌';
-                console.error('❌ Помилка збереження модифікацій');
+                console.error(`❌ Помилка збереження ${fieldName}`);
                 setTimeout(() => {
                     icon.textContent = '💾';
                     button.disabled = false;

@@ -295,6 +295,9 @@ async function loadUserCustomOptions() {
         // Додати модифікації до datalist
         addModificationsToDatalist();
         
+        // Додати канали до datalist
+        addChannelsToDatalist();
+        
         // Оновити кнопки видалення після додавання опцій
         if (window.scriptFunctions && window.scriptFunctions.updateDeleteButtons) {
             setTimeout(() => {
@@ -323,6 +326,26 @@ function addModificationsToDatalist() {
     modifications.forEach(mod => {
         const option = document.createElement('option');
         option.value = mod.value;
+        datalist.appendChild(option);
+    });
+}
+
+// Додавання каналів до datalist
+function addChannelsToDatalist() {
+    const datalist = document.getElementById('channelList');
+    if (!datalist) return;
+    
+    // Очистити datalist
+    datalist.innerHTML = '';
+    
+    const channels = userCustomOptions['channels'];
+    if (!channels || channels.length === 0) return;
+    
+    console.log('📋 Додаю канали до datalist:', channels);
+    
+    channels.forEach(channel => {
+        const option = document.createElement('option');
+        option.value = channel.value;
         datalist.appendChild(option);
     });
 }
@@ -484,19 +507,25 @@ async function saveCustomOptionsFromForm(formData) {
         { type: 'operatorOptions', field: 'operator', selectId: 'operator', customId: 'customOperator' }
     ];
     
-    // Окремо обробляємо модифікації (можуть бути багато через кому)
+    // Окремо обробляємо модифікації
     const modificationsInput = document.getElementById('modifications');
     if (modificationsInput && modificationsInput.value && modificationsInput.value.trim() !== '') {
-        const modifications = modificationsInput.value.split(',').map(m => m.trim()).filter(m => m !== '');
-        console.log('💾 Зберігаю модифікації:', modifications);
+        const shouldSave = modificationsInput.getAttribute('data-save-option') === 'true';
         
-        for (const modification of modifications) {
-            try {
-                await saveUserCustomOption('modifications', modification, null);
-                console.log(`  ✅ Збережено модифікацію: ${modification}`);
-            } catch (error) {
-                console.error(`  ❌ Помилка збереження модифікації "${modification}":`, error);
+        if (shouldSave) {
+            const modifications = modificationsInput.value.split(',').map(m => m.trim()).filter(m => m !== '');
+            console.log('💾 Зберігаю модифікації:', modifications);
+            
+            for (const modification of modifications) {
+                try {
+                    await saveUserCustomOption('modifications', modification, modification);
+                    console.log(`  ✅ Збережено модифікацію: ${modification}`);
+                } catch (error) {
+                    console.error(`  ❌ Помилка збереження модифікації "${modification}":`, error);
+                }
             }
+        } else {
+            console.log('ℹ️ Модифікації не будуть збережені (користувач не натиснув кнопку)');
         }
     }
 

@@ -199,6 +199,17 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="channel">Канал:</label>
+                    <div class="custom-input-wrapper" style="display: block;">
+                        <input type="text" id="channel" name="channel" placeholder="Наприклад: R1, R2, F1..." list="channelList" data-save-option="true">
+                        <button type="button" class="save-option-btn active" onclick="toggleSaveOption('channel')" title="Зберегти в мої опції">
+                            <span class="save-icon">💾</span>
+                        </button>
+                    </div>
+                    <datalist id="channelList"></datalist>
+                </div>
+
+                <div class="form-group">
                     <label for="controlFrequency">Частота керування:</label>
                     <select id="controlFrequency" name="controlFrequency" required onchange="toggleCustomControlFrequency()">
                         <option value="">Оберіть частоту керування...</option>
