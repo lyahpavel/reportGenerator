@@ -1,5 +1,5 @@
 // Змінюй цю версію при кожному оновленні додатку!
-const CACHE_VERSION = 'v1.26';
+const CACHE_VERSION = 'v1.27';
 const CACHE_NAME = `drone-reports-${CACHE_VERSION}`;
 const urlsToCache = [
   './',

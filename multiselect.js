@@ -73,12 +73,21 @@ class CustomMultiSelect {
             textSpan.textContent = this.placeholder;
             textSpan.style.color = '#999';
         } else {
-            const selectedTexts = this.selectedValues.map(val => {
-                const option = Array.from(this.select.options).find(opt => opt.value === val);
-                return option ? option.text : val;
-            });
-            textSpan.textContent = selectedTexts.join(', ');
-            textSpan.style.color = '#333';
+            const selectedTexts = this.selectedValues
+                .filter(val => val !== '') // Пропускаємо пусті значення
+                .map(val => {
+                    const option = Array.from(this.select.options).find(opt => opt.value === val);
+                    return option ? option.text : val;
+                })
+                .filter(text => text !== ''); // Пропускаємо пусті тексти
+            
+            if (selectedTexts.length > 0) {
+                textSpan.textContent = selectedTexts.join(', ');
+                textSpan.style.color = '#333';
+            } else {
+                textSpan.textContent = this.placeholder;
+                textSpan.style.color = '#999';
+            }
         }
     }
     
@@ -308,7 +317,9 @@ class CustomMultiSelect {
     }
     
     updateSelectedFromSelect() {
-        this.selectedValues = Array.from(this.select.selectedOptions).map(opt => opt.value);
+        this.selectedValues = Array.from(this.select.selectedOptions)
+            .map(opt => opt.value)
+            .filter(val => val !== ''); // Фільтруємо пусті значення
     }
     
     openOverlay() {
