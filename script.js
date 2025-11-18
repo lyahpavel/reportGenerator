@@ -484,7 +484,7 @@ function generateReport(data) {
         
         <div class="report-item">
             <span class="report-label">Дата та час:</span>
-            <span class="report-value">${formattedDate} о ${formattedTime}</span>
+            <span class="report-value">${formattedDate} ${formattedTime}</span>
         </div>
         
         ${data.bk ? `
@@ -607,15 +607,15 @@ function generateReportNumber(data) {
 // Функція форматування дати
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('uk-UA', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
 }
 
 // Функція форматування часу
 function formatTime(timeString) {
+    // Час вже в форматі HH:MM, просто повертаємо
     return timeString;
 }
 

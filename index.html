@@ -176,7 +176,7 @@
                         <div class="form-group" id="modificationsGroup" style="display: none;">
                 <label for="modifications">Модифікації (через кому):</label>
                 <div class="custom-input-wrapper" style="display: block;">
-                    <input type="text" id="modifications" list="modificationsList" data-save-option="true">
+                    <input type="text" id="modifications" list="modificationsList" data-save-option="true" autocomplete="off" placeholder="Наприклад: 5.8 GHz, FPV антена">
                     <button onclick="toggleSaveOption('modifications')" class="active">💾</button>
                 </div>
                 <datalist id="modificationsList"></datalist>
@@ -201,7 +201,7 @@
                 <div class="form-group">
                     <label for="channel">Канал (через кому):</label>
                     <div class="custom-input-wrapper" style="display: block;">
-                        <input type="text" id="channel" name="channel" placeholder="Наприклад: R1, R2, F1..." list="channelList" data-save-option="true">
+                        <input type="text" id="channel" name="channel" placeholder="Наприклад: R1, R2, F1..." list="channelList" data-save-option="true" autocomplete="off">
                         <button type="button" class="save-option-btn active" onclick="toggleSaveOption('channel')" title="Зберегти в мої опції">
                             <span class="save-icon">💾</span>
                         </button>
