@@ -1437,6 +1437,34 @@ reportForm.addEventListener('reset', function() {
         
         // Встановлення підрозділу за замовчуванням після скидання
         document.getElementById('subdivision').value = 'ВБпАК 1б ТрО 101 обр ТрО';
+        
+        // Очищення множинних select (targetType, reason, losses)
+        const multipleSelects = ['targetType', 'reason', 'losses'];
+        multipleSelects.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                // Скидаємо всі вибрані опції
+                Array.from(select.options).forEach(option => {
+                    option.selected = false;
+                });
+                
+                // Оновлюємо текст кнопки якщо вона існує
+                const button = select.nextElementSibling;
+                if (button && button.classList.contains('multiselect-trigger')) {
+                    const textSpan = button.querySelector('.multiselect-text');
+                    if (textSpan) {
+                        // Отримуємо placeholder з button або використовуємо default
+                        const placeholders = {
+                            'targetType': 'Оберіть тип цілі...',
+                            'reason': 'Оберіть причину...',
+                            'losses': 'Оберіть втрати...'
+                        };
+                        textSpan.textContent = placeholders[id] || 'Оберіть...';
+                        textSpan.style.color = '#999';
+                    }
+                }
+            }
+        });
     }, 10);
 });
 
