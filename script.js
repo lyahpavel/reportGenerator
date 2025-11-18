@@ -712,6 +712,34 @@ copyButton.addEventListener('click', function() {
     }
 });
 
+// Поділитися звітом через Web Share API
+const shareButton = document.getElementById('shareReport');
+shareButton.addEventListener('click', async function() {
+    const reportText = getReportAsText();
+    
+    // Перевірка підтримки Web Share API
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Звіт про політ',
+                text: reportText
+            });
+            showSuccess('Звіт надіслано');
+        } catch (err) {
+            // Користувач скасував або сталася помилка
+            if (err.name !== 'AbortError') {
+                console.error('Помилка поділитися:', err);
+                // Fallback - копіювання в буфер
+                fallbackCopyTextToClipboard(reportText);
+            }
+        }
+    } else {
+        // Якщо Web Share API не підтримується - копіюємо в буфер
+        showError('Функція "Поділитися" не підтримується. Звіт скопійовано в буфер обміну.');
+        fallbackCopyTextToClipboard(reportText);
+    }
+});
+
 // Резервний метод копіювання для старих браузерів
 function fallbackCopyTextToClipboard(text) {
     const textArea = document.createElement('textarea');
