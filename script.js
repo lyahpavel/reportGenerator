@@ -1704,6 +1704,7 @@ window.initializeMultiselects = function() {
         
         // З пошуком (без множинного вибору)
         { id: 'subdivision', placeholder: 'Оберіть підрозділ...', multiple: false },
+        { id: 'jointWith', placeholder: 'Сумісно з...', multiple: false },
         { id: 'droneName', placeholder: 'Оберіть назву дрону...', multiple: false },
         { id: 'droneSize', placeholder: 'Оберіть розмір...', multiple: false },
         { id: 'cameraType', placeholder: 'Оберіть тип камери...', multiple: false },
