@@ -39,27 +39,69 @@ async function loadDataFromSupabase() {
             groupedOptions[option.option_type].push(option);
         });
 
-        // Формуємо об'єкт даних у форматі, який очікує додаток
-        // Конвертуємо кожен тип в потрібний формат (використовуємо label для відображення)
+        // Формуємо об'єкт даних у форматі, який очікує populateSelect: { value, label }
         const data = {
-            subdivisions: (groupedOptions['subdivision'] || []).map(o => ({ name: o.label || o.value })),
-            jointWithOptions: (groupedOptions['jointWith'] || []).map(o => ({ name: o.label || o.value })),
-            droneNames: (groupedOptions['droneName'] || []).map(o => ({ name: o.label || o.value })),
-            droneSizes: (groupedOptions['droneSize'] || []).map(o => ({ size: o.label || o.value })),
-            cameraTypes: (groupedOptions['cameraType'] || []).map(o => ({ type: o.label || o.value })),
-            videoFrequencies: (groupedOptions['videoFrequency'] || []).map(o => ({ frequency: o.label || o.value })),
-            controlFrequencies: (groupedOptions['controlFrequency'] || []).map(o => ({ frequency: o.label || o.value })),
-            targetTypeOptions: (groupedOptions['targetType'] || []).map(o => ({ type: o.label || o.value })),
+            subdivisions: (groupedOptions['subdivision'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            jointWithOptions: (groupedOptions['jointWith'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            droneNames: (groupedOptions['droneName'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            droneSizes: (groupedOptions['droneSize'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            cameraTypes: (groupedOptions['cameraType'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            videoFrequencies: (groupedOptions['videoFrequency'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            controlFrequencies: (groupedOptions['controlFrequency'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            targetTypeOptions: (groupedOptions['targetType'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
             settlementOptions: (groupedOptions['settlement'] || []).map(o => ({ 
-                name: o.label || o.value,
+                value: o.value, 
+                label: o.label,
                 coordinates: o.coordinates || ''
             })),
-            bkOptions: (groupedOptions['bkOptions'] || []).map(o => ({ name: o.label || o.value })),
-            initiationBoardOptions: (groupedOptions['initiationBoard'] || []).map(o => ({ name: o.label || o.value })),
-            statusOptions: (groupedOptions['status'] || []).map(o => ({ status: o.label || o.value })),
-            reasonOptions: (groupedOptions['reason'] || []).map(o => ({ reason: o.label || o.value })),
-            lossOptions: (groupedOptions['lossOptions'] || []).map(o => ({ loss: o.label || o.value })),
-            operatorOptions: (groupedOptions['operator'] || []).map(o => ({ name: o.label || o.value }))
+            bkOptions: (groupedOptions['bkOptions'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            initiationBoardOptions: (groupedOptions['initiationBoard'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            statusOptions: (groupedOptions['status'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            reasonOptions: (groupedOptions['reason'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            lossOptions: (groupedOptions['lossOptions'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            })),
+            operatorOptions: (groupedOptions['operator'] || []).map(o => ({ 
+                value: o.value, 
+                label: o.label 
+            }))
         };
 
         console.log('✅ Дані успішно завантажено з Supabase (user_custom_options)');
