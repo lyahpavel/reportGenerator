@@ -492,9 +492,8 @@
             }
         }
         
-        // Покращене автодоповнення для полів з комами (модифікації, канали)
-        // Зберігаємо оригінальні datalist опції
-        window.originalDatalistOptions = {};
+        // Власний dropdown для автодоповнення через кому
+        window.commaAutocompleteData = {};
         
         function setupCommaAutocomplete(inputId, datalistId) {
             const input = document.getElementById(inputId);
@@ -502,41 +501,132 @@
             
             if (!input || !datalist) return;
             
-            // Зберігаємо оригінальні опції при першому завантаженні
-            function saveOriginalOptions() {
-                if (!window.originalDatalistOptions[datalistId]) {
-                    window.originalDatalistOptions[datalistId] = Array.from(datalist.options).map(opt => opt.value);
-                }
+            // Створюємо dropdown контейнер
+            const dropdown = document.createElement('div');
+            dropdown.className = 'comma-autocomplete-dropdown';
+            dropdown.style.cssText = `
+                position: absolute;
+                background: white;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                max-height: 200px;
+                overflow-y: auto;
+                display: none;
+                z-index: 1000;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            `;
+            input.parentElement.style.position = 'relative';
+            input.parentElement.appendChild(dropdown);
+            
+            // Зберігаємо всі доступні опції
+            function getAllOptions() {
+                return Array.from(datalist.options).map(opt => opt.value);
             }
             
-            // Оновлюємо datalist на основі вже введених значень
-            function updateDatalist() {
-                saveOriginalOptions();
-                
+            // Отримуємо поточний текст (після останньої коми)
+            function getCurrentText() {
                 const value = input.value;
                 const cursorPos = input.selectionStart;
-                
-                // Знаходимо вже введені елементи (розділені комами)
-                const items = value.split(',').map(item => item.trim()).filter(item => item !== '');
-                
-                // Фільтруємо datalist - приховуємо вже введені
-                const originalOptions = window.originalDatalistOptions[datalistId] || [];
-                
-                datalist.innerHTML = '';
-                originalOptions.forEach(optValue => {
-                    if (!items.includes(optValue)) {
-                        const option = document.createElement('option');
-                        option.value = optValue;
-                        datalist.appendChild(option);
-                    }
-                });
+                const beforeCursor = value.substring(0, cursorPos);
+                const lastCommaIndex = beforeCursor.lastIndexOf(',');
+                return beforeCursor.substring(lastCommaIndex + 1).trim();
             }
             
-            input.addEventListener('input', updateDatalist);
-            input.addEventListener('focus', updateDatalist);
+            // Отримуємо вже введені елементи
+            function getEnteredItems() {
+                return input.value.split(',').map(item => item.trim()).filter(item => item !== '');
+            }
             
-            // При завантаженні сторінки зберігаємо опції
-            setTimeout(saveOriginalOptions, 500);
+            // Показуємо dropdown з підказками
+            function showDropdown() {
+                const currentText = getCurrentText().toLowerCase();
+                const enteredItems = getEnteredItems();
+                const allOptions = getAllOptions();
+                
+                // Фільтруємо: показуємо тільки ті, що не введені і підходять під пошук
+                const filtered = allOptions.filter(opt => 
+                    !enteredItems.includes(opt) && 
+                    opt.toLowerCase().includes(currentText)
+                );
+                
+                if (filtered.length === 0 || (filtered.length === 1 && filtered[0].toLowerCase() === currentText)) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                dropdown.innerHTML = '';
+                filtered.forEach(opt => {
+                    const item = document.createElement('div');
+                    item.textContent = opt;
+                    item.style.cssText = `
+                        padding: 8px 12px;
+                        cursor: pointer;
+                        border-bottom: 1px solid #f0f0f0;
+                    `;
+                    item.addEventListener('mouseenter', () => {
+                        item.style.background = '#f0f0f0';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.background = 'white';
+                    });
+                    item.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        selectOption(opt);
+                    });
+                    dropdown.appendChild(item);
+                });
+                
+                dropdown.style.display = 'block';
+                // Позиціонуємо dropdown
+                dropdown.style.width = input.offsetWidth + 'px';
+                dropdown.style.top = input.offsetHeight + 'px';
+                dropdown.style.left = '0';
+            }
+            
+            // Вибір опції
+            function selectOption(value) {
+                const cursorPos = input.selectionStart;
+                const fullValue = input.value;
+                const beforeCursor = fullValue.substring(0, cursorPos);
+                const afterCursor = fullValue.substring(cursorPos);
+                const lastCommaIndex = beforeCursor.lastIndexOf(',');
+                
+                let newValue;
+                if (lastCommaIndex >= 0) {
+                    const prefix = beforeCursor.substring(0, lastCommaIndex + 1);
+                    newValue = prefix + ' ' + value + ', ' + afterCursor;
+                } else {
+                    newValue = value + ', ' + afterCursor;
+                }
+                
+                input.value = newValue;
+                const newCursorPos = newValue.length - afterCursor.length;
+                input.setSelectionRange(newCursorPos, newCursorPos);
+                input.focus();
+                
+                dropdown.style.display = 'none';
+            }
+            
+            // Події
+            input.addEventListener('input', () => {
+                showDropdown();
+            });
+            
+            input.addEventListener('focus', () => {
+                showDropdown();
+            });
+            
+            input.addEventListener('blur', () => {
+                setTimeout(() => {
+                    dropdown.style.display = 'none';
+                }, 200);
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    dropdown.style.display = 'none';
+                }
+            });
         }
         
         document.addEventListener('DOMContentLoaded', function() {
