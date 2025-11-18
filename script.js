@@ -2,7 +2,6 @@
 const reportForm = document.getElementById('reportForm');
 const reportOutput = document.getElementById('reportOutput');
 const reportContent = document.getElementById('reportContent');
-const copyButton = document.getElementById('copyReport');
 const downloadButton = document.getElementById('downloadReport');
 const newReportButton = document.getElementById('newReport');
 const newReportBasedOnButton = document.getElementById('newReportBasedOn');
@@ -699,21 +698,6 @@ function showSuccess(message) {
         }
     }, 3000);
 }
-
-// Копіювання звіту в буфер обміну
-copyButton.addEventListener('click', function() {
-    const reportText = getReportAsText();
-    
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(reportText).then(() => {
-            showSuccess('Звіт скопійовано в буфер обміну');
-        }).catch(() => {
-            fallbackCopyTextToClipboard(reportText);
-        });
-    } else {
-        fallbackCopyTextToClipboard(reportText);
-    }
-});
 
 // Поділитися звітом через Web Share API
 const shareButton = document.getElementById('shareReport');
