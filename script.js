@@ -1707,9 +1707,11 @@ window.initializeMultiselects = function() {
         { id: 'droneName', placeholder: 'Оберіть назву дрону...', multiple: false },
         { id: 'droneSize', placeholder: 'Оберіть розмір...', multiple: false },
         { id: 'cameraType', placeholder: 'Оберіть тип камери...', multiple: false },
-        { id: 'operator', placeholder: 'Оберіть оператора...', multiple: false },
+        { id: 'videoFrequency', placeholder: 'Оберіть частоту відео...', multiple: false },
+        { id: 'controlFrequency', placeholder: 'Оберіть частоту керування...', multiple: false },
         { id: 'bk', placeholder: 'Оберіть БК...', multiple: false },
-        { id: 'initBoard', placeholder: 'Оберіть плату...', multiple: false },
+        { id: 'initiationBoard', placeholder: 'Оберіть плату ініціації...', multiple: false },
+        { id: 'operator', placeholder: 'Оберіть оператора...', multiple: false },
         { id: 'status', placeholder: 'Оберіть статус...', multiple: false },
         { id: 'settlement', placeholder: 'Оберіть населений пункт...', multiple: false }
     ];

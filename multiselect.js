@@ -17,6 +17,12 @@ class CustomMultiSelect {
         // Робимо select множинним якщо потрібно
         if (this.isMultiple) {
             this.select.multiple = true;
+            // Приховуємо візуально (але залишаємо в DOM для даних)
+            this.select.style.opacity = '0';
+            this.select.style.position = 'absolute';
+            this.select.style.pointerEvents = 'none';
+            this.select.style.height = '0';
+            this.select.style.overflow = 'hidden';
         }
         
         // Ініціалізуємо обрані значення
@@ -157,8 +163,8 @@ class CustomMultiSelect {
         const options = Array.from(this.select.options);
         
         options.forEach((option, index) => {
-            // Пропускаємо placeholder опції
-            if (option.value === '') return;
+            // Пропускаємо placeholder опції (пусті value або disabled)
+            if (option.value === '' || option.disabled) return;
             
             // Фільтр пошуку
             if (filter && !option.text.toLowerCase().includes(filter.toLowerCase())) {
@@ -267,16 +273,16 @@ class CustomMultiSelect {
     
     attachEvents() {
         // Відкриття overlay при кліку/фокусі на select
-        this.select.addEventListener('click', (e) => {
+        const openHandler = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             this.openOverlay();
-        });
+            return false;
+        };
         
-        this.select.addEventListener('focus', (e) => {
-            e.preventDefault();
-            this.openOverlay();
-            this.select.blur(); // Прибираємо фокус з select
-        });
+        this.select.addEventListener('mousedown', openHandler);
+        this.select.addEventListener('click', openHandler);
+        this.select.addEventListener('focus', openHandler);
         
         // Пошук
         if (this.searchInput) {
@@ -286,11 +292,15 @@ class CustomMultiSelect {
         }
         
         // ESC для закриття
-        document.addEventListener('keydown', (e) => {
+        const escHandler = (e) => {
             if (e.key === 'Escape' && this.overlay.style.display === 'flex') {
                 this.closeOverlay();
             }
-        });
+        };
+        document.addEventListener('keydown', escHandler);
+        
+        // Зберігаємо handler для можливості видалення
+        this.escHandler = escHandler;
     }
     
     destroy() {
