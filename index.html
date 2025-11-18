@@ -452,7 +452,7 @@
         // ============================================
         
         const FORM_SAVE_KEY = 'droneReportFormData';
-        const FORM_SAVE_INTERVAL = 2000; // Автозбереження кожні 2 секунди
+        const FORM_SAVE_INTERVAL = 30000; // Автозбереження кожні 30 секунд (оптимізовано для енергоефективності)
         
         // Отримати всі поля форми
         function getFormFields() {
@@ -593,8 +593,14 @@
                 }, { once: false });
             });
             
-            // Додаткове автозбереження кожні N секунд
-            setInterval(saveFormState, FORM_SAVE_INTERVAL);
+            // Додаткове автозбереження кожні N секунд (рідше, тому що є автозбереження при input/change)
+            // Це лише страховка на випадок якщо події не спрацювали
+            const saveInterval = setInterval(saveFormState, FORM_SAVE_INTERVAL);
+            
+            // Очищення інтервалу при виході
+            window.addEventListener('beforeunload', () => {
+                clearInterval(saveInterval);
+            });
             
             // Збереження при згортанні додатку
             document.addEventListener('visibilitychange', () => {
@@ -729,19 +735,31 @@
                     .then(registration => {
                         console.log('[App] ✅ Service Worker зареєстровано');
                         
-                        // Перевірка оновлень при фокусі на вкладку
+                        // Енергоефективна перевірка оновлень
+                        let lastUpdateCheck = Date.now();
+                        const MIN_UPDATE_INTERVAL = 5 * 60 * 1000; // Мінімум 5 хвилин між перевірками
+                        
+                        // Перевірка оновлень тільки при поверненні до вкладки (не частіше ніж раз на 5 хв)
                         document.addEventListener('visibilitychange', () => {
-                            if (!document.hidden) {
+                            if (!document.hidden && (Date.now() - lastUpdateCheck) > MIN_UPDATE_INTERVAL) {
                                 console.log('[App] 🔍 Перевірка оновлень (вкладка активна)');
                                 registration.update();
+                                lastUpdateCheck = Date.now();
                             }
                         });
                         
-                        // Перевірка оновлень кожні 30 секунд (частіше!)
-                        setInterval(() => {
-                            console.log('[App] 🔍 Періодична перевірка оновлень');
-                            registration.update();
-                        }, 30000);
+                        // Періодична перевірка тільки якщо вкладка активна (кожні 10 хвилин)
+                        const updateInterval = setInterval(() => {
+                            if (!document.hidden) {
+                                console.log('[App] 🔍 Періодична перевірка оновлень');
+                                registration.update();
+                            }
+                        }, 10 * 60 * 1000); // 10 хвилин
+                        
+                        // Очищення інтервалу при закритті
+                        window.addEventListener('beforeunload', () => {
+                            clearInterval(updateInterval);
+                        });
                         
                         // Відстежування оновлень
                         registration.addEventListener('updatefound', () => {
