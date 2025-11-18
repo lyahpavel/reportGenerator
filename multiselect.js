@@ -3,10 +3,9 @@ class CustomMultiSelect {
     constructor(selectElement, options = {}) {
         this.select = selectElement;
         this.isMultiple = options.multiple || false;
-        this.searchable = options.searchable !== false; // За замовчуванням true
+        this.searchable = options.searchable !== false;
         this.placeholder = options.placeholder || 'Оберіть...';
-        this.container = null;
-        this.dropdown = null;
+        this.overlay = null;
         this.searchInput = null;
         this.optionsContainer = null;
         this.selectedValues = [];
@@ -15,91 +14,72 @@ class CustomMultiSelect {
     }
     
     init() {
-        // Приховуємо оригінальний select
-        this.select.style.display = 'none';
-        
-        // Створюємо контейнер
-        this.createContainer();
-        
-        // Вставляємо після оригінального select
-        this.select.parentNode.insertBefore(this.container, this.select.nextSibling);
+        // Робимо select множинним якщо потрібно
+        if (this.isMultiple) {
+            this.select.multiple = true;
+        }
         
         // Ініціалізуємо обрані значення
         this.updateSelectedFromSelect();
+        
+        // Створюємо overlay для пошуку
+        this.createOverlay();
         
         // Події
         this.attachEvents();
     }
     
-    createContainer() {
-        // Головний контейнер
-        this.container = document.createElement('div');
-        this.container.className = 'custom-multiselect';
-        this.container.style.cssText = `
-            position: relative;
-            width: 100%;
-            z-index: 1;
+    createOverlay() {
+        // Overlay для пошуку (з'являється поверх select)
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'multiselect-overlay';
+        this.overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
         `;
         
-        // Кнопка відкриття
-        const button = document.createElement('div');
-        button.className = 'multiselect-button';
-        button.style.cssText = `
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        // Модальне вікно
+        const modal = document.createElement('div');
+        modal.className = 'multiselect-modal';
+        modal.style.cssText = `
             background: white;
-            cursor: pointer;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        `;
+        
+        // Заголовок
+        const header = document.createElement('div');
+        header.style.cssText = `
+            padding: 16px;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 44px;
-            font-size: 14px;
-            transition: border-color 0.2s;
         `;
-        button.innerHTML = `
-            <span class="multiselect-text" style="color: #999;">${this.placeholder}</span>
-            <span class="multiselect-arrow" style="color: #666; font-size: 10px;">▼</span>
+        header.innerHTML = `
+            <span style="font-weight: bold; font-size: 16px;">${this.placeholder}</span>
+            <button class="close-btn" style="border: none; background: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
         `;
-        this.button = button;
-        
-        // Hover ефект
-        button.addEventListener('mouseenter', () => {
-            if (this.dropdown.style.display === 'none') {
-                button.style.borderColor = '#4facfe';
-            }
-        });
-        button.addEventListener('mouseleave', () => {
-            if (this.dropdown.style.display === 'none') {
-                button.style.borderColor = '#ddd';
-            }
-        });
-        
-        this.container.appendChild(button);
-        
-        // Dropdown
-        this.dropdown = document.createElement('div');
-        this.dropdown.className = 'multiselect-dropdown';
-        this.dropdown.style.cssText = `
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-top: 4px;
-            max-height: 300px;
-            display: none;
-            z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        `;
+        modal.appendChild(header);
         
         // Пошук (якщо ввімкнено)
         if (this.searchable) {
             const searchWrapper = document.createElement('div');
             searchWrapper.style.cssText = `
-                padding: 8px;
+                padding: 12px 16px;
                 border-bottom: 1px solid #eee;
             `;
             
@@ -108,26 +88,68 @@ class CustomMultiSelect {
             this.searchInput.placeholder = '🔍 Пошук...';
             this.searchInput.style.cssText = `
                 width: 100%;
-                padding: 6px;
+                padding: 10px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 font-size: 14px;
             `;
             searchWrapper.appendChild(this.searchInput);
-            this.dropdown.appendChild(searchWrapper);
+            modal.appendChild(searchWrapper);
         }
         
         // Контейнер опцій
         this.optionsContainer = document.createElement('div');
         this.optionsContainer.className = 'multiselect-options';
         this.optionsContainer.style.cssText = `
-            max-height: 250px;
+            flex: 1;
             overflow-y: auto;
+            padding: 8px 0;
         `;
         
         this.renderOptions();
-        this.dropdown.appendChild(this.optionsContainer);
-        this.container.appendChild(this.dropdown);
+        modal.appendChild(this.optionsContainer);
+        
+        // Футер з кнопками (тільки для множинного вибору)
+        if (this.isMultiple) {
+            const footer = document.createElement('div');
+            footer.style.cssText = `
+                padding: 12px 16px;
+                border-top: 1px solid #eee;
+                display: flex;
+                gap: 8px;
+                justify-content: flex-end;
+            `;
+            footer.innerHTML = `
+                <button class="cancel-btn" style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer;">Скасувати</button>
+                <button class="apply-btn" style="padding: 8px 16px; border: none; background: #4facfe; color: white; border-radius: 4px; cursor: pointer;">Застосувати</button>
+            `;
+            modal.appendChild(footer);
+        }
+        
+        this.overlay.appendChild(modal);
+        document.body.appendChild(this.overlay);
+        
+        // Закриття по кліку на overlay
+        this.overlay.addEventListener('click', (e) => {
+            if (e.target === this.overlay) {
+                this.closeOverlay();
+            }
+        });
+        
+        // Закриття по кнопці
+        const closeBtn = header.querySelector('.close-btn');
+        closeBtn.addEventListener('click', () => this.closeOverlay());
+        
+        if (this.isMultiple) {
+            const cancelBtn = modal.querySelector('.cancel-btn');
+            const applyBtn = modal.querySelector('.apply-btn');
+            
+            cancelBtn.addEventListener('click', () => this.closeOverlay());
+            applyBtn.addEventListener('click', () => {
+                this.updateSelect();
+                this.closeOverlay();
+            });
+        }
     }
     
     renderOptions(filter = '') {
@@ -151,13 +173,13 @@ class CustomMultiSelect {
             const isSelected = this.selectedValues.includes(option.value);
             
             optionEl.style.cssText = `
-                padding: 10px;
+                padding: 12px 16px;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
-                gap: 8px;
-                border-bottom: 1px solid #f5f5f5;
+                gap: 10px;
                 background: ${isSelected ? '#f0f7ff' : 'white'};
+                transition: background 0.15s;
             `;
             
             if (this.isMultiple) {
@@ -167,12 +189,15 @@ class CustomMultiSelect {
                 checkbox.checked = isSelected;
                 checkbox.style.cssText = `
                     pointer-events: none;
+                    width: 18px;
+                    height: 18px;
                 `;
                 optionEl.appendChild(checkbox);
             }
             
             const label = document.createElement('span');
             label.textContent = option.text;
+            label.style.cssText = `flex: 1;`;
             optionEl.appendChild(label);
             
             optionEl.addEventListener('mouseenter', () => {
@@ -202,15 +227,13 @@ class CustomMultiSelect {
             } else {
                 this.selectedValues.push(value);
             }
+            this.renderOptions(this.searchInput ? this.searchInput.value : '');
         } else {
-            // Одиничний вибір
+            // Одиничний вибір - одразу застосовуємо та закриваємо
             this.selectedValues = [value];
-            this.closeDropdown();
+            this.updateSelect();
+            this.closeOverlay();
         }
-        
-        this.updateSelect();
-        this.updateButton();
-        this.renderOptions(this.searchInput ? this.searchInput.value : '');
     }
     
     updateSelect() {
@@ -219,49 +242,23 @@ class CustomMultiSelect {
             option.selected = this.selectedValues.includes(option.value);
         });
         
-        // Тригеримо change event
+        // Тригеримо change event для сумісності
         this.select.dispatchEvent(new Event('change', { bubbles: true }));
     }
     
     updateSelectedFromSelect() {
         this.selectedValues = Array.from(this.select.selectedOptions).map(opt => opt.value);
-        this.updateButton();
     }
     
-    updateButton() {
-        const textSpan = this.button.querySelector('.multiselect-text');
-        
-        if (this.selectedValues.length === 0) {
-            textSpan.textContent = this.placeholder;
-            textSpan.style.color = '#999';
-        } else {
-            const selectedTexts = this.selectedValues.map(val => {
-                const option = Array.from(this.select.options).find(opt => opt.value === val);
-                return option ? option.text : val;
-            });
-            
-            if (this.isMultiple) {
-                textSpan.textContent = selectedTexts.join(', ');
-            } else {
-                textSpan.textContent = selectedTexts[0];
-            }
-            textSpan.style.color = '#333';
-        }
-    }
-    
-    openDropdown() {
-        this.dropdown.style.display = 'block';
-        this.container.style.zIndex = '1000'; // Підняти контейнер на передній план
-        this.button.style.borderColor = '#4facfe'; // Підсвітити активну кнопку
+    openOverlay() {
+        this.overlay.style.display = 'flex';
         if (this.searchInput) {
             setTimeout(() => this.searchInput.focus(), 100);
         }
     }
     
-    closeDropdown() {
-        this.dropdown.style.display = 'none';
-        this.container.style.zIndex = '1'; // Повернути назад
-        this.button.style.borderColor = '#ddd'; // Повернути звичайний border
+    closeOverlay() {
+        this.overlay.style.display = 'none';
         if (this.searchInput) {
             this.searchInput.value = '';
             this.renderOptions();
@@ -269,14 +266,16 @@ class CustomMultiSelect {
     }
     
     attachEvents() {
-        // Відкриття/закриття dropdown
-        this.button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (this.dropdown.style.display === 'none') {
-                this.openDropdown();
-            } else {
-                this.closeDropdown();
-            }
+        // Відкриття overlay при кліку/фокусі на select
+        this.select.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openOverlay();
+        });
+        
+        this.select.addEventListener('focus', (e) => {
+            e.preventDefault();
+            this.openOverlay();
+            this.select.blur(); // Прибираємо фокус з select
         });
         
         // Пошук
@@ -284,23 +283,18 @@ class CustomMultiSelect {
             this.searchInput.addEventListener('input', (e) => {
                 this.renderOptions(e.target.value);
             });
-            
-            this.searchInput.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
         }
         
-        // Закриття при кліку поза елементом
-        document.addEventListener('click', (e) => {
-            if (!this.container.contains(e.target)) {
-                this.closeDropdown();
+        // ESC для закриття
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.overlay.style.display === 'flex') {
+                this.closeOverlay();
             }
         });
     }
     
     destroy() {
-        this.container.remove();
-        this.select.style.display = '';
+        this.overlay.remove();
     }
 }
 
