@@ -292,6 +292,8 @@ reportForm.addEventListener('submit', function(e) {
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
         droneSize: document.getElementById('droneSize').value === 'Інший' ? document.getElementById('customDroneSize').value : document.getElementById('droneSize').value,
         cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
+        factoryConfig: document.getElementById('factoryConfig').checked,
+        modifications: document.getElementById('modifications').value,
         videoFrequency: document.getElementById('videoFrequency').value === 'Інша' ? document.getElementById('customVideoFrequency').value : document.getElementById('videoFrequency').value,
         controlFrequency: document.getElementById('controlFrequency').value === 'Інша' ? document.getElementById('customControlFrequency').value : document.getElementById('controlFrequency').value,
         fiberOptic: document.getElementById('fiberOptic').checked,
@@ -447,6 +449,18 @@ function generateReport(data) {
             <span class="report-label">Дрон:</span>
             <span class="report-value">${data.droneName} | ${data.droneSize} | ${data.cameraType}</span>
         </div>
+        
+        ${!data.factoryConfig && data.modifications ? `
+        <div class="report-item">
+            <span class="report-label">Модифікації:</span>
+            <span class="report-value">${data.modifications}</span>
+        </div>
+        ` : data.factoryConfig ? `
+        <div class="report-item">
+            <span class="report-label">Комплектація:</span>
+            <span class="report-value">Заводська</span>
+        </div>
+        ` : ''}
         
         ${data.fiberOptic ? `
         <div class="report-item">

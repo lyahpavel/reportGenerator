@@ -292,6 +292,9 @@ async function loadUserCustomOptions() {
         // Додати кастомні опції до селектів
         addUserCustomOptionsToSelects();
         
+        // Додати модифікації до datalist
+        addModificationsToDatalist();
+        
         // Оновити кнопки видалення після додавання опцій
         if (window.scriptFunctions && window.scriptFunctions.updateDeleteButtons) {
             setTimeout(() => {
@@ -302,6 +305,26 @@ async function loadUserCustomOptions() {
     } catch (error) {
         console.error('❌ Помилка завантаження кастомних опцій:', error);
     }
+}
+
+// Додавання модифікацій до datalist
+function addModificationsToDatalist() {
+    const datalist = document.getElementById('modificationsList');
+    if (!datalist) return;
+    
+    // Очистити datalist
+    datalist.innerHTML = '';
+    
+    const modifications = userCustomOptions['modifications'];
+    if (!modifications || modifications.length === 0) return;
+    
+    console.log('📋 Додаю модифікації до datalist:', modifications);
+    
+    modifications.forEach(mod => {
+        const option = document.createElement('option');
+        option.value = mod.value;
+        datalist.appendChild(option);
+    });
 }
 
 // Додавання кастомних опцій до селектів
@@ -460,6 +483,22 @@ async function saveCustomOptionsFromForm(formData) {
         { type: 'lossOptions', field: 'losses', selectId: 'losses', customId: 'customLosses' },
         { type: 'operatorOptions', field: 'operator', selectId: 'operator', customId: 'customOperator' }
     ];
+    
+    // Окремо обробляємо модифікації (можуть бути багато через кому)
+    const modificationsInput = document.getElementById('modifications');
+    if (modificationsInput && modificationsInput.value && modificationsInput.value.trim() !== '') {
+        const modifications = modificationsInput.value.split(',').map(m => m.trim()).filter(m => m !== '');
+        console.log('💾 Зберігаю модифікації:', modifications);
+        
+        for (const modification of modifications) {
+            try {
+                await saveUserCustomOption('modifications', modification, null);
+                console.log(`  ✅ Збережено модифікацію: ${modification}`);
+            } catch (error) {
+                console.error(`  ❌ Помилка збереження модифікації "${modification}":`, error);
+            }
+        }
+    }
 
     for (const custom of customFields) {
         const selectElement = document.getElementById(custom.selectId);
