@@ -17,12 +17,11 @@ class CustomMultiSelect {
         // Робимо select множинним якщо потрібно
         if (this.isMultiple) {
             this.select.multiple = true;
-            // Приховуємо візуально (але залишаємо в DOM для даних)
-            this.select.style.opacity = '0';
-            this.select.style.position = 'absolute';
-            this.select.style.pointerEvents = 'none';
-            this.select.style.height = '0';
-            this.select.style.overflow = 'hidden';
+            // Приховуємо оригінальний select
+            this.select.style.display = 'none';
+            
+            // Створюємо замінник (кнопку для відкриття)
+            this.createButton();
         }
         
         // Ініціалізуємо обрані значення
@@ -33,6 +32,54 @@ class CustomMultiSelect {
         
         // Події
         this.attachEvents();
+    }
+    
+    createButton() {
+        // Створюємо кнопку яка виглядає як select
+        this.button = document.createElement('div');
+        this.button.className = 'multiselect-trigger';
+        this.button.style.cssText = `
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+        `;
+        this.button.innerHTML = `<span class="multiselect-text">${this.placeholder}</span>`;
+        
+        // Вставляємо після select
+        this.select.parentNode.insertBefore(this.button, this.select.nextSibling);
+        
+        // Клік на кнопку відкриває modal
+        this.button.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.openOverlay();
+        });
+    }
+    
+    updateButtonText() {
+        if (!this.button) return;
+        
+        const textSpan = this.button.querySelector('.multiselect-text');
+        if (!textSpan) return;
+        
+        if (this.selectedValues.length === 0) {
+            textSpan.textContent = this.placeholder;
+            textSpan.style.color = '#999';
+        } else {
+            const selectedTexts = this.selectedValues.map(val => {
+                const option = Array.from(this.select.options).find(opt => opt.value === val);
+                return option ? option.text : val;
+            });
+            textSpan.textContent = selectedTexts.join(', ');
+            textSpan.style.color = '#333';
+        }
     }
     
     createOverlay() {
@@ -150,7 +197,11 @@ class CustomMultiSelect {
             const cancelBtn = modal.querySelector('.cancel-btn');
             const applyBtn = modal.querySelector('.apply-btn');
             
-            cancelBtn.addEventListener('click', () => this.closeOverlay());
+            cancelBtn.addEventListener('click', () => {
+                // Відновлюємо попередні значення
+                this.selectedValues = Array.from(this.select.selectedOptions).map(opt => opt.value);
+                this.closeOverlay();
+            });
             applyBtn.addEventListener('click', () => {
                 this.updateSelect();
                 this.closeOverlay();
@@ -234,6 +285,7 @@ class CustomMultiSelect {
                 this.selectedValues.push(value);
             }
             this.renderOptions(this.searchInput ? this.searchInput.value : '');
+            this.updateButtonText(); // Оновлюємо текст кнопки
         } else {
             // Одиничний вибір - одразу застосовуємо та закриваємо
             this.selectedValues = [value];
@@ -247,6 +299,9 @@ class CustomMultiSelect {
         Array.from(this.select.options).forEach(option => {
             option.selected = this.selectedValues.includes(option.value);
         });
+        
+        // Оновлюємо текст кнопки (для множинного вибору)
+        this.updateButtonText();
         
         // Тригеримо change event для сумісності
         this.select.dispatchEvent(new Event('change', { bubbles: true }));
@@ -272,17 +327,20 @@ class CustomMultiSelect {
     }
     
     attachEvents() {
-        // Відкриття overlay при кліку/фокусі на select
-        const openHandler = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.openOverlay();
-            return false;
-        };
-        
-        this.select.addEventListener('mousedown', openHandler);
-        this.select.addEventListener('click', openHandler);
-        this.select.addEventListener('focus', openHandler);
+        // Відкриття overlay при кліку/фокусі на select (тільки для одиничного вибору)
+        if (!this.isMultiple) {
+            const openHandler = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.openOverlay();
+                return false;
+            };
+            
+            this.select.addEventListener('mousedown', openHandler);
+            this.select.addEventListener('click', openHandler);
+            this.select.addEventListener('focus', openHandler);
+        }
+        // Для множинного вибору кнопка вже має обробник в createButton()
         
         // Пошук
         if (this.searchInput) {
