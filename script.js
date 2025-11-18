@@ -10,6 +10,9 @@ const newReportBasedOnButton = document.getElementById('newReportBasedOn');
 // Глобальна змінна для зберігання даних
 let appData = null;
 
+// Глобальна змінна для зберігання відео
+let attachedVideoFile = null;
+
 // Fallback дані на випадок, якщо JSON не завантажиться
 const fallbackData = {
     "subdivisions": [
@@ -720,10 +723,23 @@ shareButton.addEventListener('click', async function() {
     // Перевірка підтримки Web Share API
     if (navigator.share) {
         try {
-            await navigator.share({
+            const shareData = {
                 title: 'Звіт про політ',
                 text: reportText
-            });
+            };
+
+            // Якщо є прикріплене відео - додаємо його
+            if (attachedVideoFile) {
+                shareData.files = [attachedVideoFile];
+                
+                // Перевірка чи браузер підтримує поділитися файлами
+                if (!navigator.canShare || !navigator.canShare(shareData)) {
+                    showError('Ваш браузер не підтримує поділитися відео. Спробуйте інший браузер або надішліть звіт без відео.');
+                    return;
+                }
+            }
+
+            await navigator.share(shareData);
             showSuccess('Звіт надіслано');
         } catch (err) {
             // Користувач скасував або сталася помилка
@@ -819,6 +835,15 @@ downloadButton.addEventListener('click', function() {
 newReportButton.addEventListener('click', function() {
     reportForm.reset();
     reportOutput.classList.add('hidden');
+    
+    // Очистити прикріплене відео
+    attachedVideoFile = null;
+    const videoFileInput = document.getElementById('videoFile');
+    const videoFileName = document.getElementById('videoFileName');
+    const removeVideoBtn = document.getElementById('removeVideoBtn');
+    if (videoFileInput) videoFileInput.value = '';
+    if (videoFileName) videoFileName.textContent = '';
+    if (removeVideoBtn) removeVideoBtn.style.display = 'none';
     
     // Встановлення поточної дати та часу
     const now = new Date();
@@ -1783,3 +1808,43 @@ window.initializeMultiselects = function() {
         }
     });
 };
+
+// Обробка завантаження відео
+document.addEventListener('DOMContentLoaded', function() {
+    const videoFileInput = document.getElementById('videoFile');
+    const videoUploadBtn = document.getElementById('videoUploadBtn');
+    const videoFileName = document.getElementById('videoFileName');
+    const removeVideoBtn = document.getElementById('removeVideoBtn');
+
+    // Відкрити діалог вибору файлу
+    videoUploadBtn.addEventListener('click', function() {
+        videoFileInput.click();
+    });
+
+    // Обробка вибору файлу
+    videoFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            attachedVideoFile = file;
+            videoFileName.textContent = `📹 ${file.name} (${formatFileSize(file.size)})`;
+            removeVideoBtn.style.display = 'inline-block';
+        }
+    });
+
+    // Видалення відео
+    removeVideoBtn.addEventListener('click', function() {
+        attachedVideoFile = null;
+        videoFileInput.value = '';
+        videoFileName.textContent = '';
+        removeVideoBtn.style.display = 'none';
+    });
+});
+
+// Форматування розміру файлу
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}

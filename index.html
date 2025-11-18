@@ -91,6 +91,20 @@
         </header>
 
         <form id="reportForm" class="report-form">
+            <!-- Додавання відео -->
+            <div class="form-group video-upload-section">
+                <label for="videoFile">Додати відео (необов'язково):</label>
+                <div class="video-upload-wrapper">
+                    <input type="file" id="videoFile" name="videoFile" accept="video/*" style="display: none;">
+                    <button type="button" id="videoUploadBtn" class="btn btn-outline">
+                        <span>📹 Вибрати відео</span>
+                    </button>
+                    <span id="videoFileName" class="video-file-name"></span>
+                    <button type="button" id="removeVideoBtn" class="btn btn-outline btn-small" style="display: none;">✕</button>
+                </div>
+                <small class="form-hint">Відео буде додано до звіту при поділитися</small>
+            </div>
+
             <div class="form-group">
                 <label for="subdivision">Підрозділ:</label>
                 <select id="subdivision" name="subdivision" required onchange="toggleCustomSubdivision()">

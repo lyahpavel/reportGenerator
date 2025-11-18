@@ -1012,3 +1012,70 @@ textarea {
     display: block;
     pointer-events: none;
 }
+
+/* Стилі для завантаження відео */
+.video-upload-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.video-upload-section label {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.video-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.video-upload-wrapper .btn {
+    background: white;
+    color: #667eea;
+    border: 2px solid white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.video-upload-wrapper .btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.video-file-name {
+    color: white;
+    font-weight: 500;
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    backdrop-filter: blur(10px);
+}
+
+.video-upload-wrapper #removeVideoBtn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 12px;
+    min-width: auto;
+}
+
+.video-upload-wrapper #removeVideoBtn:hover {
+    background: rgba(255, 59, 48, 0.8);
+    border-color: rgba(255, 59, 48, 0.8);
+}
+
+.form-hint {
+    display: block;
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.85rem;
+    font-style: italic;
+}
