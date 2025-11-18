@@ -505,18 +505,17 @@
             const dropdown = document.createElement('div');
             dropdown.className = 'comma-autocomplete-dropdown';
             dropdown.style.cssText = `
-                position: absolute;
+                position: fixed;
                 background: white;
                 border: 1px solid #ccc;
                 border-radius: 4px;
                 max-height: 200px;
                 overflow-y: auto;
                 display: none;
-                z-index: 1000;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             `;
-            input.parentElement.style.position = 'relative';
-            input.parentElement.appendChild(dropdown);
+            document.body.appendChild(dropdown);
             
             // Зберігаємо всі доступні опції
             function getAllOptions() {
@@ -577,10 +576,11 @@
                 });
                 
                 dropdown.style.display = 'block';
-                // Позиціонуємо dropdown
-                dropdown.style.width = input.offsetWidth + 'px';
-                dropdown.style.top = input.offsetHeight + 'px';
-                dropdown.style.left = '0';
+                // Позиціонуємо dropdown відносно input (fixed positioning)
+                const rect = input.getBoundingClientRect();
+                dropdown.style.width = rect.width + 'px';
+                dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+                dropdown.style.left = (rect.left + window.scrollX) + 'px';
             }
             
             // Вибір опції
@@ -627,14 +627,51 @@
                     dropdown.style.display = 'none';
                 }
             });
+            
+            // Оновлюємо позицію при скролі
+            window.addEventListener('scroll', () => {
+                if (dropdown.style.display === 'block') {
+                    const rect = input.getBoundingClientRect();
+                    dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+                    dropdown.style.left = (rect.left + window.scrollX) + 'px';
+                }
+            });
+            
+            // Оновлюємо позицію при resize
+            window.addEventListener('resize', () => {
+                if (dropdown.style.display === 'block') {
+                    const rect = input.getBoundingClientRect();
+                    dropdown.style.width = rect.width + 'px';
+                    dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+                    dropdown.style.left = (rect.left + window.scrollX) + 'px';
+                }
+            });
         }
         
         document.addEventListener('DOMContentLoaded', function() {
             // Налаштовуємо автодоповнення для модифікацій та каналів
-            setTimeout(() => {
-                setupCommaAutocomplete('modifications', 'modificationsList');
-                setupCommaAutocomplete('channel', 'channelList');
-            }, 1000);
+            // Чекаємо поки дані завантажаться
+            function initAutocomplete() {
+                const modificationsInput = document.getElementById('modifications');
+                const channelInput = document.getElementById('channel');
+                const modificationsList = document.getElementById('modificationsList');
+                const channelList = document.getElementById('channelList');
+                
+                if (modificationsInput && modificationsList) {
+                    console.log('🔍 Ініціалізація автодоповнення модифікацій');
+                    setupCommaAutocomplete('modifications', 'modificationsList');
+                }
+                
+                if (channelInput && channelList) {
+                    console.log('🔍 Ініціалізація автодоповнення каналів');
+                    setupCommaAutocomplete('channel', 'channelList');
+                }
+            }
+            
+            // Пробуємо ініціалізувати кілька разів
+            setTimeout(initAutocomplete, 1000);
+            setTimeout(initAutocomplete, 2000);
+            setTimeout(initAutocomplete, 3000);
         });
     </script>
     
