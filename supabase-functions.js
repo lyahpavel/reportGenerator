@@ -1,6 +1,6 @@
 // Функції для роботи з Supabase
 
-// Завантаження даних з Supabase
+// Завантаження даних з Supabase (тільки user_custom_options)
 async function loadDataFromSupabase() {
     try {
         const supabase = window.supabaseClient;
@@ -9,74 +9,62 @@ async function loadDataFromSupabase() {
             throw new Error('Supabase client не ініціалізовано');
         }
 
-        // Завантажуємо всі дані паралельно
-        const [
-            subdivisionsResult,
-            jointWithResult,
-            droneNamesResult,
-            droneSizesResult,
-            cameraTypesResult,
-            videoFreqResult,
-            controlFreqResult,
-            targetTypesResult,
-            settlementsResult,
-            bkOptionsResult,
-            initiationBoardResult,
-            statusOptionsResult,
-            reasonOptionsResult,
-            lossOptionsResult,
-            operatorOptionsResult
-        ] = await Promise.all([
-            supabase.from('subdivisions').select('*').order('id'),
-            supabase.from('joint_with_options').select('*').order('id'),
-            supabase.from('drone_names').select('*').order('id'),
-            supabase.from('drone_sizes').select('*').order('id'),
-            supabase.from('camera_types').select('*').order('id'),
-            supabase.from('video_frequencies').select('*').order('id'),
-            supabase.from('control_frequencies').select('*').order('id'),
-            supabase.from('target_types').select('*').order('id'),
-            supabase.from('settlements').select('*').order('id'),
-            supabase.from('bk_options').select('*').order('id'),
-            supabase.from('initiation_board_options').select('*').order('id'),
-            supabase.from('status_options').select('*').order('id'),
-            supabase.from('reason_options').select('*').order('id'),
-            supabase.from('loss_options').select('*').order('id'),
-            supabase.from('operator_options').select('*').order('id')
-        ]);
-
-        // Перевірка помилок
-        const errors = [
-            subdivisionsResult, jointWithResult, droneNamesResult, droneSizesResult,
-            cameraTypesResult, videoFreqResult, controlFreqResult, targetTypesResult,
-            settlementsResult, bkOptionsResult, initiationBoardResult, statusOptionsResult,
-            reasonOptionsResult, lossOptionsResult, operatorOptionsResult
-        ].filter(result => result.error);
-
-        if (errors.length > 0) {
-            console.error('Помилки при завантаженні даних:', errors);
-            throw new Error('Не вдалося завантажити деякі дані з Supabase');
+        // Отримати поточного користувача
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+            throw new Error('Користувач не авторизований');
         }
 
+        // Завантажуємо всі опції користувача
+        const { data: userOptions, error } = await supabase
+            .from('user_custom_options')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('value');
+
+        if (error) {
+            console.error('Помилка завантаження даних:', error);
+            throw error;
+        }
+
+        console.log('📦 Завантажено опцій з БД:', userOptions?.length || 0);
+
+        // Групуємо опції по типах
+        const groupedOptions = {};
+        userOptions.forEach(option => {
+            if (!groupedOptions[option.option_type]) {
+                groupedOptions[option.option_type] = [];
+            }
+            groupedOptions[option.option_type].push(option);
+        });
+
         // Формуємо об'єкт даних у форматі, який очікує додаток
+        // Конвертуємо кожен тип в потрібний формат
         const data = {
-            subdivisions: subdivisionsResult.data,
-            jointWithOptions: jointWithResult.data,
-            droneNames: droneNamesResult.data,
-            droneSizes: droneSizesResult.data,
-            cameraTypes: cameraTypesResult.data,
-            videoFrequencies: videoFreqResult.data,
-            controlFrequencies: controlFreqResult.data,
-            targetTypeOptions: targetTypesResult.data,
-            settlementOptions: settlementsResult.data,
-            bkOptions: bkOptionsResult.data,
-            initiationBoardOptions: initiationBoardResult.data,
-            statusOptions: statusOptionsResult.data,
-            reasonOptions: reasonOptionsResult.data,
-            lossOptions: lossOptionsResult.data,
-            operatorOptions: operatorOptionsResult.data
+            subdivisions: (groupedOptions['subdivision'] || []).map(o => ({ name: o.value })),
+            jointWithOptions: (groupedOptions['jointWith'] || []).map(o => ({ name: o.value })),
+            droneNames: (groupedOptions['droneName'] || []).map(o => ({ name: o.value })),
+            droneSizes: (groupedOptions['droneSize'] || []).map(o => ({ size: o.value })),
+            cameraTypes: (groupedOptions['cameraType'] || []).map(o => ({ type: o.value })),
+            videoFrequencies: (groupedOptions['videoFrequency'] || []).map(o => ({ frequency: o.value })),
+            controlFrequencies: (groupedOptions['controlFrequency'] || []).map(o => ({ frequency: o.value })),
+            targetTypeOptions: (groupedOptions['targetType'] || []).map(o => ({ type: o.value })),
+            settlementOptions: (groupedOptions['settlement'] || []).map(o => ({ 
+                name: o.value,
+                coordinates: o.coordinates || ''
+            })),
+            bkOptions: (groupedOptions['bkOptions'] || []).map(o => ({ name: o.value })),
+            initiationBoardOptions: (groupedOptions['initiationBoard'] || []).map(o => ({ name: o.value })),
+            statusOptions: (groupedOptions['status'] || []).map(o => ({ status: o.value })),
+            reasonOptions: (groupedOptions['reason'] || []).map(o => ({ reason: o.value })),
+            lossOptions: (groupedOptions['lossOptions'] || []).map(o => ({ loss: o.value })),
+            operatorOptions: (groupedOptions['operator'] || []).map(o => ({ name: o.value }))
         };
 
-        console.log('✅ Дані успішно завантажено з Supabase');
+        console.log('✅ Дані успішно завантажено з Supabase (user_custom_options)');
+        console.log('📊 Статистика по типах:', Object.keys(groupedOptions).map(key => `${key}: ${groupedOptions[key].length}`).join(', '));
+        
         return data;
 
     } catch (error) {

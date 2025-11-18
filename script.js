@@ -1407,8 +1407,7 @@ async function addSavedOptionToSelect(inputId, value, coordinates = null) {
     option.setAttribute('data-select-id', selectId);
     option.setAttribute('data-label', value);
     
-    // Завжди тільки іконка користувача (окрема кнопка для видалення)
-    option.textContent = '👤 ' + value;
+    option.textContent = value;
     
     if (coordinates) {
         option.setAttribute('data-coordinates', coordinates);
@@ -1535,7 +1534,7 @@ function showCustomInputs(show) {
 // Експортувати для використання з auth.js
 window.showCustomInputs = showCustomInputs;
 
-// Оновлення тексту користувацьких опцій (тільки іконка користувача)
+// Оновлення тексту користувацьких опцій
 function updateUserOptionsText(showDelete) {
     const allSelects = document.querySelectorAll('select');
     allSelects.forEach(select => {
@@ -1543,8 +1542,7 @@ function updateUserOptionsText(showDelete) {
         userOptions.forEach(option => {
             const label = option.getAttribute('data-label');
             if (label) {
-                // Завжди тільки 👤, бо окрема кнопка видалення
-                option.textContent = '👤 ' + label;
+                option.textContent = label;
             }
         });
     });

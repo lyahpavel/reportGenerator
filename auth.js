@@ -400,8 +400,7 @@ function addUserCustomOptionsToSelects() {
                     option.setAttribute('data-select-id', selectId);
                     option.setAttribute('data-label', customOpt.label);
                     
-                    // Текст опції - іконка зліва
-                    option.textContent = '👤 ' + customOpt.label;
+                    option.textContent = customOpt.label;
                     
                     // Зберігаємо координати в data-атрибут для населених пунктів
                     if (customOpt.coordinates) {
