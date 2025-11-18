@@ -1169,6 +1169,71 @@ async function toggleSaveOption(inputId) {
     const button = input.nextElementSibling;
     const icon = button.querySelector('.save-icon') || button;
     
+    // Окрема логіка для модифікацій - завжди зберігаємо при натисканні
+    if (inputId === 'modifications') {
+        const customValue = input.value.trim();
+        
+        if (!customValue) {
+            alert('⚠️ Спочатку введіть модифікації');
+            return;
+        }
+        
+        // Модифікації можуть бути через кому
+        const modifications = customValue.split(',').map(m => m.trim()).filter(m => m !== '');
+        
+        if (modifications.length === 0) {
+            alert('⚠️ Спочатку введіть модифікації');
+            return;
+        }
+        
+        if (window.authFunctions && window.authFunctions.saveUserCustomOption) {
+            button.disabled = true;
+            icon.textContent = '⏳';
+            
+            let allSuccess = true;
+            let savedCount = 0;
+            
+            for (const modification of modifications) {
+                console.log(`💾 Зберігаю модифікацію: "${modification}"`);
+                const success = await window.authFunctions.saveUserCustomOption(
+                    'modifications',
+                    modification,
+                    modification,
+                    null
+                );
+                if (success) {
+                    savedCount++;
+                } else {
+                    allSuccess = false;
+                }
+            }
+            
+            if (allSuccess) {
+                icon.textContent = '✅';
+                console.log(`✅ Збережено ${savedCount} модифікацій`);
+                
+                // Оновлюємо datalist
+                if (window.authFunctions.loadUserCustomOptions) {
+                    await window.authFunctions.loadUserCustomOptions();
+                }
+                
+                setTimeout(() => {
+                    icon.textContent = '💾';
+                    button.disabled = false;
+                }, 1500);
+            } else {
+                icon.textContent = '❌';
+                console.error('❌ Помилка збереження модифікацій');
+                setTimeout(() => {
+                    icon.textContent = '💾';
+                    button.disabled = false;
+                }, 2000);
+            }
+        }
+        return;
+    }
+    
+    // Для інших полів - toggle логіка
     const currentValue = input.getAttribute('data-save-option');
     const newValue = currentValue === 'true' ? 'false' : 'true';
     
@@ -1178,55 +1243,6 @@ async function toggleSaveOption(inputId) {
         
         if (!customValue) {
             alert('⚠️ Спочатку введіть значення');
-            return;
-        }
-        
-        // Окрема логіка для модифікацій
-        if (inputId === 'modifications') {
-            // Модифікації можуть бути через кому
-            const modifications = customValue.split(',').map(m => m.trim()).filter(m => m !== '');
-            
-            if (modifications.length === 0) {
-                alert('⚠️ Спочатку введіть модифікації');
-                return;
-            }
-            
-            if (window.authFunctions && window.authFunctions.saveUserCustomOption) {
-                button.disabled = true;
-                icon.textContent = '⏳';
-                
-                let allSuccess = true;
-                for (const modification of modifications) {
-                    const success = await window.authFunctions.saveUserCustomOption(
-                        'modifications',
-                        modification,
-                        modification,
-                        null
-                    );
-                    if (!success) allSuccess = false;
-                }
-                
-                if (allSuccess) {
-                    input.setAttribute('data-save-option', 'true');
-                    button.classList.add('active');
-                    icon.textContent = '✅';
-                    
-                    // Оновлюємо datalist
-                    if (window.authFunctions.loadUserCustomOptions) {
-                        await window.authFunctions.loadUserCustomOptions();
-                    }
-                    
-                    setTimeout(() => {
-                        icon.textContent = '💾';
-                    }, 2000);
-                } else {
-                    icon.textContent = '❌';
-                    button.disabled = false;
-                    setTimeout(() => {
-                        icon.textContent = '💾';
-                    }, 2000);
-                }
-            }
             return;
         }
         

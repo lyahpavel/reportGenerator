@@ -173,17 +173,13 @@
             </div>
 
             <!-- Модифікації (показується коли заводська комплектація вимкнена) -->
-            <div class="form-group" id="modificationsGroup" style="display: none;">
+                        <div class="form-group" id="modificationsGroup" style="display: none;">
                 <label for="modifications">Модифікації (через кому):</label>
                 <div class="custom-input-wrapper" style="display: block;">
-                    <input type="text" id="modifications" name="modifications" placeholder="Наприклад: 5.8 GHz, Відеопередавач, Антена..." list="modificationsList" data-save-option="false">
-                    <button type="button" class="save-option-btn" onclick="toggleSaveOption('modifications')" title="Зберегти в мої опції">
-                        <span class="save-icon">💾</span>
-                    </button>
+                    <input type="text" id="modifications" list="modificationsList" data-save-option="true">
+                    <button onclick="toggleSaveOption('modifications')" class="active">💾</button>
                 </div>
-                <datalist id="modificationsList">
-                    <!-- Опції заповнюються динамічно з БД -->
-                </datalist>
+                <datalist id="modificationsList"></datalist>
             </div>
 
             <!-- Частоти: відео і керування в одному рядку -->
@@ -484,6 +480,28 @@
                 modificationsInput.required = false; // Не обов'язкове, можна залишити порожнім
             }
         }
+        
+        // Покращене автодоповнення для модифікацій
+        document.addEventListener('DOMContentLoaded', function() {
+            const modificationsInput = document.getElementById('modifications');
+            if (modificationsInput) {
+                modificationsInput.addEventListener('input', function(e) {
+                    // Отримуємо поточне значення і позицію курсора
+                    const value = e.target.value;
+                    const cursorPos = e.target.selectionStart;
+                    
+                    // Знаходимо поточний елемент (після останньої коми перед курсором)
+                    const beforeCursor = value.substring(0, cursorPos);
+                    const lastCommaIndex = beforeCursor.lastIndexOf(',');
+                    const currentItem = beforeCursor.substring(lastCommaIndex + 1).trim();
+                    
+                    // Логування для дебагу
+                    if (currentItem) {
+                        console.log('🔍 Автодоповнення для:', currentItem);
+                    }
+                });
+            }
+        });
     </script>
     
     <script>
