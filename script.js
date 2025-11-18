@@ -1365,6 +1365,11 @@ function showCustomInputs(show) {
     // Знайти всі custom-input-wrapper (обгортки з полями "Інше" та кнопками 💾)
     const customWrappers = document.querySelectorAll('.custom-input-wrapper');
     customWrappers.forEach(wrapper => {
+        // Пропускаємо wrapper для модифікацій - він має свою логіку через toggleModifications
+        const input = wrapper.querySelector('input');
+        if (input && input.id === 'modifications') {
+            return; // Не чіпаємо поле модифікацій
+        }
         wrapper.style.display = show ? 'flex' : 'none';
     });
     
