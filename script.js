@@ -1192,13 +1192,8 @@ async function toggleSaveOption(inputId) {
             button.disabled = true;
             icon.textContent = '⏳';
             
-            // Для модифікацій - можуть бути через кому, для каналу - одне значення
-            let items = [];
-            if (inputId === 'modifications') {
-                items = customValue.split(',').map(m => m.trim()).filter(m => m !== '');
-            } else {
-                items = [customValue];
-            }
+            // Для модифікацій і каналів - можуть бути через кому
+            const items = customValue.split(',').map(m => m.trim()).filter(m => m !== '');
             
             if (items.length === 0) {
                 alert(`⚠️ Спочатку введіть ${fieldName}`);
