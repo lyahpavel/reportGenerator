@@ -219,6 +219,13 @@ async function handleUserLogin() {
     // Завантажити кастомні опції користувача
     await loadUserCustomOptions();
     
+    // Ініціалізувати multiselect після завантаження даних
+    setTimeout(() => {
+        if (typeof window.initializeMultiselects === 'function') {
+            window.initializeMultiselects();
+        }
+    }, 150);
+    
     // Приховати поля "Інше" якщо розширений режим вимкнений
     const advancedModeSwitch = document.getElementById('advancedModeSwitch');
     if (advancedModeSwitch && !advancedModeSwitch.checked) {

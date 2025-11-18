@@ -306,7 +306,19 @@ reportForm.addEventListener('submit', function(e) {
         coordinates: document.getElementById('coordinates').value,
         status: document.getElementById('status').value === 'Інший' ? document.getElementById('customStatus').value : document.getElementById('status').value,
         reason: document.getElementById('reason').value === 'Інша' ? document.getElementById('customReason').value : document.getElementById('reason').value,
-        losses: document.getElementById('losses').value === 'Інше' ? document.getElementById('customLosses').value : document.getElementById('losses').value,
+        losses: (() => {
+            const lossesSelect = document.getElementById('losses');
+            const selectedOptions = Array.from(lossesSelect.selectedOptions);
+            if (selectedOptions.length > 0) {
+                const values = selectedOptions.map(opt => opt.value);
+                // Якщо є "Інше", використовуємо customLosses
+                if (values.includes('Інше')) {
+                    return document.getElementById('customLosses').value;
+                }
+                return values.join(', ');
+            }
+            return '';
+        })(),
         operator: document.getElementById('operator').value === 'Інший' ? document.getElementById('customOperator').value : document.getElementById('operator').value,
         stream: document.getElementById('stream').checked,
         date: document.getElementById('date').value,
@@ -796,7 +808,7 @@ newReportBasedOnButton.addEventListener('click', function() {
         status: document.getElementById('status').value,
         reason: document.getElementById('reason').value,
         customReason: document.getElementById('customReason').value,
-        losses: document.getElementById('losses').value,
+        losses: Array.from(document.getElementById('losses').selectedOptions).map(opt => opt.value),
         operator: document.getElementById('operator').value,
         stream: document.getElementById('stream').checked,
         mission: document.getElementById('mission').value
@@ -1657,4 +1669,39 @@ async function deleteCustomOption(selectId, optionValue) {
 window.scriptFunctions = {
     setupDeleteButtons,
     updateDeleteButtons
+};
+
+// Ініціалізація multiselect для select елементів
+window.initializeMultiselects = function() {
+    // Втрати - з множинним вибором та пошуком
+    const lossesSelect = document.getElementById('losses');
+    if (lossesSelect && !lossesSelect.dataset.multiselectInit) {
+        window.initCustomMultiSelect('#losses', {
+            multiple: true,
+            searchable: true,
+            placeholder: 'Оберіть втрати...'
+        });
+        lossesSelect.dataset.multiselectInit = 'true';
+    }
+    
+    // Додаткові select з пошуком (без множинного вибору)
+    const searchableSelects = [
+        { id: 'subdivision', placeholder: 'Оберіть підрозділ...' },
+        { id: 'droneName', placeholder: 'Оберіть назву дрону...' },
+        { id: 'droneSize', placeholder: 'Оберіть розмір...' },
+        { id: 'cameraType', placeholder: 'Оберіть тип камери...' },
+        { id: 'operator', placeholder: 'Оберіть оператора...' }
+    ];
+    
+    searchableSelects.forEach(config => {
+        const select = document.getElementById(config.id);
+        if (select && !select.dataset.multiselectInit) {
+            window.initCustomMultiSelect(`#${config.id}`, {
+                multiple: false,
+                searchable: true,
+                placeholder: config.placeholder
+            });
+            select.dataset.multiselectInit = 'true';
+        }
+    });
 };
