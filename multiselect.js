@@ -38,13 +38,14 @@ class CustomMultiSelect {
         this.container.style.cssText = `
             position: relative;
             width: 100%;
+            z-index: 1;
         `;
         
         // Кнопка відкриття
         const button = document.createElement('div');
         button.className = 'multiselect-button';
         button.style.cssText = `
-            padding: 10px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             background: white;
@@ -52,13 +53,28 @@ class CustomMultiSelect {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 42px;
+            min-height: 44px;
+            font-size: 14px;
+            transition: border-color 0.2s;
         `;
         button.innerHTML = `
-            <span class="multiselect-text">${this.placeholder}</span>
-            <span class="multiselect-arrow">▼</span>
+            <span class="multiselect-text" style="color: #999;">${this.placeholder}</span>
+            <span class="multiselect-arrow" style="color: #666; font-size: 10px;">▼</span>
         `;
         this.button = button;
+        
+        // Hover ефект
+        button.addEventListener('mouseenter', () => {
+            if (this.dropdown.style.display === 'none') {
+                button.style.borderColor = '#4facfe';
+            }
+        });
+        button.addEventListener('mouseleave', () => {
+            if (this.dropdown.style.display === 'none') {
+                button.style.borderColor = '#ddd';
+            }
+        });
+        
         this.container.appendChild(button);
         
         // Dropdown
@@ -75,7 +91,7 @@ class CustomMultiSelect {
             margin-top: 4px;
             max-height: 300px;
             display: none;
-            z-index: 1000;
+            z-index: 9999;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         `;
         
@@ -235,6 +251,8 @@ class CustomMultiSelect {
     
     openDropdown() {
         this.dropdown.style.display = 'block';
+        this.container.style.zIndex = '1000'; // Підняти контейнер на передній план
+        this.button.style.borderColor = '#4facfe'; // Підсвітити активну кнопку
         if (this.searchInput) {
             setTimeout(() => this.searchInput.focus(), 100);
         }
@@ -242,6 +260,8 @@ class CustomMultiSelect {
     
     closeDropdown() {
         this.dropdown.style.display = 'none';
+        this.container.style.zIndex = '1'; // Повернути назад
+        this.button.style.borderColor = '#ddd'; // Повернути звичайний border
         if (this.searchInput) {
             this.searchInput.value = '';
             this.renderOptions();
