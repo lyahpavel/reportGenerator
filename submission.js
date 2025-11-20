@@ -4,7 +4,7 @@
 let currentSubmission = null;
 
 // Ініціалізація секції подання
-function initSubmission() {
+async function initSubmission() {
     const submissionForm = document.getElementById('submissionForm');
     const dronesContainer = document.getElementById('dronesContainer');
     const bkContainer = document.getElementById('bkContainer');
@@ -12,11 +12,31 @@ function initSubmission() {
     
     if (!submissionForm) return;
     
+    // Почекати поки Supabase буде готовий і користувач авторизується
+    let attempts = 0;
+    while ((!window.supabaseClient || !window.currentUser) && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+    
+    if (!window.supabaseClient) {
+        console.error('Supabase клієнт не ініціалізовано після очікування');
+        return;
+    }
+    
+    if (!window.currentUser) {
+        console.warn('Користувач не авторизований, очікуємо авторизації...');
+        // Не завантажуємо дані, поки користувач не авторизується
+        return;
+    }
+    
+    console.log('✅ Supabase готовий, користувач авторизований, ініціалізуємо подання');
+    
     // Завантажити операторів як чекбокси
-    loadCrewMembers();
+    await loadCrewMembers();
     
     // Завантажити поточне подання
-    loadCurrentSubmission();
+    await loadCurrentSubmission();
     
     // Event delegation для кнопок додавання (працює завжди)
     dronesContainer?.addEventListener('click', (e) => {
@@ -61,6 +81,10 @@ async function loadCrewMembers() {
     if (!crewContainer) return;
     
     try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabase клієнт не ініціалізовано');
+        }
+        
         // Завантажуємо операторів з user_custom_options
         const { data, error } = await window.supabaseClient
             .from('user_custom_options')
@@ -68,25 +92,59 @@ async function loadCrewMembers() {
             .eq('option_type', 'operator')
             .order('label');
         
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase помилка:', error);
+            throw error;
+        }
         
         crewContainer.innerHTML = '';
         data.forEach(operator => {
-            const checkboxWrapper = document.createElement('label');
-            checkboxWrapper.className = 'checkbox-label';
+            const crewItem = document.createElement('div');
+            crewItem.className = 'crew-member-item';
             
+            // Чекбокс для участі в екіпажі
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.name = 'crewMember';
             checkbox.value = operator.value;
             checkbox.className = 'crew-checkbox';
+            checkbox.id = `crew-${operator.value}`;
             
-            const span = document.createElement('span');
-            span.textContent = operator.label;
+            const checkboxLabel = document.createElement('label');
+            checkboxLabel.htmlFor = `crew-${operator.value}`;
+            checkboxLabel.textContent = operator.label;
+            checkboxLabel.className = 'crew-name-label';
             
-            checkboxWrapper.appendChild(checkbox);
-            checkboxWrapper.appendChild(span);
-            crewContainer.appendChild(checkboxWrapper);
+            // Радіобатон для старшого екіпажу
+            const radioWrapper = document.createElement('span');
+            radioWrapper.className = 'crew-leader-radio';
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'crewLeader';
+            radio.value = operator.value;
+            radio.className = 'crew-leader-input';
+            radio.disabled = true; // Спочатку заблокований
+            
+            const radioLabel = document.createElement('label');
+            radioLabel.textContent = 'Старший';
+            radioLabel.className = 'crew-leader-label';
+            
+            // Коли чекбокс змінюється, вмикаємо/вимикаємо радіобатон
+            checkbox.addEventListener('change', () => {
+                radio.disabled = !checkbox.checked;
+                if (!checkbox.checked && radio.checked) {
+                    radio.checked = false;
+                }
+            });
+            
+            radioWrapper.appendChild(radio);
+            radioWrapper.appendChild(radioLabel);
+            
+            crewItem.appendChild(checkbox);
+            crewItem.appendChild(checkboxLabel);
+            crewItem.appendChild(radioWrapper);
+            crewContainer.appendChild(crewItem);
         });
         
     } catch (error) {
@@ -96,7 +154,7 @@ async function loadCrewMembers() {
 }
 
 // Додавання рядка ресурсу (дрон або БК)
-function addResourceRow(type) {
+async function addResourceRow(type) {
     console.log('addResourceRow викликано для:', type);
     
     const container = document.getElementById(type === 'drone' ? 'dronesContainer' : 'bkContainer');
@@ -158,7 +216,7 @@ function addResourceRow(type) {
                 </div>
                 <div class="drone-field">
                     <label>Канал</label>
-                    <select class="drone-channel form-control" required>
+                    <select class="drone-channel form-control" multiple>
                         <option value="">Завантаження...</option>
                     </select>
                 </div>
@@ -171,9 +229,10 @@ function addResourceRow(type) {
                     </select>
                 </div>
                 <div class="drone-field modification-details-field" style="display: none;">
-                    <label>Модифікації (через кому)</label>
-                    <input type="text" class="drone-modification form-control" placeholder="5.8 GHz, FPV антена..." list="modificationsList_${Date.now()}">
-                    <datalist id="modificationsList_${Date.now()}"></datalist>
+                    <label>Модифікації</label>
+                    <select class="drone-modification form-control" multiple>
+                        <option value="">Завантаження...</option>
+                    </select>
                 </div>
             </div>
         `;
@@ -214,9 +273,55 @@ function addResourceRow(type) {
     
     // Якщо це дрон, завантажити додаткові опції
     if (type === 'drone') {
-        loadDroneFrequencies(resourceItem);
-        loadDroneChannels(resourceItem);
-        loadDroneModifications(resourceItem);
+        // Завантажити всі дані спочатку
+        await Promise.all([
+            loadDroneFrequencies(resourceItem),
+            loadDroneChannels(resourceItem),
+            loadDroneModifications(resourceItem)
+        ]);
+        
+        // Тепер ініціалізувати мультиселекти після завантаження даних
+        setTimeout(() => {
+            const channelSelect = resourceItem.querySelector('.drone-channel');
+            const modSelect = resourceItem.querySelector('.drone-modification');
+            
+            console.log('🔍 Перевірка мультиселектів:');
+            console.log('  window.initCustomMultiSelect існує?', typeof window.initCustomMultiSelect);
+            console.log('  channelSelect:', channelSelect, 'ID:', channelSelect?.id);
+            console.log('  modSelect:', modSelect, 'ID:', modSelect?.id);
+            
+            if (channelSelect && channelSelect.id) {
+                if (window.initCustomMultiSelect) {
+                    try {
+                        window.initCustomMultiSelect(`#${channelSelect.id}`, {
+                            multiple: true,
+                            placeholder: 'Оберіть канали...'
+                        });
+                        console.log('✅ Мультиселект каналів ініціалізовано:', channelSelect.id);
+                    } catch (e) {
+                        console.error('❌ Помилка ініціалізації каналів:', e);
+                    }
+                } else {
+                    console.error('❌ window.initCustomMultiSelect не знайдено!');
+                }
+            }
+            
+            if (modSelect && modSelect.id) {
+                if (window.initCustomMultiSelect) {
+                    try {
+                        window.initCustomMultiSelect(`#${modSelect.id}`, {
+                            multiple: true,
+                            placeholder: 'Оберіть модифікації...'
+                        });
+                        console.log('✅ Мультиселект модифікацій ініціалізовано:', modSelect.id);
+                    } catch (e) {
+                        console.error('❌ Помилка ініціалізації модифікацій:', e);
+                    }
+                } else {
+                    console.error('❌ window.initCustomMultiSelect не знайдено!');
+                }
+            }
+        }, 200);
         
         // Показати/сховати поле модифікації залежно від статусу
         const modStatusSelect = resourceItem.querySelector('.drone-modification-status');
@@ -355,7 +460,7 @@ async function loadDroneChannels(resourceItem) {
         
         if (error) throw error;
         
-        channelSelect.innerHTML = '<option value="">Оберіть канал</option>';
+        channelSelect.innerHTML = '<option value="">Оберіть канал...</option>';
         data.forEach(item => {
             const option = document.createElement('option');
             option.value = item.value;
@@ -363,20 +468,22 @@ async function loadDroneChannels(resourceItem) {
             channelSelect.appendChild(option);
         });
         
+        // Встановити унікальний ID для подальшої ініціалізації мультиселекту
+        const uniqueId = `drone-channel-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        channelSelect.id = uniqueId;
+        
+        console.log('Канали завантажені:', data.length, 'ID:', uniqueId);
+        
     } catch (error) {
         console.error('Помилка завантаження каналів:', error);
         channelSelect.innerHTML = '<option value="">Помилка завантаження</option>';
     }
 }
 
-// Завантаження модифікацій в datalist
+// Завантаження модифікацій
 async function loadDroneModifications(resourceItem) {
-    const modInput = resourceItem.querySelector('.drone-modification');
-    if (!modInput) return;
-    
-    const datalistId = modInput.getAttribute('list');
-    const datalist = resourceItem.querySelector(`#${datalistId}`);
-    if (!datalist) return;
+    const modSelect = resourceItem.querySelector('.drone-modification');
+    if (!modSelect) return;
     
     try {
         const { data, error } = await window.supabaseClient
@@ -387,17 +494,23 @@ async function loadDroneModifications(resourceItem) {
         
         if (error) throw error;
         
-        datalist.innerHTML = '';
+        modSelect.innerHTML = '<option value="">Оберіть модифікації...</option>';
         data.forEach(item => {
             const option = document.createElement('option');
             option.value = item.value;
-            datalist.appendChild(option);
+            option.textContent = item.label;
+            modSelect.appendChild(option);
         });
         
-        console.log('Модифікації завантажені:', data.length);
+        // Встановити унікальний ID для подальшої ініціалізації мультиселекту
+        const uniqueId = `drone-mod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        modSelect.id = uniqueId;
+        
+        console.log('Модифікації завантажені:', data.length, 'ID:', uniqueId);
         
     } catch (error) {
         console.error('Помилка завантаження модифікацій:', error);
+        modSelect.innerHTML = '<option value="">Помилка завантаження</option>';
     }
 }
 
@@ -414,6 +527,11 @@ async function saveSubmission() {
         const crewMembers = Array.from(crewCheckboxes).map(cb => cb.value);
         console.log('Екіпаж зібрано:', crewMembers);
         
+        // Збір старшого екіпажу (радіобатон)
+        const crewLeaderRadio = document.querySelector('.crew-leader-input:checked');
+        const crewLeader = crewLeaderRadio ? crewLeaderRadio.value : null;
+        console.log('Старший екіпажу:', crewLeader);
+        
         // Збір дронів з усіма полями
         const droneItems = document.querySelectorAll('.resource-item[data-type="drone"]');
         console.log('Знайдено рядків дронів:', droneItems.length);
@@ -425,11 +543,23 @@ async function saveSubmission() {
             const type = item.querySelector('.drone-type')?.value || '';
             const videoFreq = item.querySelector('.drone-video-freq')?.value || '';
             const controlFreq = item.querySelector('.drone-control-freq')?.value || '';
-            const channel = item.querySelector('.drone-channel')?.value || '';
             const modStatus = item.querySelector('.drone-modification-status')?.value || '';
-            const modification = modStatus === 'modified' 
-                ? (item.querySelector('.drone-modification')?.value || '') 
+            
+            // Канали - збираємо масив вибраних значень з мультиселекту
+            const channelSelect = item.querySelector('.drone-channel');
+            const channel = channelSelect 
+                ? Array.from(channelSelect.selectedOptions).map(opt => opt.value).join(', ')
                 : '';
+            
+            // Модифікації - збираємо масив вибраних значень з мультиселекту
+            let modification = '';
+            if (modStatus === 'modified') {
+                const modSelect = item.querySelector('.drone-modification');
+                if (modSelect) {
+                    const selectedOptions = Array.from(modSelect.selectedOptions).map(opt => opt.value);
+                    modification = selectedOptions.join(', ');
+                }
+            }
             
             const droneData = {
                 name: select.value,
@@ -481,6 +611,7 @@ async function saveSubmission() {
             date_from: dateFrom,
             date_to: dateTo,
             crew_members: crewMembers,
+            crew_leader: crewLeader,
             drones: drones,
             bk: bk,
             updated_at: new Date().toISOString()
@@ -546,6 +677,9 @@ async function loadCurrentSubmission() {
         if (data) {
             currentSubmission = data;
             displayCurrentSubmission();
+            
+            // Відновити вибір екіпажу
+            restoreCrewSelection(data);
         }
         
     } catch (error) {
@@ -574,7 +708,7 @@ function displayCurrentSubmission() {
         </div>
         <div class="info-row">
             <span class="info-label">Екіпаж:</span>
-            <span class="info-value">${currentSubmission.crew_members.join(', ')}</span>
+            <span class="info-value">${currentSubmission.crew_members.join(', ')}${currentSubmission.crew_leader ? ` (Старший: ${currentSubmission.crew_leader})` : ''}</span>
         </div>
     `;
     
@@ -653,6 +787,34 @@ function shareSubmission() {
         });
     } else {
         fallbackCopyTextToClipboard(text);
+    }
+}
+
+// Відновлення вибору екіпажу при завантаженні подання
+function restoreCrewSelection(submissionData) {
+    if (!submissionData) return;
+    
+    // Відновити чекбокси екіпажу
+    if (submissionData.crew_members && Array.isArray(submissionData.crew_members)) {
+        submissionData.crew_members.forEach(member => {
+            const checkbox = document.querySelector(`.crew-checkbox[value="${member}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+                // Вмикаємо відповідний радіобатон
+                const radio = document.querySelector(`.crew-leader-input[value="${member}"]`);
+                if (radio) {
+                    radio.disabled = false;
+                }
+            }
+        });
+    }
+    
+    // Відновити старшого екіпажу
+    if (submissionData.crew_leader) {
+        const radio = document.querySelector(`.crew-leader-input[value="${submissionData.crew_leader}"]`);
+        if (radio) {
+            radio.checked = true;
+        }
     }
 }
 
