@@ -18,7 +18,7 @@
     <!-- Форма логіна/реєстрації -->
     <div id="authSection" class="auth-section">
         <div class="auth-container">
-            <h1>🚁 Генератор звітів про дрони</h1>
+            <h1>Генератор звітів про дрони</h1>
             
             <!-- Форма логіна -->
             <div id="loginForm" class="auth-form">
@@ -80,8 +80,25 @@
                     <button id="logoutBtn" class="btn btn-outline btn-small">Вийти</button>
                 </div>
             </div>
-            <!-- Перемикач розширеного режиму -->
-            <div class="advanced-mode-toggle">
+            
+            <!-- Навігація -->
+            <nav class="main-nav">
+                <button class="nav-tab" data-page="submission">
+                    <span class="nav-label">Подання</span>
+                </button>
+                <button class="nav-tab active" data-page="generator">
+                    <span class="nav-label">Новий звіт</span>
+                </button>
+                <button class="nav-tab" data-page="archive">
+                    <span class="nav-label">Архів</span>
+                </button>
+                <button class="nav-tab" data-page="settings">
+                    <span class="nav-label">Налаштування</span>
+                </button>
+            </nav>
+            
+            <!-- Перемикач розширеного режиму (тільки для генератора) -->
+            <div class="advanced-mode-toggle" id="advancedModeSection">
                 <label class="switch-label">
                     <input type="checkbox" id="advancedModeSwitch">
                     <span class="switch-slider"></span>
@@ -90,6 +107,67 @@
             </div>
         </header>
 
+        <!-- Секція: Подання -->
+        <section id="submissionSection" class="page-section">
+            <h2>Подання на чергування</h2>
+            <div class="submission-content">
+                <form id="submissionForm" class="submission-form">
+                    <!-- Період чергування -->
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="dutyDateFrom">Чергування з:</label>
+                            <input type="date" id="dutyDateFrom" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dutyDateTo">Чергування по:</label>
+                            <input type="date" id="dutyDateTo" required>
+                        </div>
+                    </div>
+
+                    <!-- Склад екіпажу -->
+                    <div class="form-group">
+                        <label>Склад екіпажу:</label>
+                        <div id="crewMembers" class="crew-checkboxes">
+                            <p class="loading-text">Завантаження операторів...</p>
+                        </div>
+                        <small class="form-hint">Оберіть операторів для чергування</small>
+                    </div>
+
+                    <!-- Засоби (Дрони) -->
+                    <div class="form-group">
+                        <h3>Засоби (Дрони)</h3>
+                        <div id="dronesContainer" class="resources-container">
+                            <button type="button" class="btn btn-outline" id="addDroneBtn">+ Додати дрон</button>
+                        </div>
+                    </div>
+
+                    <!-- Боєкомплект -->
+                    <div class="form-group">
+                        <h3>Боєкомплект (БК)</h3>
+                        <div id="bkContainer" class="resources-container">
+                            <button type="button" class="btn btn-outline" id="addBkBtn">+ Додати БК</button>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки дій -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Зберегти подання</button>
+                        <button type="button" id="shareSubmission" class="btn btn-outline">Поділитися</button>
+                        <button type="reset" class="btn btn-secondary">Очистити</button>
+                        <button type="button" id="closeSubmission" class="btn btn-danger">Закрити подання</button>
+                    </div>
+                </form>
+
+                <!-- Поточне подання (перегляд) -->
+                <div id="currentSubmission" class="current-submission hidden">
+                    <h3>Поточне подання</h3>
+                    <div id="submissionDisplay" class="submission-display"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секція: Генератор звітів -->
+        <section id="generatorSection" class="page-section active">
         <form id="reportForm" class="report-form">
             <!-- Додавання відео -->
             <div class="form-group video-upload-section">
@@ -137,9 +215,9 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="droneName">Назва дрону:</label>
-                    <select id="droneName" name="droneName" required onchange="toggleCustomDroneName()">
+                    <select id="droneName" name="droneName" required onchange="autoFillReportDroneFields()">
                         <option value="">Оберіть назву дрону...</option>
-                        <!-- Опції заповнюються динамічно з data.json -->
+                        <!-- Опції заповнюються динамічно з поточного подання -->
                     </select>
                     <div class="custom-input-wrapper" style="display: none;">
                         <input type="text" id="customDroneName" name="customDroneName" placeholder="Введіть назву дрону..." data-save-option="false">
@@ -150,27 +228,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="droneSize">Розмір дрону:</label>
-                    <select id="droneSize" name="droneSize" required onchange="toggleCustomDroneSize()">
-                        <option value="">Оберіть розмір дрону...</option>
-                        <!-- Опції заповнюються динамічно з data.json -->
-                    </select>
-                    <div class="custom-input-wrapper" style="display: none;">
-                        <input type="text" id="customDroneSize" name="customDroneSize" placeholder="Введіть розмір дрону..." data-save-option="false">
-                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customDroneSize')" title="Зберегти в мої опції">
-                            <span class="save-icon">💾</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="cameraType">Тип камери:</label>
+                    <label for="cameraType">Тип:</label>
                     <select id="cameraType" name="cameraType" required onchange="toggleCustomCameraType()">
-                        <option value="">Оберіть тип камери...</option>
+                        <option value="">Оберіть тип...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
                     <div class="custom-input-wrapper" style="display: none;">
-                        <input type="text" id="customCameraType" name="customCameraType" placeholder="Введіть тип камери..." data-save-option="false">
+                        <input type="text" id="customCameraType" name="customCameraType" placeholder="Введіть тип..." data-save-option="false">
                         <button type="button" class="save-option-btn" onclick="toggleSaveOption('customCameraType')" title="Зберегти в мої опції">
                             <span class="save-icon">💾</span>
                         </button>
@@ -178,22 +242,18 @@
                 </div>
             </div>
 
-            <!-- Заводська комплектація -->
+            <!-- Стан дрона (автоматично з подання) -->
             <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                    <input type="checkbox" id="factoryConfig" name="factoryConfig" onchange="toggleModifications()" checked style="width: auto; margin: 0;">
-                    <span>Заводська комплектація</span>
-                </label>
+                <label>Стан дрона:</label>
+                <div id="droneStatusDisplay" style="padding: 12px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 8px; color: #2d3748;">
+                    <span id="droneStatusText">Оберіть дрон для відображення статусу</span>
+                </div>
             </div>
 
-            <!-- Модифікації (показується коли заводська комплектація вимкнена) -->
-                        <div class="form-group" id="modificationsGroup" style="display: none;">
-                <label for="modifications">Модифікації (через кому):</label>
-                <div class="custom-input-wrapper" style="display: block;">
-                    <input type="text" id="modifications" list="modificationsList" data-save-option="true" autocomplete="off" placeholder="Наприклад: 5.8 GHz, FPV антена">
-                    <button onclick="toggleSaveOption('modifications')" class="active">💾</button>
-                </div>
-                <datalist id="modificationsList"></datalist>
+            <!-- Оптоволокно (якщо є в поданні) -->
+            <div class="form-group" id="fiberOpticGroup" style="display: none;">
+                <label>Оптоволокно:</label>
+                <input type="text" id="fiberOpticLength" name="fiberOpticLength" class="form-control" readonly>
             </div>
 
             <!-- Частоти: відео і керування в одному рядку -->
@@ -238,20 +298,10 @@
                 </div>
             </div>
 
-            <!-- Оптоволоконний кабель -->
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="fiberOptic" name="fiberOptic" onchange="toggleFiberLength()">
-                    Оптоволоконний кабель
-                </label>
-            </div>
-
-            <div class="form-group" id="fiberLengthGroup" style="display: none;">
-                <label for="fiberLength">Довжина котушки (км):</label>
-                <input type="number" id="fiberLength" name="fiberLength" min="0.1" max="100" step="0.1" placeholder="Наприклад: 0.5">
-                <small style="color: #666; font-size: 0.85rem; margin-top: 4px; display: block;">
-                    💡 Вкажіть довжину в кілометрах
-                </small>
+            <!-- Довжина оптоволокна (показується автоматично для оптоволоконних дронів) -->
+            <div class="form-group" id="fiberOpticGroup" style="display: none;">
+                <label for="fiberOpticLength">Довжина оптоволокна:</label>
+                <input type="text" id="fiberOpticLength" name="fiberOpticLength" placeholder="Наприклад: 10 км">
             </div>
 
             <!-- Додаткові поля -->
@@ -419,31 +469,71 @@
                 <button id="newReport" class="btn btn-primary">Новий звіт</button>
             </div>
         </div>
+        </section>
+        <!-- Кінець секції генератора -->
 
-        <!-- Секція історії звітів -->
-        <div id="reportsHistory" class="reports-history" style="display: none;">
-            <h2>Історія звітів</h2>
-            <div class="history-controls">
-                <button id="toggleHistory" class="btn btn-secondary">Показати історію</button>
-                <button id="refreshHistory" class="btn btn-outline" style="display: none;">Оновити</button>
-            </div>
-            <div id="historyContent" class="history-content" style="display: none;">
-                <div class="history-filters">
-                    <input type="text" id="searchReports" placeholder="Пошук за номером звіту, підрозділом..." class="search-input">
-                    <select id="filterBySubdivision" class="filter-select">
-                        <option value="">Всі підрозділи</option>
-                    </select>
+        <!-- Секція: Архів звітів -->
+        <section id="archiveSection" class="page-section">
+            <h2>Архів</h2>
+            
+            <!-- Архівні подання -->
+            <div id="archivedSubmissions" class="archived-submissions">
+                <h3>Архівні подання</h3>
+                <div class="history-controls">
+                    <button id="refreshArchivedSubmissions" class="btn btn-outline">🔄 Оновити</button>
                 </div>
-                <div id="reportsList" class="reports-list">
-                    <!-- Список звітів буде тут -->
-                </div>
-                <div class="pagination">
-                    <button id="prevPage" class="btn btn-outline">← Попередня</button>
-                    <span id="pageInfo">Сторінка 1</span>
-                    <button id="nextPage" class="btn btn-outline">Наступна →</button>
+                <div id="archivedSubmissionsList" class="archived-submissions-list">
+                    <!-- Список архівних подань буде тут -->
                 </div>
             </div>
-        </div>
+            
+            <hr style="margin: 2rem 0;">
+            
+            <!-- Звіти -->
+            <div id="reportsHistory" class="reports-history">
+                <h3>Звіти</h3>
+                <div class="history-controls">
+                    <button id="refreshHistory" class="btn btn-outline">🔄 Оновити</button>
+                </div>
+                <div id="historyContent" class="history-content">
+                    <div class="history-filters">
+                        <input type="text" id="searchReports" placeholder="Пошук за номером звіту, підрозділом..." class="search-input">
+                        <select id="filterBySubdivision" class="filter-select">
+                            <option value="">Всі підрозділи</option>
+                        </select>
+                    </div>
+                    <div id="reportsList" class="reports-list">
+                        <!-- Список звітів буде тут -->
+                    </div>
+                    <div class="pagination">
+                        <button id="prevPage" class="btn btn-outline">← Попередня</button>
+                        <span id="pageInfo">Сторінка 1</span>
+                        <button id="nextPage" class="btn btn-outline">Наступна →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секція: Налаштування -->
+        <section id="settingsSection" class="page-section">
+            <h2>Налаштування</h2>
+            <div class="settings-content">
+                <div class="settings-group">
+                    <h3>Користувацькі опції</h3>
+                    <p>Тут ви можете керувати вашими збереженими опціями для всіх полів форми.</p>
+                    <div id="customOptionsManager">
+                        <!-- Менеджер користувацьких опцій буде тут -->
+                        <p class="info-message">💡 Щоб додати нові опції, використовуйте кнопку 💾 в полях форми генератора звітів.</p>
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3>Про додаток</h3>
+                    <p><strong>Версія:</strong> 2.0</p>
+                    <p><strong>Користувач:</strong> <span id="settingsUserEmail"></span></p>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script src="supabase-functions.js"></script>
@@ -451,61 +541,9 @@
     <script src="multiselect.js"></script>
     <script src="script.js"></script>
     <script src="reports-history.js"></script>
+    <script src="submission.js"></script>
     <script>
-        // Функція для показу/приховування поля довжини котушки та частот
-        function toggleFiberLength() {
-            const checkbox = document.getElementById('fiberOptic');
-            const lengthGroup = document.getElementById('fiberLengthGroup');
-            const lengthInput = document.getElementById('fiberLength');
-            const frequencyRow = document.getElementById('frequencyRow');
-            const videoFreqInput = document.getElementById('videoFrequency');
-            const controlFreqInput = document.getElementById('controlFrequency');
-            
-            if (checkbox.checked) {
-                // Показати поле довжини котушки
-                lengthGroup.style.display = 'block';
-                lengthInput.required = true;
-                
-                // Приховати весь рядок з частотами (і відео і керування)
-                if (frequencyRow) {
-                    frequencyRow.style.display = 'none';
-                }
-                videoFreqInput.required = false;
-                controlFreqInput.required = false;
-                videoFreqInput.value = '';
-                controlFreqInput.value = '';
-            } else {
-                // Приховати поле довжини котушки
-                lengthGroup.style.display = 'none';
-                lengthInput.required = false;
-                lengthInput.value = '';
-                
-                // Показати рядок з частотами (використовуємо '' щоб відновити CSS клас)
-                if (frequencyRow) {
-                    frequencyRow.style.display = '';
-                }
-                videoFreqInput.required = true;
-                controlFreqInput.required = true;
-            }
-        }
-
-        // Функція для показу/приховування поля модифікацій
-        function toggleModifications() {
-            const checkbox = document.getElementById('factoryConfig');
-            const modificationsGroup = document.getElementById('modificationsGroup');
-            const modificationsInput = document.getElementById('modifications');
-            
-            if (checkbox.checked) {
-                // Заводська комплектація - приховати модифікації
-                modificationsGroup.style.display = 'none';
-                modificationsInput.required = false;
-                modificationsInput.value = '';
-            } else {
-                // Не заводська - показати поле модифікацій
-                modificationsGroup.style.display = 'block';
-                modificationsInput.required = false; // Не обов'язкове, можна залишити порожнім
-            }
-        }
+        // toggleModifications більше не потрібна - статус береться з подання
         
 
     </script>
@@ -892,5 +930,26 @@
         }
     </script>
     </div> <!-- End of appSection -->
+    
+    <!-- Модальне вікно для перегляду архівного подання -->
+    <div id="archivedSubmissionModal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeArchivedSubmissionModal()">
+        <div class="modal-content archived-submission-modal">
+            <div class="modal-header">
+                <h2 id="modalSubmissionTitle">Подання</h2>
+                <button class="modal-close" onclick="closeArchivedSubmissionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalSubmissionDetails" class="submission-details">
+                    <!-- Деталі подання -->
+                </div>
+                <div id="modalSubmissionReports" class="submission-reports">
+                    <h3>Звіти цього подання</h3>
+                    <div id="modalReportsList">
+                        <!-- Список звітів -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

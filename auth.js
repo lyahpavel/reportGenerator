@@ -20,6 +20,7 @@ async function initAuth() {
     
     if (session) {
         currentUser = session.user;
+        window.currentUser = currentUser;
         await handleUserLogin();
     } else {
         // Показати форму логіна
@@ -31,9 +32,11 @@ async function initAuth() {
     supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN') {
             currentUser = session.user;
+            window.currentUser = currentUser;
             handleUserLogin();
         } else if (event === 'SIGNED_OUT') {
             currentUser = null;
+            window.currentUser = null;
             handleUserLogout();
         }
     });
@@ -218,6 +221,17 @@ async function handleUserLogin() {
 
     // Завантажити кастомні опції користувача
     await loadUserCustomOptions();
+    
+    // ЗАВЖДИ завантажити поточне подання (потрібно для генератора звітів)
+    if (window.submissionFunctions?.loadCurrentSubmission) {
+        await window.submissionFunctions.loadCurrentSubmission();
+    }
+    
+    // Ініціалізувати подання якщо користувач на цій сторінці
+    const currentHash = window.location.hash || '#/';
+    if (currentHash === '#/submission' && window.submissionFunctions) {
+        await window.submissionFunctions.initSubmission();
+    }
     
     // Ініціалізувати multiselect після завантаження даних
     setTimeout(() => {
@@ -641,6 +655,13 @@ window.authFunctions = {
     loadUserCustomOptions,
     saveCustomOptionsFromForm
 };
+
+// Експорт currentUser для доступу з інших скриптів
+window.currentUser = currentUser;
+Object.defineProperty(window, 'currentUser', {
+    get: () => currentUser,
+    set: (value) => { currentUser = value; }
+});
 
 // Автоматична ініціалізація при завантаженні
 document.addEventListener('DOMContentLoaded', () => {

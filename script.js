@@ -5,6 +5,7 @@ const reportContent = document.getElementById('reportContent');
 const downloadButton = document.getElementById('downloadReport');
 const newReportButton = document.getElementById('newReport');
 const newReportBasedOnButton = document.getElementById('newReportBasedOn');
+const closeSubmissionButton = document.getElementById('closeSubmission');
 
 // Глобальна змінна для зберігання даних
 let appData = null;
@@ -179,21 +180,62 @@ async function loadData() {
         }
     }
     
-    // В будь-якому випадку заповнюємо селекти
-    populateSelects();
+    // В будь-якому випадку заповнюємо селекти (асинхронно, функція сама почекає на кеш)
+    populateSelects().catch(err => console.error('Помилка populateSelects:', err));
+    
+    // Експортуємо функцію для глобального використання
+    window.populateSelects = populateSelects;
 }
 
 // Заповнення випадаючих списків даними
-function populateSelects() {
+async function populateSelects() {
     if (!appData) return;
+    
+    // Чекаємо на готовність submission.js та завантаження кешу
+    let attempts = 0;
+    while (!window.submissionFunctions?.waitForCache && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        attempts++;
+    }
+    
+    // Чекаємо на завантаження кешу якщо він ще не готовий
+    if (window.submissionFunctions?.waitForCache) {
+        await window.submissionFunctions.waitForCache();
+    }
+    
+    // Завантажити подання якщо ще не завантажене
+    if (window.submissionFunctions?.loadCurrentSubmission && !window.submissionFunctions?.getCurrentSubmission()) {
+        await window.submissionFunctions.loadCurrentSubmission();
+    }
     
     // Заповнення підрозділів
     populateSelect('subdivision', appData.subdivisions);
     populateSelect('jointWith', appData.jointWithOptions || appData.subdivisions);
     
-    // Заповнення дронів (три окремі поля)
-    populateSelect('droneName', appData.droneNames);
-    populateSelect('droneSize', appData.droneSizes);
+    // Отримуємо поточне подання для фільтрації
+    const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+    
+    // Заповнення дронів ТІЛЬКИ з поточного подання
+    if (currentSubmission && currentSubmission.drones && currentSubmission.drones.length > 0) {
+        const availableDrones = currentSubmission.drones
+            .filter(drone => drone.count > 0)
+            .map(drone => ({
+                value: drone.name || drone.label,
+                label: `${drone.label} (${drone.count} шт)`
+            }));
+        
+        if (availableDrones.length > 0) {
+            populateSelect('droneName', availableDrones);
+        } else {
+            // Немає дронів з count > 0
+            populateSelect('droneName', [{ value: '', label: 'Немає доступних дронів' }]);
+        }
+    } else {
+        // Немає подання - показуємо попередження
+        populateSelect('droneName', [{ value: '', label: 'Спочатку створіть подання' }]);
+    }
+    
+    // Розмір дрону видалено
     populateSelect('cameraType', appData.cameraTypes);
     
     // Заповнення частот (два окремі поля)
@@ -202,8 +244,24 @@ function populateSelects() {
     
     // Поле 'Тип місії' видалено
     
-    // Заповнення нових полів
-    populateSelect('bk', appData.bkOptions);
+    // Заповнення БК ТІЛЬКИ з поточного подання
+    if (currentSubmission && currentSubmission.bk && currentSubmission.bk.length > 0) {
+        const availableBk = currentSubmission.bk
+            .filter(bk => bk.count > 0)
+            .map(bk => ({
+                value: bk.name || bk.label,
+                label: `${bk.label} (${bk.count} шт)`
+            }));
+        
+        if (availableBk.length > 0) {
+            populateSelect('bk', availableBk);
+        } else {
+            populateSelect('bk', [{ value: '', label: 'Немає доступного БК' }]);
+        }
+    } else {
+        populateSelect('bk', [{ value: '', label: 'Спочатку створіть подання' }]);
+    }
+    
     populateSelect('initiationBoard', appData.initiationBoardOptions);
     populateSelect('targetType', appData.targetTypeOptions);
     populateSelect('settlement', appData.settlementOptions);
@@ -283,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Обробка відправки форми
-reportForm.addEventListener('submit', function(e) {
+reportForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // Збір даних з форми
@@ -292,15 +350,15 @@ reportForm.addEventListener('submit', function(e) {
         subdivision: document.getElementById('subdivision').value === 'Інший' ? document.getElementById('customSubdivision').value : document.getElementById('subdivision').value,
         jointWith: document.getElementById('jointWith').value === 'Інший' ? document.getElementById('customJointWith').value : document.getElementById('jointWith').value,
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
-        droneSize: document.getElementById('droneSize').value === 'Інший' ? document.getElementById('customDroneSize').value : document.getElementById('droneSize').value,
         cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
-        factoryConfig: document.getElementById('factoryConfig').checked,
-        modifications: document.getElementById('modifications').value,
+        droneStatus: document.getElementById('droneStatusText').textContent,
+        fiberOptic: document.getElementById('fiberOpticGroup').style.display !== 'none',
+        hasFiberOptic: document.getElementById('fiberOpticGroup').style.display !== 'none',
+        fiberOpticLength: document.getElementById('fiberOpticLength').value,
+        fiberLength: document.getElementById('fiberOpticLength').value,
         videoFrequency: document.getElementById('videoFrequency').value === 'Інша' ? document.getElementById('customVideoFrequency').value : document.getElementById('videoFrequency').value,
         channel: document.getElementById('channel').value,
         controlFrequency: document.getElementById('controlFrequency').value === 'Інша' ? document.getElementById('customControlFrequency').value : document.getElementById('controlFrequency').value,
-        fiberOptic: document.getElementById('fiberOptic').checked,
-        fiberLength: document.getElementById('fiberLength').value,
         bk: bkValue === 'Інший' ? document.getElementById('customBk').value : bkValue,
         initiationBoard: document.getElementById('initiationBoard').value === 'Інший' ? document.getElementById('customInitiationBoard').value : document.getElementById('initiationBoard').value,
         targetType: (() => {
@@ -359,6 +417,9 @@ reportForm.addEventListener('submit', function(e) {
     const reportNumber = generateReportNumber(formData);
     formData.reportNumber = reportNumber;
     
+    // Генерація текстового звіту для БД
+    formData.reportText = generateReportText(formData);
+    
     // Генерація звіту
     generateReport(formData);
     
@@ -379,7 +440,21 @@ reportForm.addEventListener('submit', function(e) {
     
     // Зберегти звіт у Supabase (асинхронно, не блокуємо UI)
     if (window.supabaseFunctions && window.supabaseClient) {
-        window.supabaseFunctions.saveReportToSupabase(formData).catch(error => {
+        window.supabaseFunctions.saveReportToSupabase(formData).then(async () => {
+            console.log('✅ Звіт збережено, оновлюємо дані...');
+            // Після успішного збереження перезавантажити подання
+            if (window.submissionFunctions?.loadCurrentSubmission) {
+                await window.submissionFunctions.loadCurrentSubmission();
+                console.log('✅ Подання перезавантажене');
+            }
+            // Невелика затримка щоб дані встигли оновитися
+            await new Promise(resolve => setTimeout(resolve, 100));
+            // Потім оновити селекти
+            if (typeof populateSelects === 'function') {
+                await populateSelects();
+                console.log('✅ Селекти оновлено');
+            }
+        }).catch(error => {
             console.error('Не вдалося зберегти звіт:', error);
             // Не показуємо помилку користувачу, якщо збереження не вдалося
             // Звіт все одно буде доступний локально
@@ -403,10 +478,6 @@ function validateForm(data) {
     
     if (!data.droneName) {
         errors.push('Оберіть назву дрону');
-    }
-    
-    if (!data.droneSize) {
-        errors.push('Оберіть розмір дрону');
     }
     
     if (!data.cameraType) {
@@ -484,32 +555,26 @@ function generateReport(data) {
         
         <div class="report-item">
             <span class="report-label">Дрон:</span>
-            <span class="report-value">${data.droneName} | ${data.droneSize} | ${data.cameraType}</span>
+            <span class="report-value">${data.droneName} | ${data.cameraType}</span>
         </div>
         
-        ${!data.factoryConfig && data.modifications ? `
+        ${data.droneStatus ? `
         <div class="report-item">
-            <span class="report-label">Модифікації:</span>
-            <span class="report-value">${data.modifications}</span>
-        </div>
-        ` : data.factoryConfig ? `
-        <div class="report-item">
-            <span class="report-label">Комплектація:</span>
-            <span class="report-value">Заводська</span>
+            <span class="report-label">Стан:</span>
+            <span class="report-value">${data.droneStatus}</span>
         </div>
         ` : ''}
         
-        ${data.fiberOptic ? `
+        ${data.hasFiberOptic ? `
         <div class="report-item">
-            <span class="report-label">Тип зв'язку:</span>
-            <span class="report-value">Оптоволоконний кабель (${data.fiberLength} км)</span>
+            <span class="report-label">Оптоволокно:</span>
+            <span class="report-value">${data.fiberOpticLength}</span>
         </div>
         ` : `
         <div class="report-item">
             <span class="report-label">Частоти:</span>
             <span class="report-value">Відео: ${data.videoFrequency} | Керування: ${data.controlFrequency}</span>
         </div>
-        `}
         
         ${data.channel ? `
         <div class="report-item">
@@ -517,6 +582,7 @@ function generateReport(data) {
             <span class="report-value">${data.channel}</span>
         </div>
         ` : ''}
+        `}
         
         <div class="report-item">
             <span class="report-label">Дата та час:</span>
@@ -653,6 +719,78 @@ function formatDate(dateString) {
 function formatTime(timeString) {
     // Час вже в форматі HH:MM, просто повертаємо
     return timeString;
+}
+
+// Функція генерації текстового звіту (для збереження в БД)
+function generateReportText(data) {
+    const formattedDate = formatDate(data.date);
+    const formattedTime = formatTime(data.time);
+    
+    let reportText = `Підрозділ: ${data.subdivision}\n`;
+    
+    if (data.jointWith && data.jointWith !== '' && data.jointWith !== '—') {
+        reportText += `Сумісно з: ${data.jointWith}\n`;
+    }
+    
+    reportText += `Дрон: ${data.droneName} | ${data.cameraType}\n`;
+    
+    if (data.droneStatus) {
+        reportText += `Стан: ${data.droneStatus}\n`;
+    }
+    
+    if (data.hasFiberOptic) {
+        reportText += `Оптоволокно: ${data.fiberOpticLength}\n`;
+    } else {
+        reportText += `Частоти: Відео: ${data.videoFrequency} | Керування: ${data.controlFrequency}\n`;
+        if (data.channel) {
+            reportText += `Канал: ${data.channel}\n`;
+        }
+    }
+    
+    reportText += `Дата та час: ${formattedDate} ${formattedTime}\n`;
+    
+    if (data.bk) {
+        reportText += `БК: ${data.bk}\n`;
+    }
+    
+    if (data.initiationBoard) {
+        reportText += `Плата Ініціації: ${data.initiationBoard}\n`;
+    }
+    
+    if (data.targetType || data.settlement || data.coordinates) {
+        const targetParts = [
+            data.targetType || '',
+            data.settlement || '',
+            data.coordinates ? `(${data.coordinates})` : ''
+        ].filter(item => item !== '');
+        reportText += `Ціль: ${targetParts.join(' | ')}\n`;
+    }
+    
+    if (data.status) {
+        reportText += `Статус: ${data.status}\n`;
+    }
+    
+    if (data.reason && data.status === 'Не уражено') {
+        reportText += `Причина: ${data.reason}\n`;
+    }
+    
+    if (data.losses) {
+        reportText += `Втрати: ${data.losses}\n`;
+    }
+    
+    if (data.operator) {
+        reportText += `Оператор: ${data.operator}\n`;
+    }
+    
+    if (data.stream) {
+        reportText += `Стрім: Так\n`;
+    }
+    
+    if (data.mission) {
+        reportText += `Опис місії: ${data.mission}\n`;
+    }
+    
+    return reportText;
 }
 
 // Функція показу помилки
@@ -845,6 +983,13 @@ newReportButton.addEventListener('click', function() {
     reportForm.scrollIntoView({ behavior: 'smooth' });
 });
 
+// Закриття подання (кнопка)
+if (closeSubmissionButton) {
+    closeSubmissionButton.addEventListener('click', async function() {
+        await closeSubmission();
+    });
+}
+
 // Створення нового звіту на основі поточного
 newReportBasedOnButton.addEventListener('click', function() {
     reportOutput.classList.add('hidden');
@@ -853,12 +998,11 @@ newReportBasedOnButton.addEventListener('click', function() {
     const currentFormData = {
         subdivision: document.getElementById('subdivision').value,
         droneName: document.getElementById('droneName').value,
-        droneSize: document.getElementById('droneSize').value,
         cameraType: document.getElementById('cameraType').value,
+        hasFiberOptic: document.getElementById('fiberOpticGroup').style.display !== 'none',
+        fiberOpticLength: document.getElementById('fiberOpticLength').value,
         videoFrequency: document.getElementById('videoFrequency').value,
         controlFrequency: document.getElementById('controlFrequency').value,
-        fiberOptic: document.getElementById('fiberOptic').checked,
-        fiberLength: document.getElementById('fiberLength').value,
         bk: document.getElementById('bk').value,
         targetType: Array.from(document.getElementById('targetType').selectedOptions).map(opt => opt.value),
         settlement: document.getElementById('settlement').value,
@@ -896,6 +1040,171 @@ newReportBasedOnButton.addEventListener('click', function() {
 function reloadData() {
     loadData();
     showSuccess('Дані перезавантажено');
+}
+
+// Функція для закриття подання (архівування та очищення таблиці suggestions)
+async function closeSubmission() {
+    try {
+        // Отримуємо поточне подання
+        const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+        
+        if (!currentSubmission) {
+            showError('Немає активного подання для закриття');
+            return;
+        }
+        
+        // Підтвердження від користувача
+        const confirmed = confirm(
+            'Ви впевнені, що хочете закрити подання?\n\n' +
+            'Це призведе до:\n' +
+            '- Збереження подання в архів\n' +
+            '- Збереження всіх звітів разом з поданням\n' +
+            '- Очищення робочої області для нового подання\n\n' +
+            'Продовжити?'
+        );
+        
+        if (!confirmed) return;
+        
+        const supabase = window.supabaseClient;
+        if (!supabase) {
+            throw new Error('Supabase client не ініціалізовано');
+        }
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            throw new Error('Користувач не авторизований');
+        }
+        
+        // 1. Зберегти подання в архів
+        const submissionId = currentSubmission.id;
+        const archiveData = {
+            user_id: user.id,
+            submission_id: submissionId,
+            date_from: currentSubmission.date_from,
+            date_to: currentSubmission.date_to,
+            crew_members: currentSubmission.crew_members,
+            crew_leader: currentSubmission.crew_leader,
+            drones: currentSubmission.drones,
+            bk: currentSubmission.bk,
+            archived_at: new Date().toISOString()
+        };
+        
+        const { data: archivedSubmission, error: archiveError } = await supabase
+            .from('archived_submissions')
+            .insert([archiveData])
+            .select()
+            .single();
+        
+        if (archiveError) {
+            // Якщо таблиця не існує, просто продовжуємо без архівування
+            if (archiveError.code !== '42P01') { // 42P01 = таблиця не існує
+                throw archiveError;
+            }
+        } else {
+            console.log('📦 Подання архівовано, ID:', archivedSubmission.id);
+            
+            // 2. Оновити всі звіти користувача, додавши посилання на архівне подання
+            console.log('🔄 Оновлюємо звіти за період:', currentSubmission.date_from, '-', currentSubmission.date_to);
+            
+            const { data: updatedReports, error: updateReportsError } = await supabase
+                .from('reports')
+                .update({ 
+                    archived_submission_id: archivedSubmission.id,
+                    submission_archived: true
+                })
+                .eq('user_id', user.id)
+                .gte('mission_date', currentSubmission.date_from)
+                .lte('mission_date', currentSubmission.date_to)
+                .select('id, report_number, mission_date');
+            
+            if (updateReportsError) {
+                console.error('❌ Помилка оновлення звітів:', updateReportsError);
+            } else {
+                console.log(`✅ Оновлено ${updatedReports?.length || 0} звітів:`, updatedReports);
+            }
+        }
+        
+        // 3. Видаляємо дані з таблиці suggestions (якщо вона існує)
+        try {
+            await supabase
+                .from('suggestions')
+                .delete()
+                .eq('user_id', user.id);
+        } catch (err) {
+            // Таблиця може не існувати - ігноруємо помилку
+        }
+        
+        // 4. Видаляємо поточне подання
+        const { error: deleteError } = await supabase
+            .from('submissions')
+            .delete()
+            .eq('id', submissionId)
+            .eq('user_id', user.id);
+        
+        if (deleteError) {
+            throw deleteError;
+        }
+        
+        // 5. Очищаємо інтерфейс
+        reportForm.reset();
+        reportOutput.classList.add('hidden');
+        
+        // Очистити прикріплене відео
+        attachedVideoFile = null;
+        const videoFileInput = document.getElementById('videoFile');
+        const videoFileName = document.getElementById('videoFileName');
+        const removeVideoBtn = document.getElementById('removeVideoBtn');
+        if (videoFileInput) videoFileInput.value = '';
+        if (videoFileName) videoFileName.textContent = '';
+        if (removeVideoBtn) removeVideoBtn.style.display = 'none';
+        
+        // Очистити відображення подання
+        const currentSubmissionContainer = document.getElementById('currentSubmission');
+        if (currentSubmissionContainer) {
+            currentSubmissionContainer.classList.add('hidden');
+        }
+        
+        // Очистити форму подання
+        const submissionForm = document.getElementById('submissionForm');
+        if (submissionForm) {
+            submissionForm.reset();
+        }
+        
+        // Очистити контейнери дронів та БК
+        const dronesContainer = document.getElementById('dronesContainer');
+        const bkContainer = document.getElementById('bkContainer');
+        if (dronesContainer) {
+            dronesContainer.innerHTML = '<button type="button" class="btn btn-outline" id="addDroneBtn">+ Додати дрон</button>';
+        }
+        if (bkContainer) {
+            bkContainer.innerHTML = '<button type="button" class="btn btn-outline" id="addBkBtn">+ Додати БК</button>';
+        }
+        
+        // ВАЖЛИВО: Очистити змінну currentSubmission в submission.js
+        if (window.submissionFunctions?.clearSubmission) {
+            window.submissionFunctions.clearSubmission();
+        }
+        
+        // Перепідключити обробники кнопок після очищення (async, не чекаємо)
+        if (window.submissionFunctions?.initSubmission) {
+            window.submissionFunctions.initSubmission();
+        }
+        
+        // Оновити списки в генераторі (async, сама почекає на завантаження)
+        if (window.populateSelects) {
+            window.populateSelects();
+        }
+        
+        // 6. Показуємо повідомлення про успіх
+        showSuccess('Подання заархівовано! Всі звіти збережені в архіві.');
+        
+        // Прокрутити до початку
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+    } catch (error) {
+        console.error('Помилка закриття подання:', error);
+        showError('Не вдалося закрити подання: ' + error.message);
+    }
 }
 
 // Функція для показу/приховування поля ручного введення населеного пункту та керування координатами
@@ -983,6 +1292,113 @@ function toggleCustomSettlement() {
             }
         }
     }
+}
+
+// Автозаповнення полів звіту при виборі дрона з подання
+function autoFillReportDroneFields() {
+    const select = document.getElementById('droneName');
+    const selectedValue = select.value;
+    
+    if (!selectedValue) return;
+    
+    const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+    if (!currentSubmission || !currentSubmission.drones) return;
+    
+    // Знаходимо вибраний дрон в поточному поданні
+    const selectedDrone = currentSubmission.drones.find(drone => 
+        (drone.name || drone.label) === selectedValue
+    );
+    
+    if (!selectedDrone) return;
+    
+    // Заповнюємо поля форми звіту
+    const videoFreqSelect = document.getElementById('videoFrequency');
+    const controlFreqSelect = document.getElementById('controlFrequency');
+    const channelInput = document.getElementById('channel');
+    const cameraTypeSelect = document.getElementById('cameraType');
+    const frequencyRow = document.getElementById('frequencyRow');
+    const fiberOpticGroup = document.getElementById('fiberOpticGroup');
+    const fiberOpticLength = document.getElementById('fiberOpticLength');
+    
+    // Перевірка чи це оптоволоконний дрон
+    if (selectedDrone.hasFiberOptic) {
+        // Ховаємо частоти та канал
+        if (frequencyRow) frequencyRow.style.display = 'none';
+        
+        // Показуємо поле оптоволокна
+        if (fiberOpticGroup && fiberOpticLength) {
+            fiberOpticGroup.style.display = 'block';
+            fiberOpticLength.value = `${selectedDrone.fiberCableLength} км`;
+        }
+        
+        // Знімаємо required з прихованих полів
+        if (videoFreqSelect) videoFreqSelect.required = false;
+        if (controlFreqSelect) controlFreqSelect.required = false;
+        if (channelInput) channelInput.required = false;
+    } else {
+        // Показуємо частоти та канал
+        if (frequencyRow) frequencyRow.style.display = 'flex';
+        
+        // Ховаємо поле оптоволокна
+        if (fiberOpticGroup) fiberOpticGroup.style.display = 'none';
+        if (fiberOpticLength) fiberOpticLength.value = '';
+        
+        // Встановлюємо required для частот
+        if (videoFreqSelect) videoFreqSelect.required = true;
+        if (controlFreqSelect) controlFreqSelect.required = true;
+        
+        // Частота відео
+        if (videoFreqSelect && selectedDrone.videoFrequency) {
+            const option = Array.from(videoFreqSelect.options).find(opt => 
+                opt.value === selectedDrone.videoFrequency
+            );
+            if (option) {
+                videoFreqSelect.value = selectedDrone.videoFrequency;
+            }
+        }
+        
+        // Частота керування
+        if (controlFreqSelect && selectedDrone.controlFrequency) {
+            const option = Array.from(controlFreqSelect.options).find(opt => 
+                opt.value === selectedDrone.controlFrequency
+            );
+            if (option) {
+                controlFreqSelect.value = selectedDrone.controlFrequency;
+            }
+        }
+        
+        // Канал
+        if (channelInput && selectedDrone.channel) {
+            channelInput.value = selectedDrone.channel;
+        }
+    }
+    
+    // Тип камери (беремо з подання)
+    if (cameraTypeSelect && selectedDrone.type) {
+        const option = Array.from(cameraTypeSelect.options).find(opt => 
+            opt.value === selectedDrone.type
+        );
+        if (option) {
+            cameraTypeSelect.value = selectedDrone.type;
+        }
+    }
+    
+    // Відображення статусу дрона
+    const statusDisplay = document.getElementById('droneStatusText');
+    if (statusDisplay && selectedDrone.modificationStatus) {
+        if (selectedDrone.modificationStatus === 'factory') {
+            statusDisplay.innerHTML = '<strong>Заводський</strong>';
+            statusDisplay.style.color = '#38a169';
+        } else if (selectedDrone.modificationStatus === 'modified' && selectedDrone.modification) {
+            statusDisplay.innerHTML = `<strong>Модифікований:</strong> ${selectedDrone.modification}`;
+            statusDisplay.style.color = '#d69e2e';
+        } else {
+            statusDisplay.innerHTML = '<strong>Модифікований</strong>';
+            statusDisplay.style.color = '#d69e2e';
+        }
+    }
+    
+    console.log('✅ Поля звіту автозаповнено:', selectedDrone);
 }
 
 // Функція для показу/приховування поля ручного введення назви дрону
@@ -1332,11 +1748,11 @@ async function toggleSaveOption(inputId) {
         const optionTypeMap = {
             'customSubdivision': { type: 'subdivisions', label: 'Підрозділ' },
             'customJointWith': { type: 'jointWithOptions', label: 'Сумісно з' },
-            'customDroneName': { type: 'droneNames', label: 'Назва дрону' },
+            'customDroneName': { type: 'droneName', label: 'Назва дрону' },
             'customDroneSize': { type: 'droneSizes', label: 'Розмір дрону' },
             'customCameraType': { type: 'cameraTypes', label: 'Тип камери' },
-            'customVideoFrequency': { type: 'videoFrequencies', label: 'Частота відео' },
-            'customControlFrequency': { type: 'controlFrequencies', label: 'Частота керування' },
+            'customVideoFrequency': { type: 'videoFrequency', label: 'Частота відео' },
+            'customControlFrequency': { type: 'controlFrequency', label: 'Частота керування' },
             'customBk': { type: 'bkOptions', label: 'БК' },
             'customInitiationBoard': { type: 'initiationBoardOptions', label: 'Плата ініціації' },
             'customTargetType': { type: 'targetTypeOptions', label: 'Тип цілі' },
@@ -1344,7 +1760,7 @@ async function toggleSaveOption(inputId) {
             'customStatus': { type: 'statusOptions', label: 'Статус' },
             'customReason': { type: 'reasonOptions', label: 'Причина' },
             'customLosses': { type: 'lossOptions', label: 'Втрати' },
-            'customOperator': { type: 'operatorOptions', label: 'Оператор' }
+            'customOperator': { type: 'operator', label: 'Оператор' }
         };
         
         const optionInfo = optionTypeMap[inputId];
@@ -1709,11 +2125,11 @@ async function deleteCustomOption(selectId, optionValue) {
     const optionTypeMap = {
         'subdivision': 'subdivisions',
         'jointWith': 'jointWithOptions',
-        'droneName': 'droneNames',
+        'droneName': 'droneName',
         'droneSize': 'droneSizes',
         'cameraType': 'cameraTypes',
-        'videoFrequency': 'videoFrequencies',
-        'controlFrequency': 'controlFrequencies',
+        'videoFrequency': 'videoFrequency',
+        'controlFrequency': 'controlFrequency',
         'bk': 'bkOptions',
         'initiationBoard': 'initiationBoardOptions',
         'targetType': 'targetTypeOptions',
@@ -1721,7 +2137,7 @@ async function deleteCustomOption(selectId, optionValue) {
         'status': 'statusOptions',
         'reason': 'reasonOptions',
         'losses': 'lossOptions',
-        'operator': 'operatorOptions'
+        'operator': 'operator'
     };
     
     const optionType = optionTypeMap[selectId];
@@ -1822,6 +2238,12 @@ document.addEventListener('DOMContentLoaded', function() {
         videoFileName.textContent = '';
         removeVideoBtn.style.display = 'none';
     });
+    
+    // Кнопка оновлення архівних подань
+    const refreshArchivedBtn = document.getElementById('refreshArchivedSubmissions');
+    if (refreshArchivedBtn) {
+        refreshArchivedBtn.addEventListener('click', loadArchivedSubmissions);
+    }
 });
 
 // Форматування розміру файлу
@@ -1831,4 +2253,237 @@ function formatFileSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// ============================================
+// HASH ROUTING - Навігація між секціями
+// ============================================
+
+// Ініціалізація роутера
+function initRouter() {
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const sections = {
+        'submission': document.getElementById('submissionSection'),
+        'generator': document.getElementById('generatorSection'),
+        'archive': document.getElementById('archiveSection'),
+        'settings': document.getElementById('settingsSection')
+    };
+    const advancedModeSection = document.getElementById('advancedModeSection');
+    
+    // Обробник кліків на таби
+    navTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const page = this.dataset.page;
+            window.location.hash = page === 'generator' ? '' : page;
+        });
+    });
+    
+    // Функція переключення сторінок
+    function navigate() {
+        const hash = window.location.hash.slice(1) || 'generator';
+        const page = hash.split('/')[0]; // Беремо першу частину хешу
+        
+        // Оновлюємо активний таб
+        navTabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.page === page);
+        });
+        
+        // Показуємо потрібну секцію
+        Object.keys(sections).forEach(key => {
+            sections[key].classList.toggle('active', key === page);
+        });
+        
+        // Показуємо/ховаємо перемикач розширеного режиму
+        if (advancedModeSection) {
+            advancedModeSection.style.display = page === 'generator' ? 'block' : 'none';
+        }
+        
+        // Спеціальні дії для кожної сторінки
+        if (page === 'submission') {
+            // Ініціалізуємо секцію подання
+            if (window.submissionFunctions && typeof window.submissionFunctions.initSubmission === 'function') {
+                window.submissionFunctions.initSubmission();
+            }
+        } else if (page === 'archive') {
+            // Показуємо повідомлення про розробку
+            showSuccess('🚧 Функціонал архіву в розробці. Очікуйте у версії 2.1!');
+        } else if (page === 'settings') {
+            // Показуємо повідомлення про розробку
+            showSuccess('🚧 Налаштування в розробці. Очікуйте у версії 2.1!');
+        }
+    }
+    
+    // Слухаємо зміни хешу
+    window.addEventListener('hashchange', navigate);
+    
+    // Ініціалізація при завантаженні
+    navigate();
+}
+
+// Функція для завантаження архівних подань
+async function loadArchivedSubmissions() {
+    try {
+        const supabase = window.supabaseClient;
+        if (!supabase) return;
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        const { data: submissions, error } = await supabase
+            .from('archived_submissions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('archived_at', { ascending: false });
+        
+        if (error) {
+            console.error('Помилка завантаження архівних подань:', error);
+            return;
+        }
+        
+        const container = document.getElementById('archivedSubmissionsList');
+        if (!container) return;
+        
+        if (!submissions || submissions.length === 0) {
+            container.innerHTML = '<p class="info-message">Архівних подань поки немає</p>';
+            return;
+        }
+        
+        container.innerHTML = submissions.map(sub => {
+            const crewList = sub.crew_members.map(member => 
+                member === sub.crew_leader ? `<strong>${member} (старший)</strong>` : member
+            ).join(', ');
+            
+            const dronesCount = sub.drones?.reduce((sum, d) => sum + (d.count || 0), 0) || 0;
+            const bkCount = sub.bk?.reduce((sum, b) => sum + (b.count || 0), 0) || 0;
+            
+            return `
+                <div class="archived-submission-card">
+                    <div class="submission-header">
+                        <h4>Подання ${sub.date_from} - ${sub.date_to}</h4>
+                        <small>Заархівовано: ${new Date(sub.archived_at).toLocaleString('uk-UA')}</small>
+                    </div>
+                    <div class="submission-details">
+                        <p><strong>Екіпаж:</strong> ${crewList}</p>
+                        <p><strong>Дрони:</strong> ${dronesCount} шт. | <strong>БК:</strong> ${bkCount} шт.</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="viewArchivedSubmission(${sub.id})">Переглянути деталі</button>
+                </div>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('Помилка завантаження архівних подань:', error);
+    }
+}
+
+// Функція для перегляду деталей архівного подання
+async function viewArchivedSubmission(submissionId) {
+    try {
+        const supabase = window.supabaseClient;
+        
+        // Завантажити подання
+        const { data: submission, error } = await supabase
+            .from('archived_submissions')
+            .select('*')
+            .eq('id', submissionId)
+            .single();
+        
+        if (error) throw error;
+        
+        // Завантажити звіти цього подання
+        const { data: reports, error: reportsError } = await supabase
+            .from('reports')
+            .select('report_number, report_text, created_at, subdivision, drone_name')
+            .eq('archived_submission_id', submissionId)
+            .order('created_at', { ascending: false });
+        
+        if (reportsError) console.error('Помилка завантаження звітів:', reportsError);
+        
+        // Заповнити модальне вікно
+        document.getElementById('modalSubmissionTitle').textContent = 
+            `Подання ${submission.date_from} — ${submission.date_to}`;
+        
+        // Простий текст подання
+        const detailsHTML = `
+            <p style="font-size: 1.1em; margin: 1em 0;"><strong>Період:</strong> ${submission.date_from} — ${submission.date_to}</p>
+        `;
+        
+        document.getElementById('modalSubmissionDetails').innerHTML = detailsHTML;
+        
+        // Список звітів
+        if (reports && reports.length > 0) {
+            const reportsHTML = `
+                <h4 style="margin: 1.5em 0 1em 0;">Звіти (${reports.length})</h4>
+                ${reports.map(report => {
+                    const reportText = report.report_text || 'Текст звіту відсутній';
+                    const escapedText = reportText.replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\\/g, '\\\\');
+                    const reportDate = new Date(report.created_at).toLocaleDateString('uk-UA');
+                    
+                    return `
+                    <div class="report-item">
+                        <div class="report-item-header">
+                            <strong>№${report.report_number || 'Без номеру'}</strong>
+                            <span style="color: #718096;">${reportDate}</span>
+                        </div>
+                        <div class="report-item-content">${reportText}</div>
+                        <div class="report-item-actions">
+                            <button class="btn btn-outline btn-sm" onclick="copyReportText(\`${escapedText}\`)">
+                                📋 Копіювати
+                            </button>
+                        </div>
+                    </div>
+                    `;
+                }).join('')}
+            `;
+            
+            document.getElementById('modalReportsList').innerHTML = reportsHTML;
+        } else {
+            document.getElementById('modalReportsList').innerHTML = 
+                '<div class="no-reports">Немає звітів для цього подання</div>';
+        }
+        
+        // Показати модальне вікно
+        document.getElementById('archivedSubmissionModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Помилка перегляду подання:', error);
+        showError('Не вдалося завантажити деталі подання');
+    }
+}
+
+// Закрити модальне вікно
+function closeArchivedSubmissionModal() {
+    document.getElementById('archivedSubmissionModal').style.display = 'none';
+}
+
+// Закрити модальне вікно при натисканні ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('archivedSubmissionModal');
+        if (modal && modal.style.display === 'flex') {
+            closeArchivedSubmissionModal();
+        }
+    }
+});
+
+// Копіювати текст звіту
+function copyReportText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showSuccess('Текст звіту скопійовано');
+    }).catch(err => {
+        console.error('Помилка копіювання:', err);
+        showError('Не вдалося скопіювати текст');
+    });
+}
+
+// Експорт функцій для доступу з HTML onclick
+window.viewArchivedSubmission = viewArchivedSubmission;
+window.closeArchivedSubmissionModal = closeArchivedSubmissionModal;
+window.copyReportText = copyReportText;
+
+// Запуск роутера після завантаження DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRouter);
+} else {
+    initRouter();
 }

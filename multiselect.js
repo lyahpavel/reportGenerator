@@ -374,6 +374,18 @@ class CustomMultiSelect {
         this.escHandler = escHandler;
     }
     
+    // Метод для програмного встановлення значень
+    setValue(values) {
+        if (!Array.isArray(values)) {
+            values = [values];
+        }
+        
+        this.selectedValues = [...values];
+        this.updateSelect();
+        this.updateButtonText();
+        this.renderOptions();
+    }
+    
     destroy() {
         this.overlay.remove();
     }
