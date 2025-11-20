@@ -1501,11 +1501,11 @@ textarea {
 }
 
 .submission-display {
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    border: none;
-    box-shadow: none;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .submission-display .info-row {
