@@ -227,13 +227,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="cameraType">Тип камери:</label>
+                    <label for="cameraType">Тип:</label>
                     <select id="cameraType" name="cameraType" required onchange="toggleCustomCameraType()">
-                        <option value="">Оберіть тип камери...</option>
+                        <option value="">Оберіть тип...</option>
                         <!-- Опції заповнюються динамічно з data.json -->
                     </select>
                     <div class="custom-input-wrapper" style="display: none;">
-                        <input type="text" id="customCameraType" name="customCameraType" placeholder="Введіть тип камери..." data-save-option="false">
+                        <input type="text" id="customCameraType" name="customCameraType" placeholder="Введіть тип..." data-save-option="false">
                         <button type="button" class="save-option-btn" onclick="toggleSaveOption('customCameraType')" title="Зберегти в мої опції">
                             <span class="save-icon">💾</span>
                         </button>
