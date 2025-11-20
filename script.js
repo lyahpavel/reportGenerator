@@ -1475,11 +1475,11 @@ async function toggleSaveOption(inputId) {
         const optionTypeMap = {
             'customSubdivision': { type: 'subdivisions', label: 'Підрозділ' },
             'customJointWith': { type: 'jointWithOptions', label: 'Сумісно з' },
-            'customDroneName': { type: 'droneNames', label: 'Назва дрону' },
+            'customDroneName': { type: 'droneName', label: 'Назва дрону' },
             'customDroneSize': { type: 'droneSizes', label: 'Розмір дрону' },
             'customCameraType': { type: 'cameraTypes', label: 'Тип камери' },
-            'customVideoFrequency': { type: 'videoFrequencies', label: 'Частота відео' },
-            'customControlFrequency': { type: 'controlFrequencies', label: 'Частота керування' },
+            'customVideoFrequency': { type: 'videoFrequency', label: 'Частота відео' },
+            'customControlFrequency': { type: 'controlFrequency', label: 'Частота керування' },
             'customBk': { type: 'bkOptions', label: 'БК' },
             'customInitiationBoard': { type: 'initiationBoardOptions', label: 'Плата ініціації' },
             'customTargetType': { type: 'targetTypeOptions', label: 'Тип цілі' },
@@ -1487,7 +1487,7 @@ async function toggleSaveOption(inputId) {
             'customStatus': { type: 'statusOptions', label: 'Статус' },
             'customReason': { type: 'reasonOptions', label: 'Причина' },
             'customLosses': { type: 'lossOptions', label: 'Втрати' },
-            'customOperator': { type: 'operatorOptions', label: 'Оператор' }
+            'customOperator': { type: 'operator', label: 'Оператор' }
         };
         
         const optionInfo = optionTypeMap[inputId];
@@ -1852,11 +1852,11 @@ async function deleteCustomOption(selectId, optionValue) {
     const optionTypeMap = {
         'subdivision': 'subdivisions',
         'jointWith': 'jointWithOptions',
-        'droneName': 'droneNames',
+        'droneName': 'droneName',
         'droneSize': 'droneSizes',
         'cameraType': 'cameraTypes',
-        'videoFrequency': 'videoFrequencies',
-        'controlFrequency': 'controlFrequencies',
+        'videoFrequency': 'videoFrequency',
+        'controlFrequency': 'controlFrequency',
         'bk': 'bkOptions',
         'initiationBoard': 'initiationBoardOptions',
         'targetType': 'targetTypeOptions',
@@ -1864,7 +1864,7 @@ async function deleteCustomOption(selectId, optionValue) {
         'status': 'statusOptions',
         'reason': 'reasonOptions',
         'losses': 'lossOptions',
-        'operator': 'operatorOptions'
+        'operator': 'operator'
     };
     
     const optionType = optionTypeMap[selectId];
