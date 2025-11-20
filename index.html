@@ -241,22 +241,12 @@
                 </div>
             </div>
 
-            <!-- Заводська комплектація -->
+            <!-- Стан дрона (автоматично з подання) -->
             <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                    <input type="checkbox" id="factoryConfig" name="factoryConfig" onchange="toggleModifications()" checked style="width: auto; margin: 0;">
-                    <span>Заводська комплектація</span>
-                </label>
-            </div>
-
-            <!-- Модифікації (показується коли заводська комплектація вимкнена) -->
-                        <div class="form-group" id="modificationsGroup" style="display: none;">
-                <label for="modifications">Модифікації (через кому):</label>
-                <div class="custom-input-wrapper" style="display: block;">
-                    <input type="text" id="modifications" list="modificationsList" data-save-option="true" autocomplete="off" placeholder="Наприклад: 5.8 GHz, FPV антена">
-                    <button onclick="toggleSaveOption('modifications')" class="active">💾</button>
+                <label>Стан дрона:</label>
+                <div id="droneStatusDisplay" style="padding: 12px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 8px; color: #2d3748;">
+                    <span id="droneStatusText">Оберіть дрон для відображення статусу</span>
                 </div>
-                <datalist id="modificationsList"></datalist>
             </div>
 
             <!-- Частоти: відео і керування в одному рядку -->
@@ -577,23 +567,7 @@
             }
         }
 
-        // Функція для показу/приховування поля модифікацій
-        function toggleModifications() {
-            const checkbox = document.getElementById('factoryConfig');
-            const modificationsGroup = document.getElementById('modificationsGroup');
-            const modificationsInput = document.getElementById('modifications');
-            
-            if (checkbox.checked) {
-                // Заводська комплектація - приховати модифікації
-                modificationsGroup.style.display = 'none';
-                modificationsInput.required = false;
-                modificationsInput.value = '';
-            } else {
-                // Не заводська - показати поле модифікацій
-                modificationsGroup.style.display = 'block';
-                modificationsInput.required = false; // Не обов'язкове, можна залишити порожнім
-            }
-        }
+        // toggleModifications більше не потрібна - статус береться з подання
         
 
     </script>

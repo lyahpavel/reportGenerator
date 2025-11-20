@@ -336,8 +336,7 @@ reportForm.addEventListener('submit', function(e) {
         jointWith: document.getElementById('jointWith').value === 'Інший' ? document.getElementById('customJointWith').value : document.getElementById('jointWith').value,
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
         cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
-        factoryConfig: document.getElementById('factoryConfig').checked,
-        modifications: document.getElementById('modifications').value,
+        droneStatus: document.getElementById('droneStatusText').textContent,
         videoFrequency: document.getElementById('videoFrequency').value === 'Інша' ? document.getElementById('customVideoFrequency').value : document.getElementById('videoFrequency').value,
         channel: document.getElementById('channel').value,
         controlFrequency: document.getElementById('controlFrequency').value === 'Інша' ? document.getElementById('customControlFrequency').value : document.getElementById('controlFrequency').value,
@@ -525,15 +524,10 @@ function generateReport(data) {
             <span class="report-value">${data.droneName} | ${data.cameraType}</span>
         </div>
         
-        ${!data.factoryConfig && data.modifications ? `
+        ${data.droneStatus ? `
         <div class="report-item">
-            <span class="report-label">Модифікації:</span>
-            <span class="report-value">${data.modifications}</span>
-        </div>
-        ` : data.factoryConfig ? `
-        <div class="report-item">
-            <span class="report-label">Комплектація:</span>
-            <span class="report-value">Заводська</span>
+            <span class="report-label">Стан:</span>
+            <span class="report-value">${data.droneStatus}</span>
         </div>
         ` : ''}
         
@@ -1082,6 +1076,21 @@ function autoFillReportDroneFields() {
                 opt.value.includes('Ніч/день')
             );
             if (dayNightOption) cameraTypeSelect.value = dayNightOption.value;
+        }
+    }
+    
+    // Відображення статусу дрона
+    const statusDisplay = document.getElementById('droneStatusText');
+    if (statusDisplay && selectedDrone.modificationStatus) {
+        if (selectedDrone.modificationStatus === 'factory') {
+            statusDisplay.innerHTML = '<strong>Заводський</strong>';
+            statusDisplay.style.color = '#38a169';
+        } else if (selectedDrone.modificationStatus === 'modified' && selectedDrone.modification) {
+            statusDisplay.innerHTML = `<strong>Модифікований:</strong> ${selectedDrone.modification}`;
+            statusDisplay.style.color = '#d69e2e';
+        } else {
+            statusDisplay.innerHTML = '<strong>Модифікований</strong>';
+            statusDisplay.style.color = '#d69e2e';
         }
     }
     
