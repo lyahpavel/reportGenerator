@@ -567,11 +567,15 @@ textarea {
 /* Адаптивність */
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 5px;
     }
     
     .container {
         border-radius: 10px;
+    }
+    
+    .submission-content {
+        padding: 5px;
     }
     
     header {
@@ -665,6 +669,22 @@ textarea {
     
     .drone-info-details {
         font-size: 0.85rem;
+    }
+    
+    /* Стилі для форми подання на мобільних */
+    .submission-form > .form-group {
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .form-group-row {
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .submission-form .form-actions {
+        padding: 15px;
+        margin-top: 10px;
     }
 }
 
@@ -1205,15 +1225,20 @@ textarea {
     display: flex;
     gap: 20px;
     margin-bottom: 15px;
-}
-
-.form-group-row .form-group {
-    flex: 1;
     background: white;
     border-radius: 10px;
     padding: 20px;
     border: 1px solid #e9ecef;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-group-row .form-group {
+    flex: 1;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
 }
 
 .submission-form .form-actions {
