@@ -981,6 +981,7 @@ async function saveSubmission() {
 // Завантаження поточного подання
 async function loadCurrentSubmission() {
     console.log('🔄 loadCurrentSubmission викликано');
+    submissionLoaded = false; // Скинути прапорець перед завантаженням
     try {
         const { data: { user } } = await window.supabaseClient.auth.getUser();
         

@@ -222,6 +222,11 @@ async function handleUserLogin() {
     // Завантажити кастомні опції користувача
     await loadUserCustomOptions();
     
+    // ЗАВЖДИ завантажити поточне подання (потрібно для генератора звітів)
+    if (window.submissionFunctions?.loadCurrentSubmission) {
+        await window.submissionFunctions.loadCurrentSubmission();
+    }
+    
     // Ініціалізувати подання якщо користувач на цій сторінці
     const currentHash = window.location.hash || '#/';
     if (currentHash === '#/submission' && window.submissionFunctions) {
