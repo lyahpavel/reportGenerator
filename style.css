@@ -690,12 +690,19 @@ textarea {
     }
     
     .resource-select {
-        max-width: 100%;
+        min-width: 0;
+        flex: 1;
     }
     
     .drone-main-row .resource-select,
     .resource-item[data-type="bk"] .resource-select {
-        max-width: 100%;
+        min-width: 0;
+        flex: 1;
+    }
+    
+    .drone-main-row,
+    .resource-item[data-type="bk"] {
+        flex-wrap: nowrap;
     }
 }
 
@@ -1401,13 +1408,14 @@ textarea {
 
 .drone-main-row .resource-select {
     flex: 1;
-    max-width: 300px;
+    min-width: 0;
 }
 
 .drone-main-row .resource-count {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 /* Деталі дрона (додаткові поля) */
@@ -1485,14 +1493,19 @@ textarea {
     gap: 15px;
 }
 
+.resource-item[data-type="bk"] .resource-count {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
 .resource-item[data-type="bk"] .resource-select {
     flex: 1;
-    max-width: 300px;
+    min-width: 0;
 }
 
 .resource-select {
     flex: 1;
-    max-width: 300px;
+    min-width: 0;
 }
 
 .resource-count {
@@ -1523,11 +1536,11 @@ textarea {
 }
 
 .count-input {
-    width: 50px;
+    width: 40px;
     text-align: center;
     font-size: 0.95rem;
     font-weight: 600;
-    padding: 6px;
+    padding: 6px 4px;
     border: 2px solid #e2e8f0;
     border-radius: 6px;
 }
