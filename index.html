@@ -298,20 +298,10 @@
                 </div>
             </div>
 
-            <!-- Оптоволоконний кабель -->
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="fiberOptic" name="fiberOptic" onchange="toggleFiberLength()">
-                    Оптоволоконний кабель
-                </label>
-            </div>
-
-            <div class="form-group" id="fiberLengthGroup" style="display: none;">
-                <label for="fiberLength">Довжина котушки (км):</label>
-                <input type="number" id="fiberLength" name="fiberLength" min="0.1" max="100" step="0.1" placeholder="Наприклад: 0.5">
-                <small style="color: #666; font-size: 0.85rem; margin-top: 4px; display: block;">
-                    💡 Вкажіть довжину в кілометрах
-                </small>
+            <!-- Довжина оптоволокна (показується автоматично для оптоволоконних дронів) -->
+            <div class="form-group" id="fiberOpticGroup" style="display: none;">
+                <label for="fiberOpticLength">Довжина оптоволокна:</label>
+                <input type="text" id="fiberOpticLength" name="fiberOpticLength" placeholder="Наприклад: 10 км">
             </div>
 
             <!-- Додаткові поля -->
@@ -553,43 +543,6 @@
     <script src="reports-history.js"></script>
     <script src="submission.js"></script>
     <script>
-        // Функція для показу/приховування поля довжини котушки та частот
-        function toggleFiberLength() {
-            const checkbox = document.getElementById('fiberOptic');
-            const lengthGroup = document.getElementById('fiberLengthGroup');
-            const lengthInput = document.getElementById('fiberLength');
-            const frequencyRow = document.getElementById('frequencyRow');
-            const videoFreqInput = document.getElementById('videoFrequency');
-            const controlFreqInput = document.getElementById('controlFrequency');
-            
-            if (checkbox.checked) {
-                // Показати поле довжини котушки
-                lengthGroup.style.display = 'block';
-                lengthInput.required = true;
-                
-                // Приховати весь рядок з частотами (і відео і керування)
-                if (frequencyRow) {
-                    frequencyRow.style.display = 'none';
-                }
-                videoFreqInput.required = false;
-                controlFreqInput.required = false;
-                videoFreqInput.value = '';
-                controlFreqInput.value = '';
-            } else {
-                // Приховати поле довжини котушки
-                lengthGroup.style.display = 'none';
-                lengthInput.required = false;
-                lengthInput.value = '';
-                
-                // Показати рядок з частотами (використовуємо '' щоб відновити CSS клас)
-                if (frequencyRow) {
-                    frequencyRow.style.display = '';
-                }
-                videoFreqInput.required = true;
-                controlFreqInput.required = true;
-            }
-        }
-
         // toggleModifications більше не потрібна - статус береться з подання
         
 
