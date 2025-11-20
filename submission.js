@@ -360,8 +360,6 @@ function displayCurrentSubmission() {
             <span class="info-value">
                 ${currentSubmission.bk.map(b => `${b.label}: ${b.count} шт`).join(', ')}
             </span>
-                ${currentSubmission.bk.map(b => `${b.label}: ${b.count} шт`).join(', ')}
-            </span>
         </div>`;
     }
     
