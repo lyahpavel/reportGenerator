@@ -2272,8 +2272,22 @@ function initRouter() {
     
     // Обробник кліків на таби
     navTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
+        tab.addEventListener('click', function(e) {
             const page = this.dataset.page;
+            
+            // Блокуємо перехід для архіву та налаштувань
+            if (page === 'archive') {
+                e.preventDefault();
+                showSuccess('🚧 Функціонал архіву в розробці. Очікуйте у версії 2.1!');
+                return;
+            }
+            
+            if (page === 'settings') {
+                e.preventDefault();
+                showSuccess('🚧 Налаштування в розробці. Очікуйте у версії 2.1!');
+                return;
+            }
+            
             window.location.hash = page === 'generator' ? '' : page;
         });
     });
@@ -2304,12 +2318,6 @@ function initRouter() {
             if (window.submissionFunctions && typeof window.submissionFunctions.initSubmission === 'function') {
                 window.submissionFunctions.initSubmission();
             }
-        } else if (page === 'archive') {
-            // Показуємо повідомлення про розробку
-            showSuccess('🚧 Функціонал архіву в розробці. Очікуйте у версії 2.1!');
-        } else if (page === 'settings') {
-            // Показуємо повідомлення про розробку
-            showSuccess('🚧 Налаштування в розробці. Очікуйте у версії 2.1!');
         }
     }
     
