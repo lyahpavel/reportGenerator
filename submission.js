@@ -1000,22 +1000,23 @@ async function loadCurrentSubmission() {
             
             // Відновити вибір екіпажу
             restoreCrewSelection(data);
-
-            // Оновити списки дронів/БК в генераторі звітів
-            if (window.populateSelects) {
-                window.populateSelects();
-            }
         } else {
             console.log('Подання не знайдено (нормально після видалення)');
             currentSubmission = null; // Явно встановити null
         }
         
+        // Позначити що завантаження завершене ПЕРЕД викликом populateSelects
+        submissionLoaded = true;
+        
+        // Тепер можна оновити селекти
+        if (window.populateSelects) {
+            window.populateSelects();
+        }
+        
     } catch (error) {
         console.error('Помилка завантаження подання:', error);
         currentSubmission = null; // При помилці теж null
-    } finally {
-        // Завжди позначаємо що завантаження завершене (навіть якщо подання немає)
-        submissionLoaded = true;
+        submissionLoaded = true; // Все одно позначити як завершене
     }
 }
 
