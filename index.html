@@ -977,5 +977,26 @@
         }
     </script>
     </div> <!-- End of appSection -->
+    
+    <!-- Модальне вікно для перегляду архівного подання -->
+    <div id="archivedSubmissionModal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeArchivedSubmissionModal()">
+        <div class="modal-content archived-submission-modal">
+            <div class="modal-header">
+                <h2 id="modalSubmissionTitle">Подання</h2>
+                <button class="modal-close" onclick="closeArchivedSubmissionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalSubmissionDetails" class="submission-details">
+                    <!-- Деталі подання -->
+                </div>
+                <div id="modalSubmissionReports" class="submission-reports">
+                    <h3>Звіти цього подання</h3>
+                    <div id="modalReportsList">
+                        <!-- Список звітів -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

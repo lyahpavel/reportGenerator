@@ -2299,6 +2299,8 @@ async function loadArchivedSubmissions() {
 async function viewArchivedSubmission(submissionId) {
     try {
         const supabase = window.supabaseClient;
+        
+        // Завантажити подання
         const { data: submission, error } = await supabase
             .from('archived_submissions')
             .select('*')
@@ -2307,31 +2309,107 @@ async function viewArchivedSubmission(submissionId) {
         
         if (error) throw error;
         
-        // Створити детальне відображення
-        const details = `
-            <h3>Подання ${submission.date_from} - ${submission.date_to}</h3>
-            <p><strong>Екіпаж:</strong> ${submission.crew_members.join(', ')}</p>
-            <p><strong>Старший:</strong> ${submission.crew_leader}</p>
-            <h4>Дрони:</h4>
-            ${submission.drones?.map(d => `
-                <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                    <strong>${d.label || d.name}</strong> x${d.count}<br>
-                    Тип: ${d.type}, Відео: ${d.videoFrequency}, Керування: ${d.controlFrequency}<br>
-                    Канал: ${d.channel}, Стан: ${d.modificationStatus}
-                    ${d.modification ? `<br>Модифікація: ${d.modification}` : ''}
+        // Завантажити звіти цього подання
+        const { data: reports, error: reportsError } = await supabase
+            .from('reports')
+            .select('*')
+            .eq('archived_submission_id', submissionId)
+            .order('created_at', { ascending: false });
+        
+        if (reportsError) console.error('Помилка завантаження звітів:', reportsError);
+        
+        // Заповнити модальне вікно
+        document.getElementById('modalSubmissionTitle').textContent = 
+            `Подання ${submission.date_from} — ${submission.date_to}`;
+        
+        // Деталі подання
+        const detailsHTML = `
+            <p><strong>Період:</strong> ${submission.date_from} — ${submission.date_to}</p>
+            <p><strong>Екіпаж:</strong> ${submission.crew_members?.join(', ') || 'Не вказано'}</p>
+            <p><strong>Старший:</strong> ${submission.crew_leader || 'Не вказано'}</p>
+            <p><strong>Заархівовано:</strong> ${new Date(submission.archived_at).toLocaleString('uk-UA')}</p>
+            
+            <h4>Дрони (${submission.drones?.length || 0})</h4>
+            ${submission.drones?.length > 0 ? submission.drones.map(d => `
+                <div class="drone-card">
+                    <strong>${d.label || d.name}</strong> <span style="color: #667eea;">×${d.count}</span><br>
+                    <small>
+                        Тип: ${d.type} | Відео: ${d.videoFrequency} | Керування: ${d.controlFrequency}<br>
+                        Канал: ${d.channel} | Стан: ${d.modificationStatus}
+                        ${d.modification ? ` | Модифікація: ${d.modification}` : ''}
+                    </small>
                 </div>
-            `).join('') || 'Немає'}
-            <h4>Боєкомплекти:</h4>
-            ${submission.bk?.map(b => `<div>${b.label || b.name} x${b.count}</div>`).join('') || 'Немає'}
+            `).join('') : '<p style="color: #a0aec0;">Немає дронів</p>'}
+            
+            <h4>Боєкомплекти (${submission.bk?.length || 0})</h4>
+            ${submission.bk?.length > 0 ? submission.bk.map(b => `
+                <div class="bk-card">
+                    <strong>${b.label || b.name}</strong> <span style="color: #667eea;">×${b.count}</span>
+                </div>
+            `).join('') : '<p style="color: #a0aec0;">Немає БК</p>'}
         `;
         
-        // Показати в модальному вікні або alert
-        alert(details.replace(/<[^>]*>/g, '\n'));
+        document.getElementById('modalSubmissionDetails').innerHTML = detailsHTML;
+        
+        // Список звітів
+        if (reports && reports.length > 0) {
+            const reportsHTML = reports.map(report => `
+                <div class="report-item">
+                    <div class="report-item-header">
+                        <strong>Звіт №${report.report_number || 'Без номеру'}</strong>
+                        <span style="color: #718096;">${new Date(report.created_at).toLocaleString('uk-UA')}</span>
+                    </div>
+                    <div class="report-item-meta">
+                        ${report.subdivision ? `Підрозділ: ${report.subdivision} | ` : ''}
+                        ${report.drone_name ? `Дрон: ${report.drone_name}` : ''}
+                    </div>
+                    <div class="report-item-content">${report.report_text}</div>
+                    <div class="report-item-actions">
+                        <button class="btn btn-outline btn-sm" onclick="copyReportText(\`${report.report_text.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                            📋 Копіювати
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('modalReportsList').innerHTML = reportsHTML;
+        } else {
+            document.getElementById('modalReportsList').innerHTML = 
+                '<div class="no-reports">Немає звітів для цього подання</div>';
+        }
+        
+        // Показати модальне вікно
+        document.getElementById('archivedSubmissionModal').style.display = 'flex';
         
     } catch (error) {
         console.error('Помилка перегляду подання:', error);
         showError('Не вдалося завантажити деталі подання');
     }
+}
+
+// Закрити модальне вікно
+function closeArchivedSubmissionModal() {
+    document.getElementById('archivedSubmissionModal').style.display = 'none';
+}
+
+// Закрити модальне вікно при натисканні ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('archivedSubmissionModal');
+        if (modal && modal.style.display === 'flex') {
+            closeArchivedSubmissionModal();
+        }
+    }
+});
+
+// Копіювати текст звіту
+function copyReportText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showSuccess('Текст звіту скопійовано');
+    }).catch(err => {
+        console.error('Помилка копіювання:', err);
+        showError('Не вдалося скопіювати текст');
+    });
 }
 
 // Запуск роутера після завантаження DOM
