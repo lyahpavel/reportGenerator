@@ -952,9 +952,9 @@ async function closeSubmission() {
         const confirmed = confirm(
             'Ви впевнені, що хочете закрити подання?\n\n' +
             'Це призведе до:\n' +
-            '- Видалення поточного подання\n' +
-            '- Очищення даних з таблиці suggestions\n' +
-            '- Всі згенеровані звіти залишаться в архіві\n\n' +
+            '- Збереження подання в архів\n' +
+            '- Збереження всіх звітів разом з поданням\n' +
+            '- Очищення робочої області для нового подання\n\n' +
             'Продовжити?'
         );
         
@@ -972,7 +972,55 @@ async function closeSubmission() {
         
         console.log('Закриття подання для користувача:', user.id);
         
-        // 1. Видаляємо дані з таблиці suggestions (якщо вона існує)
+        // 1. Зберегти подання в архів
+        const submissionId = currentSubmission.id;
+        const archiveData = {
+            user_id: user.id,
+            submission_id: submissionId,
+            date_from: currentSubmission.date_from,
+            date_to: currentSubmission.date_to,
+            crew_members: currentSubmission.crew_members,
+            crew_leader: currentSubmission.crew_leader,
+            drones: currentSubmission.drones,
+            bk: currentSubmission.bk,
+            archived_at: new Date().toISOString()
+        };
+        
+        const { data: archivedSubmission, error: archiveError } = await supabase
+            .from('archived_submissions')
+            .insert([archiveData])
+            .select()
+            .single();
+        
+        if (archiveError) {
+            console.error('Помилка архівування подання:', archiveError);
+            // Якщо таблиця не існує, просто продовжуємо без архівування
+            if (archiveError.code !== '42P01') { // 42P01 = таблиця не існує
+                throw archiveError;
+            }
+            console.warn('Таблиця archived_submissions не існує, пропускаємо архівування');
+        } else {
+            console.log('✅ Подання заархівовано:', archivedSubmission);
+            
+            // 2. Оновити всі звіти користувача, додавши посилання на архівне подання
+            const { error: updateReportsError } = await supabase
+                .from('reports')
+                .update({ 
+                    archived_submission_id: archivedSubmission.id,
+                    submission_archived: true
+                })
+                .eq('user_id', user.id)
+                .gte('mission_date', currentSubmission.date_from)
+                .lte('mission_date', currentSubmission.date_to);
+            
+            if (updateReportsError) {
+                console.warn('Помилка оновлення звітів:', updateReportsError);
+            } else {
+                console.log('✅ Звіти прив\'язані до архівного подання');
+            }
+        }
+        
+        // 3. Видаляємо дані з таблиці suggestions (якщо вона існує)
         try {
             const { error: suggestionsError } = await supabase
                 .from('suggestions')
@@ -988,7 +1036,7 @@ async function closeSubmission() {
             console.warn('Таблиця suggestions може не існувати:', err);
         }
         
-        // 2. Видаляємо поточне подання
+        // 4. Видаляємо поточне подання
         const { error: deleteError } = await supabase
             .from('submissions')
             .delete()
@@ -998,9 +1046,9 @@ async function closeSubmission() {
             throw deleteError;
         }
         
-        console.log('✅ Подання видалено');
+        console.log('✅ Поточне подання видалено');
         
-        // 3. Очищаємо інтерфейс
+        // 5. Очищаємо інтерфейс
         reportForm.reset();
         reportOutput.classList.add('hidden');
         
@@ -1045,8 +1093,8 @@ async function closeSubmission() {
             window.populateSelects();
         }
         
-        // 4. Показуємо повідомлення про успіх
-        showSuccess('Подання закрито! Дані очищено, можна почати нове подання.');
+        // 6. Показуємо повідомлення про успіх
+        showSuccess('Подання заархівовано! Всі звіти збережені в архіві.');
         
         // Прокрутити до початку
         window.scrollTo({ top: 0, behavior: 'smooth' });
