@@ -980,6 +980,7 @@ async function saveSubmission() {
 
 // Завантаження поточного подання
 async function loadCurrentSubmission() {
+    console.log('🔄 loadCurrentSubmission викликано');
     try {
         const { data: { user } } = await window.supabaseClient.auth.getUser();
         
@@ -995,18 +996,20 @@ async function loadCurrentSubmission() {
         }
         
         if (data) {
+            console.log('✅ Отримано подання з БД:', data);
             currentSubmission = data;
             displayCurrentSubmission();
             
             // Відновити вибір екіпажу
             restoreCrewSelection(data);
         } else {
-            console.log('Подання не знайдено (нормально після видалення)');
+            console.log('❌ Подання не знайдено (нормально після видалення)');
             currentSubmission = null; // Явно встановити null
         }
         
         // Позначити що завантаження завершене
         // populateSelects() сама почекає на цей прапорець з script.js
+        console.log('✅ submissionLoaded встановлено в true, currentSubmission:', currentSubmission);
         submissionLoaded = true;
         
     } catch (error) {

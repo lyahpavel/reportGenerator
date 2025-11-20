@@ -191,7 +191,8 @@ async function loadData() {
 async function populateSelects() {
     if (!appData) return;
     
-    console.log('🔄 populateSelects викликано');
+    console.log('🔄 populateSelects викликано, stack trace:');
+    console.trace();
     
     // Чекаємо на готовність submission.js та завантаження кешу
     let attempts = 0;
