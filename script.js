@@ -180,7 +180,7 @@ async function loadData() {
         }
     }
     
-    // В будь-якому випадку заповнюємо селекти (асинхронно)
+    // В будь-якому випадку заповнюємо селекти (асинхронно, функція сама почекає на кеш)
     populateSelects().catch(err => console.error('Помилка populateSelects:', err));
     
     // Експортуємо функцію для глобального використання
@@ -193,9 +193,18 @@ async function populateSelects() {
     
     console.log('🔄 populateSelects викликано');
     
+    // Чекаємо на готовність submission.js та завантаження кешу
+    let attempts = 0;
+    while (!window.submissionFunctions?.waitForCache && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        attempts++;
+    }
+    
     // Чекаємо на завантаження кешу якщо він ще не готовий
     if (window.submissionFunctions?.waitForCache) {
+        console.log('⏳ Чекаємо на завантаження кешу...');
         await window.submissionFunctions.waitForCache();
+        console.log('✅ Кеш готовий, заповнюємо селекти');
     }
     
     // Заповнення підрозділів
