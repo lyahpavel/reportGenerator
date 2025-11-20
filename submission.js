@@ -102,11 +102,14 @@ async function loadCrewMembers() {
             throw new Error('Supabase клієнт не ініціалізовано');
         }
         
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
         // Завантажуємо операторів з user_custom_options
         const { data, error } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
             .eq('option_type', 'operator')
+            .eq('user_id', user.id)
             .order('label');
         
         if (error) {
@@ -441,10 +444,13 @@ async function loadResourceOptions(selectId, type) {
     const optionType = type === 'drone' ? 'droneName' : 'bkOptions';
 
     try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
         const { data, error } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
             .eq('option_type', optionType)
+            .eq('user_id', user.id)
             .order('label');
 
         if (error) throw error;
@@ -565,11 +571,14 @@ async function loadDroneFrequencies(resourceItem) {
     }
     
     try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
         // Завантажити частоти відео
         const { data: videoData, error: videoError } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
             .eq('option_type', 'videoFrequency')
+            .eq('user_id', user.id)
             .order('label');
         
         if (videoError) throw videoError;
@@ -587,6 +596,7 @@ async function loadDroneFrequencies(resourceItem) {
             .from('user_custom_options')
             .select('value, label')
             .eq('option_type', 'controlFrequency')
+            .eq('user_id', user.id)
             .order('label');
         
         if (controlError) throw controlError;
@@ -614,10 +624,13 @@ async function loadDroneChannels(resourceItem) {
     if (!channelSelect) return;
     
     try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
         const { data, error } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
             .eq('option_type', 'channels')
+            .eq('user_id', user.id)
             .order('label');
         
         if (error) throw error;
@@ -648,10 +661,13 @@ async function loadDroneModifications(resourceItem) {
     if (!modSelect) return;
     
     try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
         const { data, error } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
             .eq('option_type', 'modifications')
+            .eq('user_id', user.id)
             .order('label');
         
         if (error) throw error;
