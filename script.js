@@ -337,11 +337,11 @@ reportForm.addEventListener('submit', function(e) {
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
         cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
         droneStatus: document.getElementById('droneStatusText').textContent,
+        hasFiberOptic: document.getElementById('fiberOpticGroup').style.display !== 'none',
+        fiberOpticLength: document.getElementById('fiberOpticLength').value,
         videoFrequency: document.getElementById('videoFrequency').value === 'Інша' ? document.getElementById('customVideoFrequency').value : document.getElementById('videoFrequency').value,
         channel: document.getElementById('channel').value,
         controlFrequency: document.getElementById('controlFrequency').value === 'Інша' ? document.getElementById('customControlFrequency').value : document.getElementById('controlFrequency').value,
-        fiberOptic: document.getElementById('fiberOptic').checked,
-        fiberLength: document.getElementById('fiberLength').value,
         bk: bkValue === 'Інший' ? document.getElementById('customBk').value : bkValue,
         initiationBoard: document.getElementById('initiationBoard').value === 'Інший' ? document.getElementById('customInitiationBoard').value : document.getElementById('initiationBoard').value,
         targetType: (() => {
@@ -531,17 +531,16 @@ function generateReport(data) {
         </div>
         ` : ''}
         
-        ${data.fiberOptic ? `
+        ${data.hasFiberOptic ? `
         <div class="report-item">
-            <span class="report-label">Тип зв'язку:</span>
-            <span class="report-value">Оптоволоконний кабель (${data.fiberLength} км)</span>
+            <span class="report-label">Оптоволокно:</span>
+            <span class="report-value">${data.fiberOpticLength}</span>
         </div>
         ` : `
         <div class="report-item">
             <span class="report-label">Частоти:</span>
             <span class="report-value">Відео: ${data.videoFrequency} | Керування: ${data.controlFrequency}</span>
         </div>
-        `}
         
         ${data.channel ? `
         <div class="report-item">
@@ -549,6 +548,7 @@ function generateReport(data) {
             <span class="report-value">${data.channel}</span>
         </div>
         ` : ''}
+        `}
         
         <div class="report-item">
             <span class="report-label">Дата та час:</span>
@@ -886,10 +886,10 @@ newReportBasedOnButton.addEventListener('click', function() {
         subdivision: document.getElementById('subdivision').value,
         droneName: document.getElementById('droneName').value,
         cameraType: document.getElementById('cameraType').value,
+        hasFiberOptic: document.getElementById('fiberOpticGroup').style.display !== 'none',
+        fiberOpticLength: document.getElementById('fiberOpticLength').value,
         videoFrequency: document.getElementById('videoFrequency').value,
         controlFrequency: document.getElementById('controlFrequency').value,
-        fiberOptic: document.getElementById('fiberOptic').checked,
-        fiberLength: document.getElementById('fiberLength').value,
         bk: document.getElementById('bk').value,
         targetType: Array.from(document.getElementById('targetType').selectedOptions).map(opt => opt.value),
         settlement: document.getElementById('settlement').value,
@@ -1038,30 +1038,61 @@ function autoFillReportDroneFields() {
     const controlFreqSelect = document.getElementById('controlFrequency');
     const channelInput = document.getElementById('channel');
     const cameraTypeSelect = document.getElementById('cameraType');
+    const frequencyRow = document.getElementById('frequencyRow');
+    const fiberOpticGroup = document.getElementById('fiberOpticGroup');
+    const fiberOpticLength = document.getElementById('fiberOpticLength');
     
-    // Частота відео
-    if (videoFreqSelect && selectedDrone.videoFrequency) {
-        const option = Array.from(videoFreqSelect.options).find(opt => 
-            opt.value === selectedDrone.videoFrequency
-        );
-        if (option) {
-            videoFreqSelect.value = selectedDrone.videoFrequency;
+    // Перевірка чи це оптоволоконний дрон
+    if (selectedDrone.hasFiberOptic) {
+        // Ховаємо частоти та канал
+        if (frequencyRow) frequencyRow.style.display = 'none';
+        
+        // Показуємо поле оптоволокна
+        if (fiberOpticGroup && fiberOpticLength) {
+            fiberOpticGroup.style.display = 'block';
+            fiberOpticLength.value = `${selectedDrone.fiberCableLength} км`;
         }
-    }
-    
-    // Частота керування
-    if (controlFreqSelect && selectedDrone.controlFrequency) {
-        const option = Array.from(controlFreqSelect.options).find(opt => 
-            opt.value === selectedDrone.controlFrequency
-        );
-        if (option) {
-            controlFreqSelect.value = selectedDrone.controlFrequency;
+        
+        // Знімаємо required з прихованих полів
+        if (videoFreqSelect) videoFreqSelect.required = false;
+        if (controlFreqSelect) controlFreqSelect.required = false;
+        if (channelInput) channelInput.required = false;
+    } else {
+        // Показуємо частоти та канал
+        if (frequencyRow) frequencyRow.style.display = 'flex';
+        
+        // Ховаємо поле оптоволокна
+        if (fiberOpticGroup) fiberOpticGroup.style.display = 'none';
+        if (fiberOpticLength) fiberOpticLength.value = '';
+        
+        // Встановлюємо required для частот
+        if (videoFreqSelect) videoFreqSelect.required = true;
+        if (controlFreqSelect) controlFreqSelect.required = true;
+        
+        // Частота відео
+        if (videoFreqSelect && selectedDrone.videoFrequency) {
+            const option = Array.from(videoFreqSelect.options).find(opt => 
+                opt.value === selectedDrone.videoFrequency
+            );
+            if (option) {
+                videoFreqSelect.value = selectedDrone.videoFrequency;
+            }
         }
-    }
-    
-    // Канал
-    if (channelInput && selectedDrone.channel) {
-        channelInput.value = selectedDrone.channel;
+        
+        // Частота керування
+        if (controlFreqSelect && selectedDrone.controlFrequency) {
+            const option = Array.from(controlFreqSelect.options).find(opt => 
+                opt.value === selectedDrone.controlFrequency
+            );
+            if (option) {
+                controlFreqSelect.value = selectedDrone.controlFrequency;
+            }
+        }
+        
+        // Канал
+        if (channelInput && selectedDrone.channel) {
+            channelInput.value = selectedDrone.channel;
+        }
     }
     
     // Тип камери (підбираємо на основі типу дрона)
