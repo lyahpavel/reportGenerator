@@ -204,7 +204,14 @@ async function populateSelects() {
     if (window.submissionFunctions?.waitForCache) {
         console.log('⏳ Чекаємо на завантаження кешу...');
         await window.submissionFunctions.waitForCache();
-        console.log('✅ Кеш готовий, заповнюємо селекти');
+        console.log('✅ Кеш готовий');
+    }
+    
+    // Чекаємо на завершення завантаження подання
+    if (window.submissionFunctions?.waitForSubmissionLoad) {
+        console.log('⏳ Чекаємо на завантаження подання...');
+        await window.submissionFunctions.waitForSubmissionLoad();
+        console.log('✅ Подання завантажене');
     }
     
     // Заповнення підрозділів

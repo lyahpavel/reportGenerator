@@ -2,6 +2,7 @@
 
 // Глобальна змінна для поточного подання
 let currentSubmission = null;
+let submissionLoaded = false; // Прапорець завершення завантаження
 
 // Зберігання обробників подій для уникнення дублювання
 let droneButtonHandler = null;
@@ -62,6 +63,9 @@ async function initSubmission() {
     
     // Завантажити поточне подання
     await loadCurrentSubmission();
+    
+    // Позначити що завантаження завершене
+    submissionLoaded = true;
     
     // Видалити старі обробники перед додаванням нових
     if (droneButtonHandler && dronesContainer) {
@@ -199,6 +203,17 @@ async function waitForCache() {
     if (cacheLoaded) return;
     if (cachePromise) return cachePromise;
     return preloadOptionsCache();
+}
+
+// Функція для очікування завершення завантаження подання
+async function waitForSubmissionLoad() {
+    if (submissionLoaded) return;
+    
+    let attempts = 0;
+    while (!submissionLoaded && attempts < 100) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        attempts++;
+    }
 }
 
 // Завантаження операторів для екіпажу (чекбокси)
@@ -1168,6 +1183,7 @@ function getCurrentSubmission() {
 function clearSubmission() {
     console.log('🧹 Очищення currentSubmission');
     currentSubmission = null;
+    submissionLoaded = false; // Скинути прапорець
 }
 
 // Експорт функцій
@@ -1176,5 +1192,6 @@ window.submissionFunctions = {
     getCurrentSubmission,
     loadCurrentSubmission,
     clearSubmission,
-    waitForCache
+    waitForCache,
+    waitForSubmissionLoad
 };
