@@ -227,20 +227,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="droneSize">Розмір дрону:</label>
-                    <select id="droneSize" name="droneSize" required onchange="toggleCustomDroneSize()">
-                        <option value="">Оберіть розмір дрону...</option>
-                        <!-- Опції заповнюються динамічно з data.json -->
-                    </select>
-                    <div class="custom-input-wrapper" style="display: none;">
-                        <input type="text" id="customDroneSize" name="customDroneSize" placeholder="Введіть розмір дрону..." data-save-option="false">
-                        <button type="button" class="save-option-btn" onclick="toggleSaveOption('customDroneSize')" title="Зберегти в мої опції">
-                            <span class="save-icon">💾</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="cameraType">Тип камери:</label>
                     <select id="cameraType" name="cameraType" required onchange="toggleCustomCameraType()">
                         <option value="">Оберіть тип камери...</option>

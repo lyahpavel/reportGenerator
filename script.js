@@ -220,7 +220,7 @@ function populateSelects() {
         populateSelect('droneName', [{ value: '', label: 'Спочатку створіть подання' }]);
     }
     
-    populateSelect('droneSize', appData.droneSizes);
+    // Розмір дрону видалено
     populateSelect('cameraType', appData.cameraTypes);
     
     // Заповнення частот (два окремі поля)
@@ -335,7 +335,6 @@ reportForm.addEventListener('submit', function(e) {
         subdivision: document.getElementById('subdivision').value === 'Інший' ? document.getElementById('customSubdivision').value : document.getElementById('subdivision').value,
         jointWith: document.getElementById('jointWith').value === 'Інший' ? document.getElementById('customJointWith').value : document.getElementById('jointWith').value,
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
-        droneSize: document.getElementById('droneSize').value === 'Інший' ? document.getElementById('customDroneSize').value : document.getElementById('droneSize').value,
         cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
         factoryConfig: document.getElementById('factoryConfig').checked,
         modifications: document.getElementById('modifications').value,
@@ -448,10 +447,6 @@ function validateForm(data) {
         errors.push('Оберіть назву дрону');
     }
     
-    if (!data.droneSize) {
-        errors.push('Оберіть розмір дрону');
-    }
-    
     if (!data.cameraType) {
         errors.push('Оберіть тип камери');
     }
@@ -527,7 +522,7 @@ function generateReport(data) {
         
         <div class="report-item">
             <span class="report-label">Дрон:</span>
-            <span class="report-value">${data.droneName} | ${data.droneSize} | ${data.cameraType}</span>
+            <span class="report-value">${data.droneName} | ${data.cameraType}</span>
         </div>
         
         ${!data.factoryConfig && data.modifications ? `
@@ -896,7 +891,6 @@ newReportBasedOnButton.addEventListener('click', function() {
     const currentFormData = {
         subdivision: document.getElementById('subdivision').value,
         droneName: document.getElementById('droneName').value,
-        droneSize: document.getElementById('droneSize').value,
         cameraType: document.getElementById('cameraType').value,
         videoFrequency: document.getElementById('videoFrequency').value,
         controlFrequency: document.getElementById('controlFrequency').value,
