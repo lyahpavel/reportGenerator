@@ -1261,6 +1261,16 @@ textarea {
     margin-bottom: 15px;
 }
 
+.drone-main-row .resource-select {
+    flex: 2;
+}
+
+.drone-main-row .resource-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 /* Деталі дрона (додаткові поля) */
 .drone-details {
     display: grid;

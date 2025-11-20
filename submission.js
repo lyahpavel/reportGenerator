@@ -283,8 +283,17 @@ async function loadResourceOptions(selectId, type) {
 
 // Завантаження частот для дронів
 async function loadDroneFrequencies(resourceItem) {
+    console.log('loadDroneFrequencies викликано');
     const videoFreqSelect = resourceItem.querySelector('.drone-video-freq');
     const controlFreqSelect = resourceItem.querySelector('.drone-control-freq');
+    
+    console.log('videoFreqSelect:', videoFreqSelect);
+    console.log('controlFreqSelect:', controlFreqSelect);
+    
+    if (!videoFreqSelect || !controlFreqSelect) {
+        console.error('Селекти частот не знайдені!');
+        return;
+    }
     
     // Частоти відео
     const videoFreqs = [
@@ -311,6 +320,8 @@ async function loadDroneFrequencies(resourceItem) {
         option.textContent = freq;
         controlFreqSelect.appendChild(option);
     });
+    
+    console.log('Частоти завантажені, відео опцій:', videoFreqSelect.options.length, 'керування опцій:', controlFreqSelect.options.length);
 }
 
 // Завантаження каналів
