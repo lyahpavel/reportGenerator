@@ -673,8 +673,8 @@ textarea {
     
     /* Стилі для форми подання на мобільних */
     .submission-form > .form-group {
-        padding: 15px;
-        margin-bottom: 10px;
+        padding: 0;
+        margin-bottom: 20px;
     }
     
     .form-group-row {
@@ -683,8 +683,8 @@ textarea {
     }
     
     .submission-form .form-actions {
-        padding: 15px;
-        margin-top: 10px;
+        padding: 0;
+        margin-top: 25px;
     }
 }
 
@@ -1213,12 +1213,12 @@ textarea {
 }
 
 .submission-form > .form-group {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    margin-bottom: 15px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 25px;
 }
 
 .form-group-row {
@@ -1242,12 +1242,12 @@ textarea {
 }
 
 .submission-form .form-actions {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    margin: 15px 0 0 0;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    margin: 35px 0 0 0;
 }
 
 .resources-container {
