@@ -952,9 +952,12 @@ async function loadCurrentSubmission() {
             .from('submissions')
             .select('*')
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle(); // maybeSingle() замість single() - не викидає помилку якщо немає запису
         
-        if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+        if (error) {
+            console.error('Помилка завантаження подання:', error);
+            throw error;
+        }
         
         if (data) {
             currentSubmission = data;
@@ -967,6 +970,8 @@ async function loadCurrentSubmission() {
             if (window.populateSelects) {
                 window.populateSelects();
             }
+        } else {
+            console.log('Подання не знайдено (нормально після видалення)');
         }
         
     } catch (error) {
