@@ -131,19 +131,15 @@ function addResourceRow(type) {
         <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
     `;
     
-    // Перевіряємо що button все ще в container
-    if (button.parentNode === container) {
-        container.insertBefore(resourceItem, button);
-        console.log('Елемент додано перед кнопкою');
-    } else {
-        // Якщо кнопка не в container, просто додаємо в кінець
-        container.appendChild(resourceItem);
-        console.log('Елемент додано в кінець (кнопка не в контейнері)');
-        // Повертаємо кнопку в кінець
-        if (button) {
-            container.appendChild(button);
-        }
+    // Завжди додаємо елемент, а потім переміщуємо кнопку в кінець
+    container.appendChild(resourceItem);
+    
+    // Переміщуємо кнопку "Додати" в самий кінець
+    if (button && button.parentNode === container) {
+        container.appendChild(button);
     }
+    
+    console.log('Елемент додано, кнопка переміщена в кінець');
     
     // Завантажити опції
     loadResourceOptions(selectId, type);
@@ -212,30 +208,39 @@ async function saveSubmission() {
         // Збір екіпажу (чекбокси)
         const crewCheckboxes = document.querySelectorAll('.crew-checkbox:checked');
         const crewMembers = Array.from(crewCheckboxes).map(cb => cb.value);
+        console.log('Екіпаж зібрано:', crewMembers);
         
         // Збір дронів
         const droneItems = document.querySelectorAll('.resource-item[data-type="drone"]');
+        console.log('Знайдено рядків дронів:', droneItems.length);
         const drones = Array.from(droneItems).map(item => {
             const select = item.querySelector('select');
             const count = parseInt(item.querySelector('.count-input').value) || 0;
-            return {
+            const droneData = {
                 name: select.value,
                 label: select.options[select.selectedIndex]?.text || select.value,
                 count: count
             };
+            console.log('Дрон:', droneData);
+            return droneData;
         }).filter(d => d.name && d.count > 0);
+        console.log('Дрони після фільтру:', drones);
         
         // Збір БК
         const bkItems = document.querySelectorAll('.resource-item[data-type="bk"]');
+        console.log('Знайдено рядків БК:', bkItems.length);
         const bk = Array.from(bkItems).map(item => {
             const select = item.querySelector('select');
             const count = parseInt(item.querySelector('.count-input').value) || 0;
-            return {
+            const bkData = {
                 name: select.value,
                 label: select.options[select.selectedIndex]?.text || select.value,
                 count: count
             };
+            console.log('БК:', bkData);
+            return bkData;
         }).filter(b => b.name && b.count > 0);
+        console.log('БК після фільтру:', bk);
         
         if (crewMembers.length === 0) {
             showError('Оберіть хоча б одного оператора');
