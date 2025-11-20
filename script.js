@@ -1832,3 +1832,75 @@ function formatFileSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
+
+// ============================================
+// HASH ROUTING - Навігація між секціями
+// ============================================
+
+// Ініціалізація роутера
+function initRouter() {
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const sections = {
+        'generator': document.getElementById('generatorSection'),
+        'archive': document.getElementById('archiveSection'),
+        'settings': document.getElementById('settingsSection')
+    };
+    const advancedModeSection = document.getElementById('advancedModeSection');
+    
+    // Обробник кліків на таби
+    navTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const page = this.dataset.page;
+            window.location.hash = page === 'generator' ? '' : page;
+        });
+    });
+    
+    // Функція переключення сторінок
+    function navigate() {
+        const hash = window.location.hash.slice(1) || 'generator';
+        const page = hash.split('/')[0]; // Беремо першу частину хешу
+        
+        // Оновлюємо активний таб
+        navTabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.page === page);
+        });
+        
+        // Показуємо потрібну секцію
+        Object.keys(sections).forEach(key => {
+            sections[key].classList.toggle('active', key === page);
+        });
+        
+        // Показуємо/ховаємо перемикач розширеного режиму
+        if (advancedModeSection) {
+            advancedModeSection.style.display = page === 'generator' ? 'block' : 'none';
+        }
+        
+        // Спеціальні дії для кожної сторінки
+        if (page === 'archive') {
+            // Автоматично завантажуємо історію при відкритті архіву
+            if (typeof loadReportsHistory === 'function') {
+                loadReportsHistory();
+            }
+        } else if (page === 'settings') {
+            // Оновлюємо email користувача в налаштуваннях
+            const userEmail = document.getElementById('userEmailDisplay')?.textContent;
+            const settingsEmail = document.getElementById('settingsUserEmail');
+            if (settingsEmail && userEmail) {
+                settingsEmail.textContent = userEmail;
+            }
+        }
+    }
+    
+    // Слухаємо зміни хешу
+    window.addEventListener('hashchange', navigate);
+    
+    // Ініціалізація при завантаженні
+    navigate();
+}
+
+// Запуск роутера після завантаження DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRouter);
+} else {
+    initRouter();
+}

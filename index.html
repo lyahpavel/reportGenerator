@@ -80,8 +80,25 @@
                     <button id="logoutBtn" class="btn btn-outline btn-small">Вийти</button>
                 </div>
             </div>
-            <!-- Перемикач розширеного режиму -->
-            <div class="advanced-mode-toggle">
+            
+            <!-- Навігація -->
+            <nav class="main-nav">
+                <button class="nav-tab active" data-page="generator">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-label">Новий звіт</span>
+                </button>
+                <button class="nav-tab" data-page="archive">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-label">Архів</span>
+                </button>
+                <button class="nav-tab" data-page="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">Налаштування</span>
+                </button>
+            </nav>
+            
+            <!-- Перемикач розширеного режиму (тільки для генератора) -->
+            <div class="advanced-mode-toggle" id="advancedModeSection">
                 <label class="switch-label">
                     <input type="checkbox" id="advancedModeSwitch">
                     <span class="switch-slider"></span>
@@ -90,6 +107,8 @@
             </div>
         </header>
 
+        <!-- Секція: Генератор звітів -->
+        <section id="generatorSection" class="page-section active">
         <form id="reportForm" class="report-form">
             <!-- Додавання відео -->
             <div class="form-group video-upload-section">
@@ -419,31 +438,55 @@
                 <button id="newReport" class="btn btn-primary">Новий звіт</button>
             </div>
         </div>
+        </section>
+        <!-- Кінець секції генератора -->
 
-        <!-- Секція історії звітів -->
-        <div id="reportsHistory" class="reports-history" style="display: none;">
-            <h2>Історія звітів</h2>
-            <div class="history-controls">
-                <button id="toggleHistory" class="btn btn-secondary">Показати історію</button>
-                <button id="refreshHistory" class="btn btn-outline" style="display: none;">Оновити</button>
+        <!-- Секція: Архів звітів -->
+        <section id="archiveSection" class="page-section">
+            <h2>📚 Архів звітів</h2>
+            <div id="reportsHistory" class="reports-history">
+                <div class="history-controls">
+                    <button id="refreshHistory" class="btn btn-outline">🔄 Оновити</button>
+                </div>
+                <div id="historyContent" class="history-content">
+                    <div class="history-filters">
+                        <input type="text" id="searchReports" placeholder="Пошук за номером звіту, підрозділом..." class="search-input">
+                        <select id="filterBySubdivision" class="filter-select">
+                            <option value="">Всі підрозділи</option>
+                        </select>
+                    </div>
+                    <div id="reportsList" class="reports-list">
+                        <!-- Список звітів буде тут -->
+                    </div>
+                    <div class="pagination">
+                        <button id="prevPage" class="btn btn-outline">← Попередня</button>
+                        <span id="pageInfo">Сторінка 1</span>
+                        <button id="nextPage" class="btn btn-outline">Наступна →</button>
+                    </div>
+                </div>
             </div>
-            <div id="historyContent" class="history-content" style="display: none;">
-                <div class="history-filters">
-                    <input type="text" id="searchReports" placeholder="Пошук за номером звіту, підрозділом..." class="search-input">
-                    <select id="filterBySubdivision" class="filter-select">
-                        <option value="">Всі підрозділи</option>
-                    </select>
+        </section>
+
+        <!-- Секція: Налаштування -->
+        <section id="settingsSection" class="page-section">
+            <h2>⚙️ Налаштування</h2>
+            <div class="settings-content">
+                <div class="settings-group">
+                    <h3>Користувацькі опції</h3>
+                    <p>Тут ви можете керувати вашими збереженими опціями для всіх полів форми.</p>
+                    <div id="customOptionsManager">
+                        <!-- Менеджер користувацьких опцій буде тут -->
+                        <p class="info-message">💡 Щоб додати нові опції, використовуйте кнопку 💾 в полях форми генератора звітів.</p>
+                    </div>
                 </div>
-                <div id="reportsList" class="reports-list">
-                    <!-- Список звітів буде тут -->
-                </div>
-                <div class="pagination">
-                    <button id="prevPage" class="btn btn-outline">← Попередня</button>
-                    <span id="pageInfo">Сторінка 1</span>
-                    <button id="nextPage" class="btn btn-outline">Наступна →</button>
+                
+                <div class="settings-group">
+                    <h3>Про додаток</h3>
+                    <p><strong>Версія:</strong> 1.36</p>
+                    <p><strong>Користувач:</strong> <span id="settingsUserEmail"></span></p>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 
     <script src="supabase-functions.js"></script>

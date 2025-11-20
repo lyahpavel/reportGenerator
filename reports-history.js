@@ -7,38 +7,18 @@ let filteredReports = [];
 
 // Ініціалізація історії звітів
 function initReportsHistory() {
-    const historySection = document.getElementById('reportsHistory');
-    const toggleButton = document.getElementById('toggleHistory');
     const refreshButton = document.getElementById('refreshHistory');
-    const historyContent = document.getElementById('historyContent');
     const searchInput = document.getElementById('searchReports');
     const filterSelect = document.getElementById('filterBySubdivision');
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
 
-    // Показати секцію історії тільки якщо є Supabase
-    if (window.supabaseClient) {
-        historySection.style.display = 'block';
-    }
-
-    // Toggle історії
-    toggleButton.addEventListener('click', async function() {
-        if (historyContent.style.display === 'none') {
-            historyContent.style.display = 'block';
-            refreshButton.style.display = 'inline-block';
-            toggleButton.textContent = 'Сховати історію';
-            await loadAndDisplayReports();
-        } else {
-            historyContent.style.display = 'none';
-            refreshButton.style.display = 'none';
-            toggleButton.textContent = 'Показати історію';
-        }
-    });
-
     // Оновлення історії
-    refreshButton.addEventListener('click', async function() {
-        await loadAndDisplayReports();
-    });
+    if (refreshButton) {
+        refreshButton.addEventListener('click', async function() {
+            await loadAndDisplayReports();
+        });
+    }
 
     // Пошук
     searchInput.addEventListener('input', function() {
@@ -67,9 +47,19 @@ function initReportsHistory() {
     });
 }
 
+// Завантаження історії звітів (викликається з роутера)
+async function loadReportsHistory() {
+    // Завантажуємо тільки якщо ще не завантажено або потрібно оновити
+    if (allReports.length === 0) {
+        await loadAndDisplayReports();
+    }
+}
+
 // Завантаження та відображення звітів
 async function loadAndDisplayReports() {
     const reportsList = document.getElementById('reportsList');
+    
+    if (!reportsList) return;
     
     // Показати loading
     reportsList.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Завантаження звітів...</p></div>';

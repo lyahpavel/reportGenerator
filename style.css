@@ -285,6 +285,72 @@ header p {
     font-size: 1.1rem;
 }
 
+/* Навігація */
+.main-nav {
+    display: flex;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 6px;
+    margin: 20px 30px 0;
+    backdrop-filter: blur(10px);
+}
+
+.nav-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.nav-tab.active {
+    background: white;
+    color: #4facfe;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+}
+
+.nav-label {
+    font-weight: 600;
+}
+
+/* Секції сторінок */
+.page-section {
+    display: none;
+    animation: fadeInUp 0.4s ease;
+}
+
+.page-section.active {
+    display: block;
+}
+
+.page-section h2 {
+    padding: 30px 40px 20px;
+    font-size: 1.8rem;
+    color: #2d3748;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
 .report-form {
     padding: 40px;
 }
@@ -1011,6 +1077,43 @@ textarea {
 .save-option-btn .save-icon {
     display: block;
     pointer-events: none;
+}
+
+/* Стилі для секції налаштувань */
+.settings-content {
+    padding: 20px 40px 40px;
+    max-width: 900px;
+}
+
+.settings-group {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.settings-group h3 {
+    color: #2d3748;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.settings-group p {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.info-message {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-top: 20px;
 }
 
 /* Стилі для завантаження відео */
