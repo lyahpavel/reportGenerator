@@ -719,6 +719,13 @@ textarea {
     color: #4facfe;
 }
 
+/* Стиль для readonly полів (оптоволокно в генераторі) */
+#fiberOpticLength[readonly] {
+    background-color: #f7fafc;
+    cursor: default;
+    color: #2d3748;
+}
+
 /* Стилі для полів ручного введення */
 #customSettlement,
 #coordinates,
