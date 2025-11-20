@@ -195,6 +195,7 @@ async function saveReportToSupabase(reportData) {
         const reportToSave = {
             user_id: user ? user.id : null,
             report_number: reportData.reportNumber,
+            report_text: reportData.reportText || null,
             subdivision: reportData.subdivision,
             joint_with: reportData.jointWith,
             drone_name: reportData.droneName,

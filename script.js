@@ -423,6 +423,9 @@ reportForm.addEventListener('submit', function(e) {
     const reportNumber = generateReportNumber(formData);
     formData.reportNumber = reportNumber;
     
+    // Генерація текстового звіту для БД
+    formData.reportText = generateReportText(formData);
+    
     // Генерація звіту
     generateReport(formData);
     
@@ -708,6 +711,78 @@ function formatDate(dateString) {
 function formatTime(timeString) {
     // Час вже в форматі HH:MM, просто повертаємо
     return timeString;
+}
+
+// Функція генерації текстового звіту (для збереження в БД)
+function generateReportText(data) {
+    const formattedDate = formatDate(data.date);
+    const formattedTime = formatTime(data.time);
+    
+    let reportText = `Підрозділ: ${data.subdivision}\n`;
+    
+    if (data.jointWith && data.jointWith !== '' && data.jointWith !== '—') {
+        reportText += `Сумісно з: ${data.jointWith}\n`;
+    }
+    
+    reportText += `Дрон: ${data.droneName} | ${data.cameraType}\n`;
+    
+    if (data.droneStatus) {
+        reportText += `Стан: ${data.droneStatus}\n`;
+    }
+    
+    if (data.hasFiberOptic) {
+        reportText += `Оптоволокно: ${data.fiberOpticLength}\n`;
+    } else {
+        reportText += `Частоти: Відео: ${data.videoFrequency} | Керування: ${data.controlFrequency}\n`;
+        if (data.channel) {
+            reportText += `Канал: ${data.channel}\n`;
+        }
+    }
+    
+    reportText += `Дата та час: ${formattedDate} ${formattedTime}\n`;
+    
+    if (data.bk) {
+        reportText += `БК: ${data.bk}\n`;
+    }
+    
+    if (data.initiationBoard) {
+        reportText += `Плата Ініціації: ${data.initiationBoard}\n`;
+    }
+    
+    if (data.targetType || data.settlement || data.coordinates) {
+        const targetParts = [
+            data.targetType || '',
+            data.settlement || '',
+            data.coordinates ? `(${data.coordinates})` : ''
+        ].filter(item => item !== '');
+        reportText += `Ціль: ${targetParts.join(' | ')}\n`;
+    }
+    
+    if (data.status) {
+        reportText += `Статус: ${data.status}\n`;
+    }
+    
+    if (data.reason && data.status === 'Не уражено') {
+        reportText += `Причина: ${data.reason}\n`;
+    }
+    
+    if (data.losses) {
+        reportText += `Втрати: ${data.losses}\n`;
+    }
+    
+    if (data.operator) {
+        reportText += `Оператор: ${data.operator}\n`;
+    }
+    
+    if (data.stream) {
+        reportText += `Стрім: Так\n`;
+    }
+    
+    if (data.mission) {
+        reportText += `Опис місії: ${data.mission}\n`;
+    }
+    
+    return reportText;
 }
 
 // Функція показу помилки
