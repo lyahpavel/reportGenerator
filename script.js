@@ -2353,7 +2353,11 @@ async function viewArchivedSubmission(submissionId) {
         
         // Список звітів
         if (reports && reports.length > 0) {
-            const reportsHTML = reports.map(report => `
+            const reportsHTML = reports.map(report => {
+                const reportText = report.report_text || 'Текст звіту відсутній';
+                const escapedText = reportText.replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\\/g, '\\\\');
+                
+                return `
                 <div class="report-item">
                     <div class="report-item-header">
                         <strong>Звіт №${report.report_number || 'Без номеру'}</strong>
@@ -2363,14 +2367,15 @@ async function viewArchivedSubmission(submissionId) {
                         ${report.subdivision ? `Підрозділ: ${report.subdivision} | ` : ''}
                         ${report.drone_name ? `Дрон: ${report.drone_name}` : ''}
                     </div>
-                    <div class="report-item-content">${report.report_text}</div>
+                    <div class="report-item-content">${reportText}</div>
                     <div class="report-item-actions">
-                        <button class="btn btn-outline btn-sm" onclick="copyReportText(\`${report.report_text.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                        <button class="btn btn-outline btn-sm" onclick="copyReportText(\`${escapedText}\`)">
                             📋 Копіювати
                         </button>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
             
             document.getElementById('modalReportsList').innerHTML = reportsHTML;
         } else {
