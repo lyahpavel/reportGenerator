@@ -3,6 +3,12 @@
 // Глобальна змінна для поточного подання
 let currentSubmission = null;
 
+// Зберігання обробників подій для уникнення дублювання
+let droneButtonHandler = null;
+let bkButtonHandler = null;
+let submissionFormHandler = null;
+let shareButtonHandler = null;
+
 // Ініціалізація секції подання
 async function initSubmission() {
     const submissionForm = document.getElementById('submissionForm');
@@ -38,8 +44,22 @@ async function initSubmission() {
     // Завантажити поточне подання
     await loadCurrentSubmission();
     
-    // Event delegation для кнопок додавання (працює завжди)
-    dronesContainer?.addEventListener('click', (e) => {
+    // Видалити старі обробники перед додаванням нових
+    if (droneButtonHandler && dronesContainer) {
+        dronesContainer.removeEventListener('click', droneButtonHandler);
+    }
+    if (bkButtonHandler && bkContainer) {
+        bkContainer.removeEventListener('click', bkButtonHandler);
+    }
+    if (submissionFormHandler && submissionForm) {
+        submissionForm.removeEventListener('submit', submissionFormHandler);
+    }
+    if (shareButtonHandler && shareSubmissionBtn) {
+        shareSubmissionBtn.removeEventListener('click', shareButtonHandler);
+    }
+    
+    // Створити нові обробники
+    droneButtonHandler = (e) => {
         console.log('Клік в dronesContainer:', e.target);
         if (e.target.id === 'addDroneBtn' || e.target.closest('#addDroneBtn')) {
             console.log('Додаємо дрон');
@@ -47,9 +67,9 @@ async function initSubmission() {
             e.stopPropagation();
             addResourceRow('drone');
         }
-    });
+    };
     
-    bkContainer?.addEventListener('click', (e) => {
+    bkButtonHandler = (e) => {
         console.log('Клік в bkContainer:', e.target);
         if (e.target.id === 'addBkBtn' || e.target.closest('#addBkBtn')) {
             console.log('Додаємо БК');
@@ -57,17 +77,30 @@ async function initSubmission() {
             e.stopPropagation();
             addResourceRow('bk');
         }
-    });
+    };
     
-    // Збереження подання
-    submissionForm.addEventListener('submit', async (e) => {
+    submissionFormHandler = async (e) => {
         e.preventDefault();
         await saveSubmission();
-    });
+    };
     
-    // Поділитися поданням
+    shareButtonHandler = () => shareSubmission();
+    
+    // Додати обробники подій
+    if (dronesContainer) {
+        dronesContainer.addEventListener('click', droneButtonHandler);
+    }
+    
+    if (bkContainer) {
+        bkContainer.addEventListener('click', bkButtonHandler);
+    }
+    
+    if (submissionForm) {
+        submissionForm.addEventListener('submit', submissionFormHandler);
+    }
+    
     if (shareSubmissionBtn) {
-        shareSubmissionBtn.addEventListener('click', () => shareSubmission());
+        shareSubmissionBtn.addEventListener('click', shareButtonHandler);
     }
     
     // Встановити дату з сьогодні
