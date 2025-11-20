@@ -894,12 +894,12 @@ async function saveSubmission() {
             .from('submissions')
             .select('id')
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle(); // maybeSingle() замість single() - не викидає помилку якщо немає запису
         
         console.log('Існуюче подання:', existing, 'Помилка:', existingError);
         
         let result;
-        if (existing) {
+        if (existing && !existingError) {
             // Оновити існуюче
             console.log('Оновлюємо існуюче подання:', existing.id);
             result = await window.supabaseClient
