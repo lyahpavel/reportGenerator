@@ -194,7 +194,7 @@ function populateSelects() {
     // Отримуємо поточне подання для фільтрації
     const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
     
-    // Заповнення дронів з поточного подання
+    // Заповнення дронів ТІЛЬКИ з поточного подання
     if (currentSubmission && currentSubmission.drones && currentSubmission.drones.length > 0) {
         const availableDrones = currentSubmission.drones
             .filter(drone => drone.count > 0)
@@ -202,9 +202,16 @@ function populateSelects() {
                 value: drone.name || drone.label,
                 label: `${drone.label} (${drone.count} шт)`
             }));
-        populateSelect('droneName', availableDrones.length > 0 ? availableDrones : appData.droneNames);
+        
+        if (availableDrones.length > 0) {
+            populateSelect('droneName', availableDrones);
+        } else {
+            // Немає дронів з count > 0
+            populateSelect('droneName', [{ value: '', label: 'Немає доступних дронів' }]);
+        }
     } else {
-        populateSelect('droneName', appData.droneNames);
+        // Немає подання - показуємо попередження
+        populateSelect('droneName', [{ value: '', label: 'Спочатку створіть подання' }]);
     }
     
     populateSelect('droneSize', appData.droneSizes);
@@ -216,15 +223,22 @@ function populateSelects() {
     
     // Поле 'Тип місії' видалено
     
-    // Заповнення БК з фільтрацією по поданню
+    // Заповнення БК ТІЛЬКИ з поточного подання
     if (currentSubmission && currentSubmission.bk && currentSubmission.bk.length > 0) {
-        const availableBk = appData.bkOptions.filter(bkOption => {
-            const submissionBk = currentSubmission.bk.find(b => b.name === bkOption.value);
-            return submissionBk && submissionBk.count > 0;
-        });
-        populateSelect('bk', availableBk.length > 0 ? availableBk : appData.bkOptions);
+        const availableBk = currentSubmission.bk
+            .filter(bk => bk.count > 0)
+            .map(bk => ({
+                value: bk.name || bk.label,
+                label: `${bk.label} (${bk.count} шт)`
+            }));
+        
+        if (availableBk.length > 0) {
+            populateSelect('bk', availableBk);
+        } else {
+            populateSelect('bk', [{ value: '', label: 'Немає доступного БК' }]);
+        }
     } else {
-        populateSelect('bk', appData.bkOptions);
+        populateSelect('bk', [{ value: '', label: 'Спочатку створіть подання' }]);
     }
     
     populateSelect('initiationBoard', appData.initiationBoardOptions);
