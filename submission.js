@@ -131,9 +131,19 @@ function addResourceRow(type) {
         <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
     `;
     
-    // Вставити перед кнопкою "Додати"
-    container.insertBefore(resourceItem, button);
-    console.log('Елемент додано перед кнопкою');
+    // Перевіряємо що button все ще в container
+    if (button.parentNode === container) {
+        container.insertBefore(resourceItem, button);
+        console.log('Елемент додано перед кнопкою');
+    } else {
+        // Якщо кнопка не в container, просто додаємо в кінець
+        container.appendChild(resourceItem);
+        console.log('Елемент додано в кінець (кнопка не в контейнері)');
+        // Повертаємо кнопку в кінець
+        if (button) {
+            container.appendChild(button);
+        }
+    }
     
     // Завантажити опції
     loadResourceOptions(selectId, type);
