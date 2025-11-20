@@ -61,11 +61,8 @@ async function initSubmission() {
     // Тепер завантажити операторів з кешу
     await loadCrewMembers();
     
-    // Завантажити поточне подання
+    // Завантажити поточне подання (встановить submissionLoaded всередині)
     await loadCurrentSubmission();
-    
-    // Позначити що завантаження завершене
-    submissionLoaded = true;
     
     // Видалити старі обробники перед додаванням нових
     if (droneButtonHandler && dronesContainer) {
@@ -1010,10 +1007,15 @@ async function loadCurrentSubmission() {
             }
         } else {
             console.log('Подання не знайдено (нормально після видалення)');
+            currentSubmission = null; // Явно встановити null
         }
         
     } catch (error) {
         console.error('Помилка завантаження подання:', error);
+        currentSubmission = null; // При помилці теж null
+    } finally {
+        // Завжди позначаємо що завантаження завершене (навіть якщо подання немає)
+        submissionLoaded = true;
     }
 }
 

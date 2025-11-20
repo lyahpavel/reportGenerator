@@ -1094,12 +1094,12 @@ async function closeSubmission() {
             window.submissionFunctions.clearSubmission();
         }
         
-        // Перепідключити обробники кнопок після очищення
+        // Перепідключити обробники кнопок після очищення (async, не чекаємо)
         if (window.submissionFunctions?.initSubmission) {
             window.submissionFunctions.initSubmission();
         }
         
-        // Оновити списки в генераторі
+        // Оновити списки в генераторі (async, сама почекає на завантаження)
         if (window.populateSelects) {
             window.populateSelects();
         }
