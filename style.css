@@ -695,24 +695,36 @@ textarea {
     }
     
     .drone-main-row .resource-select,
+    .bk-main-row .resource-select,
     .resource-item[data-type="bk"] .resource-select {
         min-width: 0;
         flex: 1;
     }
     
     .drone-main-row,
+    .bk-main-row,
     .resource-item[data-type="bk"] {
         flex-wrap: nowrap;
     }
     
     /* Слайдер на мобільних */
     .count-slider {
-        width: 60px;
+        width: 100px;
+        flex: 1;
+    }
+    
+    .count-label {
+        font-size: 0.85rem;
     }
     
     .count-value {
         font-size: 0.85rem;
         min-width: 20px;
+    }
+    
+    .resource-count {
+        padding: 6px 10px;
+        gap: 8px;
     }
 }
 
@@ -1403,24 +1415,19 @@ textarea {
     box-shadow: 0 2px 8px rgba(79, 172, 254, 0.1);
 }
 
-/* Основний рядок дрона (назва + кількість + видалити) */
-.drone-main-row {
+/* Основний рядок дрона (назва + видалити) */
+.drone-main-row,
+.bk-main-row {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
-.drone-main-row .resource-select {
+.drone-main-row .resource-select,
+.bk-main-row .resource-select {
     flex: 1;
     min-width: 0;
-}
-
-.drone-main-row .resource-count {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
 }
 
 /* Деталі дрона (додаткові поля) */
@@ -1516,19 +1523,30 @@ textarea {
 .resource-count {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f7fafc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.count-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin: 0;
 }
 
 .count-slider {
     -webkit-appearance: none;
     appearance: none;
-    width: 80px;
+    width: 140px;
     height: 6px;
     background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
     outline: none;
     border-radius: 3px;
     cursor: pointer;
+    flex: 1;
 }
 
 .count-slider::-webkit-slider-thumb {

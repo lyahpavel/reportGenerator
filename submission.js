@@ -333,11 +333,12 @@ async function addResourceRow(type) {
                         <option value="">Завантаження...</option>
                     </select>
                 </div>
-                <div class="resource-count">
-                    <input type="range" class="count-slider" value="1" min="1" max="20" step="1">
-                    <span class="count-value">1</span>
-                </div>
                 <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
+            </div>
+            <div class="resource-count">
+                <label class="count-label">Кількість:</label>
+                <input type="range" class="count-slider" value="1" min="1" max="20" step="1">
+                <span class="count-value">1</span>
             </div>
             <div class="drone-details">
                 <div class="drone-field">
@@ -397,16 +398,19 @@ async function addResourceRow(type) {
         // Для БК - проста структура
         console.log('Створюємо HTML для БК');
         resourceItem.innerHTML = `
-            <div class="resource-select">
-                <select id="${selectId}" class="form-control" required>
-                    <option value="">Завантаження...</option>
-                </select>
+            <div class="bk-main-row">
+                <div class="resource-select">
+                    <select id="${selectId}" class="form-control" required>
+                        <option value="">Завантаження...</option>
+                    </select>
+                </div>
+                <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
             </div>
             <div class="resource-count">
+                <label class="count-label">Кількість:</label>
                 <input type="range" class="count-slider" value="1" min="1" max="20" step="1">
                 <span class="count-value">1</span>
             </div>
-            <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
         `;
     }
     
