@@ -208,10 +208,10 @@ async function populateSelects() {
         console.log('✅ Кеш готовий');
     }
     
-    // Чекаємо на завершення завантаження подання
-    if (window.submissionFunctions?.waitForSubmissionLoad) {
-        console.log('⏳ Чекаємо на завантаження подання...');
-        await window.submissionFunctions.waitForSubmissionLoad();
+    // Завантажити подання якщо ще не завантажене
+    if (window.submissionFunctions?.loadCurrentSubmission && !window.submissionFunctions?.getCurrentSubmission()) {
+        console.log('⏳ Завантажуємо подання...');
+        await window.submissionFunctions.loadCurrentSubmission();
         console.log('✅ Подання завантажене');
     }
     
@@ -360,8 +360,10 @@ reportForm.addEventListener('submit', function(e) {
         droneName: document.getElementById('droneName').value === 'Інший' ? document.getElementById('customDroneName').value : document.getElementById('droneName').value,
         cameraType: document.getElementById('cameraType').value === 'Інша' ? document.getElementById('customCameraType').value : document.getElementById('cameraType').value,
         droneStatus: document.getElementById('droneStatusText').textContent,
+        fiberOptic: document.getElementById('fiberOpticGroup').style.display !== 'none',
         hasFiberOptic: document.getElementById('fiberOpticGroup').style.display !== 'none',
         fiberOpticLength: document.getElementById('fiberOpticLength').value,
+        fiberLength: document.getElementById('fiberOpticLength').value,
         videoFrequency: document.getElementById('videoFrequency').value === 'Інша' ? document.getElementById('customVideoFrequency').value : document.getElementById('videoFrequency').value,
         channel: document.getElementById('channel').value,
         controlFrequency: document.getElementById('controlFrequency').value === 'Інша' ? document.getElementById('customControlFrequency').value : document.getElementById('controlFrequency').value,
