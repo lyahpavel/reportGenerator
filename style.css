@@ -1293,9 +1293,15 @@ textarea {
     margin: 0;
 }
 
-.drone-field select {
+.drone-field select,
+.drone-field input {
     font-size: 0.95rem;
     padding: 8px;
+}
+
+/* Поле модифікацій займає 2 колонки якщо є місце */
+.modification-details-field {
+    grid-column: span 2;
 }
 
 /* БК зберігає стару структуру */
