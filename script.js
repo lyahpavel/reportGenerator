@@ -2412,6 +2412,11 @@ function copyReportText(text) {
     });
 }
 
+// Експорт функцій для доступу з HTML onclick
+window.viewArchivedSubmission = viewArchivedSubmission;
+window.closeArchivedSubmissionModal = closeArchivedSubmissionModal;
+window.copyReportText = copyReportText;
+
 // Запуск роутера після завантаження DOM
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initRouter);
