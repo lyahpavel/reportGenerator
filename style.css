@@ -631,35 +631,29 @@ textarea {
     
     /* Стилі для подання на мобільних */
     .current-submission {
-        padding: 15px;
-        border-radius: 8px;
-    }
-    
-    .current-submission h3 {
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-    }
-    
-    .submission-display {
-        background: transparent;
-        backdrop-filter: none;
-        border-radius: 0;
         padding: 0;
     }
     
+    .current-submission h3 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .submission-display {
+        padding: 20px;
+    }
+    
     .submission-display .info-row {
-        padding: 8px 0;
+        padding: 10px 0;
         font-size: 0.9rem;
     }
     
     .submission-display .info-section {
-        padding: 10px 0;
+        padding: 12px 0;
     }
     
     .drone-info-card {
-        background: rgba(255, 255, 255, 0.1);
         padding: 12px;
-        border-radius: 6px;
     }
     
     .drone-info-header {
@@ -1492,31 +1486,31 @@ textarea {
 }
 
 .current-submission {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    padding: 30px;
-    color: white;
+    background: transparent;
+    padding: 0;
+    color: #333;
 }
 
 .current-submission h3 {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-    padding-bottom: 10px;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: #333;
+    text-align: center;
 }
 
 .submission-display {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 8px;
-    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .submission-display .info-row {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f3f4;
 }
 
 .submission-display .info-row:last-child {
@@ -1525,17 +1519,18 @@ textarea {
 
 .submission-display .info-label {
     font-weight: 600;
-    opacity: 0.9;
+    color: #495057;
 }
 
 .submission-display .info-value {
     font-weight: 500;
+    color: #212529;
 }
 
 /* Секція з дронами */
 .submission-display .info-section {
     padding: 15px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid #f1f3f4;
 }
 
 .submission-display .info-section:last-child {
@@ -1545,7 +1540,7 @@ textarea {
 .submission-display .info-section .info-label {
     display: block;
     font-weight: 600;
-    opacity: 0.9;
+    color: #4facfe;
     margin-bottom: 15px;
     font-size: 1.1rem;
 }
@@ -1557,11 +1552,10 @@ textarea {
 }
 
 .drone-info-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(5px);
+    background: #f8f9fa;
     border-radius: 8px;
     padding: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid #e9ecef;
 }
 
 .drone-info-header {
@@ -1571,6 +1565,7 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    color: #212529;
 }
 
 .drone-info-header .badge {
@@ -1586,13 +1581,14 @@ textarea {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px;
     font-size: 0.9rem;
-    opacity: 0.95;
+    color: #495057;
 }
 
 .drone-info-details span {
     padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.1);
+    background: white;
     border-radius: 4px;
+    border: 1px solid #e9ecef;
 }
 
 /* Стилі для завантаження відео */
