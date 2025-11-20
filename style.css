@@ -1209,6 +1209,11 @@ textarea {
     color: #4facfe;
 }
 
+.crew-name-label.crew-leader {
+    font-weight: 600;
+    color: #f59e0b;
+}
+
 /* Радіобатон для старшого */
 .crew-leader-radio {
     display: flex;

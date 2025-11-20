@@ -76,6 +76,25 @@ async function initSubmission() {
 }
 
 // Завантаження операторів для екіпажу (чекбокси)
+// Функція для оновлення відображення старшого екіпажу
+function updateCrewLeaderIndication() {
+    // Спочатку прибираємо клас та текст "(старший)" від всіх лейблів
+    document.querySelectorAll('.crew-name-label').forEach(label => {
+        label.classList.remove('crew-leader');
+        label.textContent = label.textContent.replace(' (старший)', '');
+    });
+    
+    // Додаємо клас та текст "(старший)" до вибраного
+    const selectedRadio = document.querySelector('.crew-leader-input:checked');
+    if (selectedRadio) {
+        const leaderLabel = document.querySelector(`label[for="crew-${selectedRadio.value}"]`);
+        if (leaderLabel) {
+            leaderLabel.classList.add('crew-leader');
+            leaderLabel.textContent += ' (старший)';
+        }
+    }
+}
+
 async function loadCrewMembers() {
     const crewContainer = document.getElementById('crewMembers');
     if (!crewContainer) return;
@@ -135,7 +154,13 @@ async function loadCrewMembers() {
                 radio.disabled = !checkbox.checked;
                 if (!checkbox.checked && radio.checked) {
                     radio.checked = false;
+                    updateCrewLeaderIndication(); // Оновити відображення старшого
                 }
+            });
+            
+            // Коли радіобатон змінюється, оновлюємо відображення старшого
+            radio.addEventListener('change', () => {
+                updateCrewLeaderIndication();
             });
             
             radioWrapper.appendChild(radio);
@@ -816,6 +841,9 @@ function restoreCrewSelection(submissionData) {
             radio.checked = true;
         }
     }
+    
+    // Оновити відображення старшого екіпажу
+    updateCrewLeaderIndication();
 }
 
 // Отримати поточне подання (для використання в генераторі)
