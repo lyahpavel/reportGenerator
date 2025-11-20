@@ -881,7 +881,9 @@ newReportButton.addEventListener('click', function() {
 // Закриття подання (кнопка)
 if (closeSubmissionButton) {
     closeSubmissionButton.addEventListener('click', async function() {
+        console.log('🔴 Натиснуто кнопку закриття подання');
         await closeSubmission();
+        console.log('🟢 Функція closeSubmission завершена');
     });
 }
 
@@ -939,16 +941,20 @@ function reloadData() {
 
 // Функція для закриття подання (архівування та очищення таблиці suggestions)
 async function closeSubmission() {
+    console.log('🔵 Функція closeSubmission викликана');
     try {
         // Отримуємо поточне подання
         const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+        console.log('📦 Поточне подання:', currentSubmission);
         
         if (!currentSubmission) {
+            console.error('❌ Немає активного подання');
             showError('Немає активного подання для закриття');
             return;
         }
         
         // Підтвердження від користувача
+        console.log('⏳ Показуємо діалог підтвердження...');
         const confirmed = confirm(
             'Ви впевнені, що хочете закрити подання?\n\n' +
             'Це призведе до:\n' +
@@ -958,7 +964,11 @@ async function closeSubmission() {
             'Продовжити?'
         );
         
-        if (!confirmed) return;
+        console.log('📝 Результат підтвердження:', confirmed);
+        if (!confirmed) {
+            console.log('🚫 Користувач скасував закриття');
+            return;
+        }
         
         const supabase = window.supabaseClient;
         if (!supabase) {
