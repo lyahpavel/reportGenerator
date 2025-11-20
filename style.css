@@ -1251,9 +1251,9 @@ textarea {
 }
 
 .resources-container {
-    background: #f7fafc;
-    border-radius: 8px;
-    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
     margin-top: 10px;
     display: flex;
     flex-direction: column;
@@ -1275,9 +1275,9 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: #f7fafc;
-    border-radius: 8px;
-    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
     max-height: 300px;
     overflow-y: auto;
 }
@@ -1356,9 +1356,9 @@ textarea {
 
 /* Контейнер для одного селекту */
 .single-resource-container {
-    background: #f7fafc;
-    border-radius: 8px;
-    padding: 15px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
     margin-top: 10px;
 }
 
