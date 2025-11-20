@@ -1005,13 +1005,9 @@ async function loadCurrentSubmission() {
             currentSubmission = null; // Явно встановити null
         }
         
-        // Позначити що завантаження завершене ПЕРЕД викликом populateSelects
+        // Позначити що завантаження завершене
+        // populateSelects() сама почекає на цей прапорець з script.js
         submissionLoaded = true;
-        
-        // Тепер можна оновити селекти
-        if (window.populateSelects) {
-            window.populateSelects();
-        }
         
     } catch (error) {
         console.error('Помилка завантаження подання:', error);
