@@ -191,9 +191,6 @@ async function loadData() {
 async function populateSelects() {
     if (!appData) return;
     
-    console.log('🔄 populateSelects викликано, stack trace:');
-    console.trace();
-    
     // Чекаємо на готовність submission.js та завантаження кешу
     let attempts = 0;
     while (!window.submissionFunctions?.waitForCache && attempts < 50) {
@@ -203,16 +200,12 @@ async function populateSelects() {
     
     // Чекаємо на завантаження кешу якщо він ще не готовий
     if (window.submissionFunctions?.waitForCache) {
-        console.log('⏳ Чекаємо на завантаження кешу...');
         await window.submissionFunctions.waitForCache();
-        console.log('✅ Кеш готовий');
     }
     
     // Завантажити подання якщо ще не завантажене
     if (window.submissionFunctions?.loadCurrentSubmission && !window.submissionFunctions?.getCurrentSubmission()) {
-        console.log('⏳ Завантажуємо подання...');
         await window.submissionFunctions.loadCurrentSubmission();
-        console.log('✅ Подання завантажене');
     }
     
     // Заповнення підрозділів
@@ -221,7 +214,6 @@ async function populateSelects() {
     
     // Отримуємо поточне подання для фільтрації
     const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
-    console.log('📋 Поточне подання:', currentSubmission);
     
     // Заповнення дронів ТІЛЬКИ з поточного подання
     if (currentSubmission && currentSubmission.drones && currentSubmission.drones.length > 0) {
@@ -449,13 +441,18 @@ reportForm.addEventListener('submit', async function(e) {
     // Зберегти звіт у Supabase (асинхронно, не блокуємо UI)
     if (window.supabaseFunctions && window.supabaseClient) {
         window.supabaseFunctions.saveReportToSupabase(formData).then(async () => {
+            console.log('✅ Звіт збережено, оновлюємо дані...');
             // Після успішного збереження перезавантажити подання
             if (window.submissionFunctions?.loadCurrentSubmission) {
                 await window.submissionFunctions.loadCurrentSubmission();
+                console.log('✅ Подання перезавантажене');
             }
+            // Невелика затримка щоб дані встигли оновитися
+            await new Promise(resolve => setTimeout(resolve, 100));
             // Потім оновити селекти
             if (typeof populateSelects === 'function') {
                 await populateSelects();
+                console.log('✅ Селекти оновлено');
             }
         }).catch(error => {
             console.error('Не вдалося зберегти звіт:', error);
