@@ -180,18 +180,23 @@ async function loadData() {
         }
     }
     
-    // В будь-якому випадку заповнюємо селекти
-    populateSelects();
+    // В будь-якому випадку заповнюємо селекти (асинхронно)
+    populateSelects().catch(err => console.error('Помилка populateSelects:', err));
     
     // Експортуємо функцію для глобального використання
     window.populateSelects = populateSelects;
 }
 
 // Заповнення випадаючих списків даними
-function populateSelects() {
+async function populateSelects() {
     if (!appData) return;
     
     console.log('🔄 populateSelects викликано');
+    
+    // Чекаємо на завантаження кешу якщо він ще не готовий
+    if (window.submissionFunctions?.waitForCache) {
+        await window.submissionFunctions.waitForCache();
+    }
     
     // Заповнення підрозділів
     populateSelect('subdivision', appData.subdivisions);

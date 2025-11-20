@@ -21,6 +21,10 @@ let optionsCache = {
     operators: null
 };
 
+// Флаг для відстеження завантаження кешу
+let cacheLoaded = false;
+let cachePromise = null;
+
 // Ініціалізація секції подання
 async function initSubmission() {
     const submissionForm = document.getElementById('submissionForm');
@@ -125,11 +129,18 @@ async function initSubmission() {
 
 // Функція для попереднього завантаження всіх опцій в кеш
 async function preloadOptionsCache() {
-    try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        if (!user) return;
-        
-        console.log('⏳ Завантаження опцій в кеш...');
+    // Якщо кеш вже завантажується, повернути існуючий проміс
+    if (cachePromise) return cachePromise;
+    
+    // Якщо кеш вже завантажений, не завантажувати знову
+    if (cacheLoaded) return Promise.resolve();
+    
+    cachePromise = (async () => {
+        try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) return;
+            
+            console.log('⏳ Завантаження опцій в кеш...');
         
         // Завантажити всі опції паралельно
         const [
@@ -173,9 +184,21 @@ async function preloadOptionsCache() {
             оператори: optionsCache.operators.length
         });
         
+        cacheLoaded = true;
+        
     } catch (error) {
         console.error('❌ Помилка завантаження кешу:', error);
     }
+    })();
+    
+    return cachePromise;
+}
+
+// Функція для очікування завантаження кешу
+async function waitForCache() {
+    if (cacheLoaded) return;
+    if (cachePromise) return cachePromise;
+    return preloadOptionsCache();
 }
 
 // Завантаження операторів для екіпажу (чекбокси)
@@ -1152,5 +1175,6 @@ window.submissionFunctions = {
     initSubmission,
     getCurrentSubmission,
     loadCurrentSubmission,
-    clearSubmission
+    clearSubmission,
+    waitForCache
 };
