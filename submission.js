@@ -147,13 +147,13 @@ function addResourceRow(type) {
                 <div class="drone-field">
                     <label>Частота відео</label>
                     <select class="drone-video-freq form-control" required>
-                        <option value="">Оберіть частоту</option>
+                        <option value="">Завантаження...</option>
                     </select>
                 </div>
                 <div class="drone-field">
                     <label>Частота керування</label>
                     <select class="drone-control-freq form-control" required>
-                        <option value="">Оберіть частоту</option>
+                        <option value="">Завантаження...</option>
                     </select>
                 </div>
                 <div class="drone-field">
@@ -171,10 +171,8 @@ function addResourceRow(type) {
                     </select>
                 </div>
                 <div class="drone-field modification-details-field" style="display: none;">
-                    <label>Модифікація</label>
-                    <select class="drone-modification form-control">
-                        <option value="">Завантаження...</option>
-                    </select>
+                    <label>Модифікації (через кому)</label>
+                    <input type="text" class="drone-modification form-control" placeholder="5.8 GHz, FPV антена...">
                 </div>
             </div>
         `;
@@ -217,7 +215,6 @@ function addResourceRow(type) {
     if (type === 'drone') {
         loadDroneFrequencies(resourceItem);
         loadDroneChannels(resourceItem);
-        loadDroneModifications(resourceItem);
         
         // Показати/сховати поле модифікації залежно від статусу
         const modStatusSelect = resourceItem.querySelector('.drone-modification-status');
@@ -287,47 +284,59 @@ async function loadResourceOptions(selectId, type) {
     }
 }
 
-// Завантаження частот для дронів
+// Завантаження частот для дронів з БД
 async function loadDroneFrequencies(resourceItem) {
     console.log('loadDroneFrequencies викликано');
     const videoFreqSelect = resourceItem.querySelector('.drone-video-freq');
     const controlFreqSelect = resourceItem.querySelector('.drone-control-freq');
-    
-    console.log('videoFreqSelect:', videoFreqSelect);
-    console.log('controlFreqSelect:', controlFreqSelect);
     
     if (!videoFreqSelect || !controlFreqSelect) {
         console.error('Селекти частот не знайдені!');
         return;
     }
     
-    // Частоти відео
-    const videoFreqs = [
-        "2.4 ГГц", "5.8 ГГц", "1.2 ГГц", "900 МГц", 
-        "Аналогова 5.8 ГГц", "Інша"
-    ];
-    
-    videoFreqs.forEach(freq => {
-        const option = document.createElement('option');
-        option.value = freq;
-        option.textContent = freq;
-        videoFreqSelect.appendChild(option);
-    });
-    
-    // Частоти керування
-    const controlFreqs = [
-        "2.4 ГГц", "433 МГц", "868 МГц", "915 МГц",
-        "Crossfire (868/915 МГц)", "ExpressLRS", "Інша"
-    ];
-    
-    controlFreqs.forEach(freq => {
-        const option = document.createElement('option');
-        option.value = freq;
-        option.textContent = freq;
-        controlFreqSelect.appendChild(option);
-    });
-    
-    console.log('Частоти завантажені, відео опцій:', videoFreqSelect.options.length, 'керування опцій:', controlFreqSelect.options.length);
+    try {
+        // Завантажити частоти відео
+        const { data: videoData, error: videoError } = await window.supabaseClient
+            .from('user_custom_options')
+            .select('value, label')
+            .eq('option_type', 'videoFrequencies')
+            .order('label');
+        
+        if (videoError) throw videoError;
+        
+        videoFreqSelect.innerHTML = '<option value="">Оберіть частоту відео</option>';
+        videoData.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.label;
+            videoFreqSelect.appendChild(option);
+        });
+        
+        // Завантажити частоти керування
+        const { data: controlData, error: controlError } = await window.supabaseClient
+            .from('user_custom_options')
+            .select('value, label')
+            .eq('option_type', 'controlFrequencies')
+            .order('label');
+        
+        if (controlError) throw controlError;
+        
+        controlFreqSelect.innerHTML = '<option value="">Оберіть частоту керування</option>';
+        controlData.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.label;
+            controlFreqSelect.appendChild(option);
+        });
+        
+        console.log('Частоти завантажені, відео:', videoData.length, 'керування:', controlData.length);
+        
+    } catch (error) {
+        console.error('Помилка завантаження частот:', error);
+        videoFreqSelect.innerHTML = '<option value="">Помилка завантаження</option>';
+        controlFreqSelect.innerHTML = '<option value="">Помилка завантаження</option>';
+    }
 }
 
 // Завантаження каналів
@@ -358,33 +367,7 @@ async function loadDroneChannels(resourceItem) {
     }
 }
 
-// Завантаження модифікацій
-async function loadDroneModifications(resourceItem) {
-    const modSelect = resourceItem.querySelector('.drone-modification');
-    if (!modSelect) return;
-    
-    try {
-        const { data, error } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', 'modifications')
-            .order('label');
-        
-        if (error) throw error;
-        
-        modSelect.innerHTML = '<option value="">Оберіть модифікацію</option>';
-        data.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.value;
-            option.textContent = item.label;
-            modSelect.appendChild(option);
-        });
-        
-    } catch (error) {
-        console.error('Помилка завантаження модифікацій:', error);
-        modSelect.innerHTML = '<option value="">Помилка завантаження</option>';
-    }
-}
+
 
 // Збереження подання
 async function saveSubmission() {
