@@ -628,6 +628,48 @@ textarea {
     .report-value {
         text-align: left;
     }
+    
+    /* Стилі для подання на мобільних */
+    .current-submission {
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    .current-submission h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .submission-display {
+        background: transparent;
+        backdrop-filter: none;
+        border-radius: 0;
+        padding: 0;
+    }
+    
+    .submission-display .info-row {
+        padding: 8px 0;
+        font-size: 0.9rem;
+    }
+    
+    .submission-display .info-section {
+        padding: 10px 0;
+    }
+    
+    .drone-info-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        border-radius: 6px;
+    }
+    
+    .drone-info-header {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+    
+    .drone-info-details {
+        font-size: 0.85rem;
+    }
 }
 
 /* Анімації для кнопок */
