@@ -731,9 +731,11 @@ function displayCurrentSubmission() {
         </div>
         <div class="info-row">
             <span class="info-label">Екіпаж:</span>
-            <span class="info-value">${currentSubmission.crew_members.map(member => 
-                member === currentSubmission.crew_leader ? `${member} (старший)` : member
-            ).join(', ')}</span>
+            <span class="info-value">
+                ${currentSubmission.crew_members.map(member => 
+                    member === currentSubmission.crew_leader ? `<strong>${member} (старший)</strong>` : member
+                ).join(', ')}
+            </span>
         </div>
     `;
     
@@ -745,11 +747,11 @@ function displayCurrentSubmission() {
                     <div class="drone-info-card">
                         <div class="drone-info-header">${d.label} <span class="badge">${d.count} шт</span></div>
                         <div class="drone-info-details">
-                            <span>Тип: ${d.type === 'day' ? 'Денний' : d.type === 'night' ? 'Нічний' : 'Денний/Нічний'}</span>
-                            <span>Відео: ${d.videoFrequency}</span>
-                            <span>Керування: ${d.controlFrequency}</span>
-                            <span>Канал: ${d.channel}</span>
-                            <span>Стан: ${d.modificationStatus === 'factory' ? 'Заводський' : `Модифікований (${d.modification})`}</span>
+                            <span><strong>Тип:</strong> ${d.type === 'day' ? 'Денний' : d.type === 'night' ? 'Нічний' : 'Денний/Нічний'}</span>
+                            <span><strong>Відео:</strong> ${d.videoFrequency}</span>
+                            <span><strong>Керування:</strong> ${d.controlFrequency}</span>
+                            <span><strong>Канал:</strong> ${d.channel || 'Не вказано'}</span>
+                            <span><strong>Стан:</strong> ${d.modificationStatus === 'factory' ? 'Заводський' : `Модифікований (${d.modification || 'деталі не вказані'})`}</span>
                         </div>
                     </div>
                 `).join('')}
@@ -782,13 +784,22 @@ function shareSubmission() {
     text += `📅 Період: ${formatDate(currentSubmission.date_from)} - ${formatDate(currentSubmission.date_to)}\n\n`;
     text += `👥 Склад екіпажу:\n`;
     currentSubmission.crew_members.forEach((member, i) => {
-        text += `${i + 1}. ${member}\n`;
+        const leaderMark = member === currentSubmission.crew_leader ? ' (старший)' : '';
+        text += `${i + 1}. ${member}${leaderMark}\n`;
     });
     
     if (currentSubmission.drones && currentSubmission.drones.length > 0) {
         text += `\n🚁 Засоби (Дрони):\n`;
         currentSubmission.drones.forEach(drone => {
+            const typeText = drone.type === 'day' ? 'Денний' : drone.type === 'night' ? 'Нічний' : 'Денний/Нічний';
+            const statusText = drone.modificationStatus === 'factory' ? 'Заводський' : `Модифікований (${drone.modification || 'деталі не вказані'})`;
+            
             text += `• ${drone.label}: ${drone.count} шт\n`;
+            text += `  - Тип: ${typeText}\n`;
+            text += `  - Частота відео: ${drone.videoFrequency}\n`;
+            text += `  - Частота керування: ${drone.controlFrequency}\n`;
+            text += `  - Канал: ${drone.channel || 'Не вказано'}\n`;
+            text += `  - Стан: ${statusText}\n\n`;
         });
     }
     
