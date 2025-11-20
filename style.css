@@ -1156,6 +1156,76 @@ textarea {
     margin-top: 10px;
 }
 
+/* Чекбокси для екіпажу */
+.crew-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.checkbox-label:hover {
+    border-color: #4facfe;
+    background: #f0f9ff;
+}
+
+.crew-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #4facfe;
+}
+
+.checkbox-label span {
+    flex: 1;
+    font-size: 1rem;
+    color: #2d3748;
+}
+
+.checkbox-label:has(.crew-checkbox:checked) {
+    border-color: #4facfe;
+    background: #e6f7ff;
+}
+
+.loading-text, .error-text {
+    color: #718096;
+    font-style: italic;
+    padding: 10px;
+}
+
+.error-text {
+    color: #e53e3e;
+}
+
+/* Контейнер для одного селекту */
+.single-resource-container {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.single-resource-container select {
+    width: 100%;
+}
+
 .resource-item {
     display: flex;
     align-items: center;

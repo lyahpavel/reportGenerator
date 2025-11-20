@@ -12,17 +12,17 @@ function initSubmission() {
     
     if (!submissionForm) return;
     
-    // Завантажити операторів в multiselect
+    // Завантажити операторів як чекбокси
     loadCrewMembers();
     
     // Завантажити поточне подання
     loadCurrentSubmission();
     
     // Додавання дрону
-    addDroneBtn.addEventListener('click', () => addResourceRow('drone'));
+    addDroneBtn?.addEventListener('click', () => addResourceRow('drone'));
     
     // Додавання БК
-    addBkBtn.addEventListener('click', () => addResourceRow('bk'));
+    addBkBtn?.addEventListener('click', () => addResourceRow('bk'));
     
     // Збереження подання
     submissionForm.addEventListener('submit', async (e) => {
@@ -40,10 +40,10 @@ function initSubmission() {
     document.getElementById('dutyDateFrom').value = today;
 }
 
-// Завантаження операторів для екіпажу
+// Завантаження операторів для екіпажу (чекбокси)
 async function loadCrewMembers() {
-    const crewSelect = document.getElementById('crewMembers');
-    if (!crewSelect) return;
+    const crewContainer = document.getElementById('crewMembers');
+    if (!crewContainer) return;
     
     try {
         // Завантажуємо операторів з user_custom_options
@@ -55,17 +55,28 @@ async function loadCrewMembers() {
         
         if (error) throw error;
         
-        crewSelect.innerHTML = '';
+        crewContainer.innerHTML = '';
         data.forEach(operator => {
-            const option = document.createElement('option');
-            option.value = operator.value;
-            option.textContent = operator.label;
-            crewSelect.appendChild(option);
+            const checkboxWrapper = document.createElement('label');
+            checkboxWrapper.className = 'checkbox-label';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'crewMember';
+            checkbox.value = operator.value;
+            checkbox.className = 'crew-checkbox';
+            
+            const span = document.createElement('span');
+            span.textContent = operator.label;
+            
+            checkboxWrapper.appendChild(checkbox);
+            checkboxWrapper.appendChild(span);
+            crewContainer.appendChild(checkboxWrapper);
         });
         
     } catch (error) {
         console.error('Помилка завантаження операторів:', error);
-        crewSelect.innerHTML = '<option value="">Помилка завантаження</option>';
+        crewContainer.innerHTML = '<p class="error-text">Помилка завантаження операторів</p>';
     }
 }
 
@@ -150,7 +161,7 @@ async function loadResourceOptions(selectId, type) {
         });
         
     } catch (error) {
-        console.error(`Помилка завантаження ${type}:`, error);
+        console.error(`Помилка завантаження опцій (${type}):`, error);
         select.innerHTML = '<option value="">Помилка завантаження</option>';
     }
 }
@@ -160,8 +171,10 @@ async function saveSubmission() {
     try {
         const dateFrom = document.getElementById('dutyDateFrom').value;
         const dateTo = document.getElementById('dutyDateTo').value;
-        const crewSelect = document.getElementById('crewMembers');
-        const crewMembers = Array.from(crewSelect.selectedOptions).map(opt => opt.value);
+        
+        // Збір екіпажу (чекбокси)
+        const crewCheckboxes = document.querySelectorAll('.crew-checkbox:checked');
+        const crewMembers = Array.from(crewCheckboxes).map(cb => cb.value);
         
         // Збір дронів
         const droneItems = document.querySelectorAll('.resource-item[data-type="drone"]');
@@ -193,7 +206,7 @@ async function saveSubmission() {
         }
         
         if (drones.length === 0 && bk.length === 0) {
-            showError('Додайте хоча б один засіб або БК');
+            showError('Додайте хоча б один дрон або БК');
             return;
         }
         
@@ -286,7 +299,7 @@ function displayCurrentSubmission() {
         </div>
         <div class="info-row">
             <span class="info-label">Екіпаж:</span>
-            <span class="info-value">${currentSubmission.crew_members.length} оператор(ів)</span>
+            <span class="info-value">${currentSubmission.crew_members.join(', ')}</span>
         </div>
     `;
     
@@ -303,6 +316,8 @@ function displayCurrentSubmission() {
         html += `<div class="info-row">
             <span class="info-label">БК:</span>
             <span class="info-value">
+                ${currentSubmission.bk.map(b => `${b.label}: ${b.count} шт`).join(', ')}
+            </span>
                 ${currentSubmission.bk.map(b => `${b.label}: ${b.count} шт`).join(', ')}
             </span>
         </div>`;
@@ -322,7 +337,7 @@ function shareSubmission() {
     
     let text = `📋 ПОДАННЯ НА ЧЕРГУВАННЯ\n\n`;
     text += `📅 Період: ${formatDate(currentSubmission.date_from)} - ${formatDate(currentSubmission.date_to)}\n\n`;
-    text += `👥 Склад екіпажу (${currentSubmission.crew_members.length}):\n`;
+    text += `👥 Склад екіпажу:\n`;
     currentSubmission.crew_members.forEach((member, i) => {
         text += `${i + 1}. ${member}\n`;
     });
@@ -335,7 +350,7 @@ function shareSubmission() {
     }
     
     if (currentSubmission.bk && currentSubmission.bk.length > 0) {
-        text += `\n💣 Боєкомплект:\n`;
+        text += `\n💥 Боєкомплект:\n`;
         currentSubmission.bk.forEach(item => {
             text += `• ${item.label}: ${item.count} шт\n`;
         });

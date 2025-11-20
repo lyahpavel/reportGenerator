@@ -69,5 +69,5 @@ COMMENT ON COLUMN public.submissions.user_id IS 'ID користувача, як
 COMMENT ON COLUMN public.submissions.date_from IS 'Дата початку чергування';
 COMMENT ON COLUMN public.submissions.date_to IS 'Дата закінчення чергування';
 COMMENT ON COLUMN public.submissions.crew_members IS 'Масив імен членів екіпажу';
-COMMENT ON COLUMN public.submissions.drones IS 'JSON масив об''єктів {name: string, count: number}';
-COMMENT ON COLUMN public.submissions.bk IS 'JSON масив об''єктів {name: string, count: number}';
+COMMENT ON COLUMN public.submissions.drones IS 'JSON масив об''єктів {name: string, label: string, count: number}';
+COMMENT ON COLUMN public.submissions.bk IS 'JSON масив об''єктів {name: string, label: string, count: number}';
