@@ -946,6 +946,9 @@ async function closeSubmission() {
         // Отримуємо поточне подання
         const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
         console.log('📦 Поточне подання:', currentSubmission);
+        console.log('📦 currentSubmission.id:', currentSubmission?.id);
+        console.log('📦 Тип currentSubmission:', typeof currentSubmission);
+        console.log('📦 Ключі currentSubmission:', currentSubmission ? Object.keys(currentSubmission) : 'null');
         
         if (!currentSubmission) {
             console.error('❌ Немає активного подання');
