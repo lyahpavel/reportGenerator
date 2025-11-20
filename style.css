@@ -325,10 +325,6 @@ header p {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.nav-icon {
-    font-size: 1.3rem;
-}
-
 .nav-label {
     font-weight: 600;
 }

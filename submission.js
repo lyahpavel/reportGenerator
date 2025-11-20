@@ -675,7 +675,7 @@ async function saveSubmission() {
         
         currentSubmission = submissionData;
         displayCurrentSubmission();
-        showSuccess('Подання збережено успішно! 📋');
+        showSuccess('Подання збережено успішно!');
         console.log('✅ Подання збережено в БД');
         
     } catch (error) {
@@ -780,16 +780,16 @@ function shareSubmission() {
     
     const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('uk-UA');
     
-    let text = `📋 ПОДАННЯ НА ЧЕРГУВАННЯ\n\n`;
-    text += `📅 Період: ${formatDate(currentSubmission.date_from)} - ${formatDate(currentSubmission.date_to)}\n\n`;
-    text += `👥 Склад екіпажу:\n`;
+    let text = `ПОДАННЯ НА ЧЕРГУВАННЯ\n\n`;
+    text += `Період: ${formatDate(currentSubmission.date_from)} - ${formatDate(currentSubmission.date_to)}\n\n`;
+    text += `Склад екіпажу:\n`;
     currentSubmission.crew_members.forEach((member, i) => {
         const leaderMark = member === currentSubmission.crew_leader ? ' (старший)' : '';
         text += `${i + 1}. ${member}${leaderMark}\n`;
     });
     
     if (currentSubmission.drones && currentSubmission.drones.length > 0) {
-        text += `\n🚁 Засоби (Дрони):\n`;
+        text += `\nЗасоби (Дрони):\n`;
         currentSubmission.drones.forEach(drone => {
             const typeText = drone.type === 'day' ? 'Денний' : drone.type === 'night' ? 'Нічний' : 'Денний/Нічний';
             const statusText = drone.modificationStatus === 'factory' ? 'Заводський' : `Модифікований (${drone.modification || 'деталі не вказані'})`;
@@ -804,7 +804,7 @@ function shareSubmission() {
     }
     
     if (currentSubmission.bk && currentSubmission.bk.length > 0) {
-        text += `\n💥 Боєкомплект:\n`;
+        text += `\nБоєкомплект:\n`;
         currentSubmission.bk.forEach(item => {
             text += `• ${item.label}: ${item.count} шт\n`;
         });
