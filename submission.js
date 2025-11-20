@@ -334,9 +334,8 @@ async function addResourceRow(type) {
                     </select>
                 </div>
                 <div class="resource-count">
-                    <button type="button" class="count-btn minus">−</button>
-                    <input type="number" class="count-input" value="1" min="1" max="999" required>
-                    <button type="button" class="count-btn plus">+</button>
+                    <input type="range" class="count-slider" value="1" min="1" max="20" step="1">
+                    <span class="count-value">1</span>
                 </div>
                 <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
             </div>
@@ -404,9 +403,8 @@ async function addResourceRow(type) {
                 </select>
             </div>
             <div class="resource-count">
-                <button type="button" class="count-btn minus">−</button>
-                <input type="number" class="count-input" value="1" min="1" max="999" required>
-                <button type="button" class="count-btn plus">+</button>
+                <input type="range" class="count-slider" value="1" min="1" max="20" step="1">
+                <span class="count-value">1</span>
             </div>
             <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
         `;
@@ -531,24 +529,14 @@ async function addResourceRow(type) {
         });
     }
     
-    // Обробники кнопок
-    const minusBtn = resourceItem.querySelector('.minus');
-    const plusBtn = resourceItem.querySelector('.plus');
-    const countInput = resourceItem.querySelector('.count-input');
+    // Обробники для слайдера кількості
+    const countSlider = resourceItem.querySelector('.count-slider');
+    const countValue = resourceItem.querySelector('.count-value');
     const removeBtn = resourceItem.querySelector('.remove-resource-btn');
     
-    minusBtn.addEventListener('click', () => {
-        const currentValue = parseInt(countInput.value) || 1;
-        if (currentValue > 1) {
-            countInput.value = currentValue - 1;
-        }
-    });
-    
-    plusBtn.addEventListener('click', () => {
-        const currentValue = parseInt(countInput.value) || 1;
-        if (currentValue < 999) {
-            countInput.value = currentValue + 1;
-        }
+    // Оновлення значення при зміні слайдера
+    countSlider.addEventListener('input', () => {
+        countValue.textContent = countSlider.value;
     });
     
     removeBtn.addEventListener('click', () => {
@@ -818,7 +806,7 @@ async function saveSubmission() {
         console.log('Знайдено рядків дронів:', droneItems.length);
         const drones = Array.from(droneItems).map(item => {
             const select = item.querySelector('select');
-            const count = parseInt(item.querySelector('.count-input').value) || 0;
+            const count = parseInt(item.querySelector('.count-slider').value) || 0;
             
             // Додаткові поля для дрона
             const type = item.querySelector('.drone-type')?.value || '';
@@ -888,7 +876,7 @@ async function saveSubmission() {
         console.log('Знайдено рядків БК:', bkItems.length);
         const bk = Array.from(bkItems).map(item => {
             const select = item.querySelector('select');
-            const count = parseInt(item.querySelector('.count-input').value) || 0;
+            const count = parseInt(item.querySelector('.count-slider').value) || 0;
             const bkData = {
                 name: select.value,
                 label: select.options[select.selectedIndex]?.text || select.value,
