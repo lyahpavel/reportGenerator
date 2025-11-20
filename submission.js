@@ -9,6 +9,18 @@ let bkButtonHandler = null;
 let submissionFormHandler = null;
 let shareButtonHandler = null;
 
+// Кеш для даних з БД (щоб не завантажувати кожен раз)
+let optionsCache = {
+    droneTypes: null,
+    videoFrequencies: null,
+    controlFrequencies: null,
+    channels: null,
+    modifications: null,
+    droneNames: null,
+    bkOptions: null,
+    operators: null
+};
+
 // Ініціалізація секції подання
 async function initSubmission() {
     const submissionForm = document.getElementById('submissionForm');
@@ -106,6 +118,64 @@ async function initSubmission() {
     // Встановити дату з сьогодні
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('dutyDateFrom').value = today;
+    
+    // Завантажити всі опції в кеш для швидкої роботи
+    await preloadOptionsCache();
+}
+
+// Функція для попереднього завантаження всіх опцій в кеш
+async function preloadOptionsCache() {
+    try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (!user) return;
+        
+        console.log('⏳ Завантаження опцій в кеш...');
+        
+        // Завантажити всі опції паралельно
+        const [
+            droneTypesData,
+            videoFreqData,
+            controlFreqData,
+            channelsData,
+            modificationsData,
+            droneNamesData,
+            bkOptionsData,
+            operatorsData
+        ] = await Promise.all([
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'cameraType').eq('user_id', user.id).order('label'),
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'videoFrequency').eq('user_id', user.id).order('label'),
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'controlFrequency').eq('user_id', user.id).order('label'),
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'channels').eq('user_id', user.id).order('label'),
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'modifications').eq('user_id', user.id).order('label'),
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'droneName').eq('user_id', user.id).order('label'),
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'bkOptions').eq('user_id', user.id).order('label'),
+            window.supabaseClient.from('user_custom_options').select('value, label').eq('option_type', 'operator').eq('user_id', user.id).order('label')
+        ]);
+        
+        // Зберегти в кеш
+        optionsCache.droneTypes = droneTypesData.data || [];
+        optionsCache.videoFrequencies = videoFreqData.data || [];
+        optionsCache.controlFrequencies = controlFreqData.data || [];
+        optionsCache.channels = channelsData.data || [];
+        optionsCache.modifications = modificationsData.data || [];
+        optionsCache.droneNames = droneNamesData.data || [];
+        optionsCache.bkOptions = bkOptionsData.data || [];
+        optionsCache.operators = operatorsData.data || [];
+        
+        console.log('✅ Кеш завантажено:', {
+            типи: optionsCache.droneTypes.length,
+            відео: optionsCache.videoFrequencies.length,
+            керування: optionsCache.controlFrequencies.length,
+            канали: optionsCache.channels.length,
+            модифікації: optionsCache.modifications.length,
+            дрони: optionsCache.droneNames.length,
+            БК: optionsCache.bkOptions.length,
+            оператори: optionsCache.operators.length
+        });
+        
+    } catch (error) {
+        console.error('❌ Помилка завантаження кешу:', error);
+    }
 }
 
 // Завантаження операторів для екіпажу (чекбокси)
@@ -131,24 +201,8 @@ async function loadCrewMembers() {
     if (!crewContainer) return;
     
     try {
-        if (!window.supabaseClient) {
-            throw new Error('Supabase клієнт не ініціалізовано');
-        }
-        
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        
-        // Завантажуємо операторів з user_custom_options
-        const { data, error } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', 'operator')
-            .eq('user_id', user.id)
-            .order('label');
-        
-        if (error) {
-            console.error('Supabase помилка:', error);
-            throw error;
-        }
+        // Використовуємо кеш
+        const data = optionsCache.operators || [];
         
         crewContainer.innerHTML = '';
         data.forEach(operator => {
@@ -472,19 +526,9 @@ async function loadResourceOptions(selectId, type) {
     const select = document.getElementById(selectId);
     if (!select) return;
 
-    const optionType = type === 'drone' ? 'droneName' : 'bkOptions';
-
     try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        
-        const { data, error } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', optionType)
-            .eq('user_id', user.id)
-            .order('label');
-
-        if (error) throw error;
+        // Використовуємо кеш
+        const data = type === 'drone' ? (optionsCache.droneNames || []) : (optionsCache.bkOptions || []);
 
         select.innerHTML = '<option value="">Оберіть...</option>';
         data.forEach(item => {
@@ -493,6 +537,8 @@ async function loadResourceOptions(selectId, type) {
             option.textContent = item.label;
             select.appendChild(option);
         });
+
+        console.log(`Опції завантажені з кешу (${type}):`, data.length);
 
         // Додаємо обробник зміни для дронів
         if (type === 'drone') {
@@ -596,16 +642,8 @@ async function loadDroneTypes(resourceItem) {
     if (!typeSelect) return;
     
     try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        
-        const { data, error } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', 'cameraType')
-            .eq('user_id', user.id)
-            .order('label');
-        
-        if (error) throw error;
+        // Використовуємо кеш замість запиту до БД
+        const data = optionsCache.droneTypes || [];
         
         typeSelect.innerHTML = '<option value="">Оберіть тип</option>';
         data.forEach(item => {
@@ -615,7 +653,7 @@ async function loadDroneTypes(resourceItem) {
             typeSelect.appendChild(option);
         });
         
-        console.log('Типи дронів завантажені:', data.length);
+        console.log('Типи дронів завантажені з кешу:', data.length);
         
     } catch (error) {
         console.error('Помилка завантаження типів дронів:', error);
@@ -635,17 +673,9 @@ async function loadDroneFrequencies(resourceItem) {
     }
     
     try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        
-        // Завантажити частоти відео
-        const { data: videoData, error: videoError } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', 'videoFrequency')
-            .eq('user_id', user.id)
-            .order('label');
-        
-        if (videoError) throw videoError;
+        // Використовуємо кеш замість запитів до БД
+        const videoData = optionsCache.videoFrequencies || [];
+        const controlData = optionsCache.controlFrequencies || [];
         
         videoFreqSelect.innerHTML = '<option value="">Оберіть частоту відео</option>';
         videoData.forEach(item => {
@@ -655,16 +685,6 @@ async function loadDroneFrequencies(resourceItem) {
             videoFreqSelect.appendChild(option);
         });
         
-        // Завантажити частоти керування
-        const { data: controlData, error: controlError } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', 'controlFrequency')
-            .eq('user_id', user.id)
-            .order('label');
-        
-        if (controlError) throw controlError;
-        
         controlFreqSelect.innerHTML = '<option value="">Оберіть частоту керування</option>';
         controlData.forEach(item => {
             const option = document.createElement('option');
@@ -673,7 +693,7 @@ async function loadDroneFrequencies(resourceItem) {
             controlFreqSelect.appendChild(option);
         });
         
-        console.log('Частоти завантажені, відео:', videoData.length, 'керування:', controlData.length);
+        console.log('Частоти завантажені з кешу, відео:', videoData.length, 'керування:', controlData.length);
         
     } catch (error) {
         console.error('Помилка завантаження частот:', error);
@@ -688,16 +708,8 @@ async function loadDroneChannels(resourceItem) {
     if (!channelSelect) return;
     
     try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        
-        const { data, error } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', 'channels')
-            .eq('user_id', user.id)
-            .order('label');
-        
-        if (error) throw error;
+        // Використовуємо кеш
+        const data = optionsCache.channels || [];
         
         channelSelect.innerHTML = '<option value="">Оберіть канал...</option>';
         data.forEach(item => {
@@ -711,7 +723,7 @@ async function loadDroneChannels(resourceItem) {
         const uniqueId = `drone-channel-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         channelSelect.id = uniqueId;
         
-        console.log('Канали завантажені:', data.length, 'ID:', uniqueId);
+        console.log('Канали завантажені з кешу:', data.length, 'ID:', uniqueId);
         
     } catch (error) {
         console.error('Помилка завантаження каналів:', error);
@@ -725,16 +737,8 @@ async function loadDroneModifications(resourceItem) {
     if (!modSelect) return;
     
     try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        
-        const { data, error } = await window.supabaseClient
-            .from('user_custom_options')
-            .select('value, label')
-            .eq('option_type', 'modifications')
-            .eq('user_id', user.id)
-            .order('label');
-        
-        if (error) throw error;
+        // Використовуємо кеш
+        const data = optionsCache.modifications || [];
         
         modSelect.innerHTML = '<option value="">Оберіть модифікації...</option>';
         data.forEach(item => {
@@ -748,7 +752,7 @@ async function loadDroneModifications(resourceItem) {
         const uniqueId = `drone-mod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         modSelect.id = uniqueId;
         
-        console.log('Модифікації завантажені:', data.length, 'ID:', uniqueId);
+        console.log('Модифікації завантажені з кешу:', data.length, 'ID:', uniqueId);
         
     } catch (error) {
         console.error('Помилка завантаження модифікацій:', error);
