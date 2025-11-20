@@ -194,13 +194,14 @@ function populateSelects() {
     // Отримуємо поточне подання для фільтрації
     const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
     
-    // Заповнення дронів (три окремі поля)
-    // Якщо є активне подання - фільтруємо по ньому
+    // Заповнення дронів з поточного подання
     if (currentSubmission && currentSubmission.drones && currentSubmission.drones.length > 0) {
-        const availableDrones = appData.droneNames.filter(drone => {
-            const submissionDrone = currentSubmission.drones.find(d => d.name === drone.value);
-            return submissionDrone && submissionDrone.count > 0;
-        });
+        const availableDrones = currentSubmission.drones
+            .filter(drone => drone.count > 0)
+            .map(drone => ({
+                value: drone.name || drone.label,
+                label: `${drone.label} (${drone.count} шт)`
+            }));
         populateSelect('droneName', availableDrones.length > 0 ? availableDrones : appData.droneNames);
     } else {
         populateSelect('droneName', appData.droneNames);
@@ -1005,6 +1006,72 @@ function toggleCustomSettlement() {
             }
         }
     }
+}
+
+// Автозаповнення полів звіту при виборі дрона з подання
+function autoFillReportDroneFields() {
+    const select = document.getElementById('droneName');
+    const selectedValue = select.value;
+    
+    if (!selectedValue) return;
+    
+    const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+    if (!currentSubmission || !currentSubmission.drones) return;
+    
+    // Знаходимо вибраний дрон в поточному поданні
+    const selectedDrone = currentSubmission.drones.find(drone => 
+        (drone.name || drone.label) === selectedValue
+    );
+    
+    if (!selectedDrone) return;
+    
+    // Заповнюємо поля форми звіту
+    const videoFreqSelect = document.getElementById('videoFrequency');
+    const controlFreqSelect = document.getElementById('controlFrequency');
+    const channelInput = document.getElementById('channel');
+    const cameraTypeSelect = document.getElementById('cameraType');
+    
+    // Частота відео
+    if (videoFreqSelect && selectedDrone.videoFrequency) {
+        const option = Array.from(videoFreqSelect.options).find(opt => 
+            opt.value === selectedDrone.videoFrequency
+        );
+        if (option) {
+            videoFreqSelect.value = selectedDrone.videoFrequency;
+        }
+    }
+    
+    // Частота керування
+    if (controlFreqSelect && selectedDrone.controlFrequency) {
+        const option = Array.from(controlFreqSelect.options).find(opt => 
+            opt.value === selectedDrone.controlFrequency
+        );
+        if (option) {
+            controlFreqSelect.value = selectedDrone.controlFrequency;
+        }
+    }
+    
+    // Канал
+    if (channelInput && selectedDrone.channel) {
+        channelInput.value = selectedDrone.channel;
+    }
+    
+    // Тип камери (підбираємо на основі типу дрона)
+    if (cameraTypeSelect && selectedDrone.type) {
+        if (selectedDrone.type === 'night') {
+            const nightOption = Array.from(cameraTypeSelect.options).find(opt => 
+                opt.value.includes('Тепловізор') || opt.value.includes('Ніч')
+            );
+            if (nightOption) cameraTypeSelect.value = nightOption.value;
+        } else if (selectedDrone.type === 'day-night') {
+            const dayNightOption = Array.from(cameraTypeSelect.options).find(opt => 
+                opt.value.includes('Ніч/день')
+            );
+            if (dayNightOption) cameraTypeSelect.value = dayNightOption.value;
+        }
+    }
+    
+    console.log('✅ Поля звіту автозаповнено:', selectedDrone);
 }
 
 // Функція для показу/приховування поля ручного введення назви дрону
@@ -1880,7 +1947,7 @@ function initRouter() {
     
     // Функція переключення сторінок
     function navigate() {
-        const hash = window.location.hash.slice(1) || 'submission';
+        const hash = window.location.hash.slice(1) || 'generator';
         const page = hash.split('/')[0]; // Беремо першу частину хешу
         
         // Оновлюємо активний таб

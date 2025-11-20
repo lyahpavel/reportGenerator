@@ -388,18 +388,18 @@ async function addResourceRow(type) {
 async function loadResourceOptions(selectId, type) {
     const select = document.getElementById(selectId);
     if (!select) return;
-    
+
     const optionType = type === 'drone' ? 'droneName' : 'bkOptions';
-    
+
     try {
         const { data, error } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
             .eq('option_type', optionType)
             .order('label');
-        
+
         if (error) throw error;
-        
+
         select.innerHTML = '<option value="">Оберіть...</option>';
         data.forEach(item => {
             const option = document.createElement('option');
@@ -407,11 +407,82 @@ async function loadResourceOptions(selectId, type) {
             option.textContent = item.label;
             select.appendChild(option);
         });
-        
+
+        // Додаємо обробник зміни для дронів
+        if (type === 'drone') {
+            select.addEventListener('change', () => {
+                autoFillDroneFields(select);
+            });
+        }
+
     } catch (error) {
         console.error(`Помилка завантаження опцій (${type}):`, error);
         select.innerHTML = '<option value="">Помилка завантаження</option>';
     }
+}// Автозаповнення полів дрона при виборі
+function autoFillDroneFields(select) {
+    const selectedValue = select.value;
+    if (!selectedValue || !currentSubmission || !currentSubmission.drones) return;
+
+    const resourceItem = select.closest('.resource-item');
+    if (!resourceItem) return;
+
+    // Знаходимо вибраний дрон в поточному поданні
+    const selectedDrone = currentSubmission.drones.find(drone => (drone.name || drone.label) === selectedValue);
+    if (!selectedDrone) return;
+
+    // Заповнюємо поля
+    const typeSelect = resourceItem.querySelector('.drone-type');
+    const videoFreqSelect = resourceItem.querySelector('.drone-video-freq');
+    const controlFreqSelect = resourceItem.querySelector('.drone-control-freq');
+    const channelSelect = resourceItem.querySelector('.drone-channel');
+    const statusSelect = resourceItem.querySelector('.drone-modification-status');
+    const modificationSelect = resourceItem.querySelector('.drone-modification');
+
+    if (typeSelect && selectedDrone.type) {
+        typeSelect.value = selectedDrone.type;
+    }
+
+    if (videoFreqSelect && selectedDrone.videoFrequency) {
+        // Спробуємо знайти відповідну опцію
+        const option = Array.from(videoFreqSelect.options).find(opt => opt.value === selectedDrone.videoFrequency);
+        if (option) {
+            videoFreqSelect.value = selectedDrone.videoFrequency;
+        }
+    }
+
+    if (controlFreqSelect && selectedDrone.controlFrequency) {
+        const option = Array.from(controlFreqSelect.options).find(opt => opt.value === selectedDrone.controlFrequency);
+        if (option) {
+            controlFreqSelect.value = selectedDrone.controlFrequency;
+        }
+    }
+
+    if (channelSelect && selectedDrone.channel) {
+        // Для мультиселекту каналів
+        if (window.customMultiSelects && window.customMultiSelects[channelSelect.id]) {
+            window.customMultiSelects[channelSelect.id].setValue([selectedDrone.channel]);
+        }
+    }
+
+    if (statusSelect && selectedDrone.modificationStatus) {
+        statusSelect.value = selectedDrone.modificationStatus;
+
+        // Показуємо/ховаємо поле модифікацій
+        const modificationField = resourceItem.querySelector('.modification-details-field');
+        if (modificationField) {
+            modificationField.style.display = selectedDrone.modificationStatus === 'modified' ? 'block' : 'none';
+        }
+    }
+
+    if (modificationSelect && selectedDrone.modification) {
+        // Для мультиселекту модифікацій
+        if (window.customMultiSelects && window.customMultiSelects[modificationSelect.id]) {
+            window.customMultiSelects[modificationSelect.id].setValue([selectedDrone.modification]);
+        }
+    }
+
+    console.log('✅ Поля дрона автозаповнено:', selectedDrone);
 }
 
 // Завантаження частот для дронів з БД

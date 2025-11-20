@@ -83,10 +83,10 @@
             
             <!-- Навігація -->
             <nav class="main-nav">
-                <button class="nav-tab active" data-page="submission">
+                <button class="nav-tab" data-page="submission">
                     <span class="nav-label">Подання</span>
                 </button>
-                <button class="nav-tab" data-page="generator">
+                <button class="nav-tab active" data-page="generator">
                     <span class="nav-label">Новий звіт</span>
                 </button>
                 <button class="nav-tab" data-page="archive">
@@ -108,7 +108,7 @@
         </header>
 
         <!-- Секція: Подання -->
-        <section id="submissionSection" class="page-section active">
+        <section id="submissionSection" class="page-section">
             <h2>Подання на чергування</h2>
             <div class="submission-content">
                 <form id="submissionForm" class="submission-form">
@@ -166,7 +166,7 @@
         </section>
 
         <!-- Секція: Генератор звітів -->
-        <section id="generatorSection" class="page-section">
+        <section id="generatorSection" class="page-section active">
         <form id="reportForm" class="report-form">
             <!-- Додавання відео -->
             <div class="form-group video-upload-section">
@@ -214,9 +214,9 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="droneName">Назва дрону:</label>
-                    <select id="droneName" name="droneName" required onchange="toggleCustomDroneName()">
+                    <select id="droneName" name="droneName" required onchange="autoFillReportDroneFields()">
                         <option value="">Оберіть назву дрону...</option>
-                        <!-- Опції заповнюються динамічно з data.json -->
+                        <!-- Опції заповнюються динамічно з поточного подання -->
                     </select>
                     <div class="custom-input-wrapper" style="display: none;">
                         <input type="text" id="customDroneName" name="customDroneName" placeholder="Введіть назву дрону..." data-save-option="false">
