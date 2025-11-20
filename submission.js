@@ -78,19 +78,26 @@ async function initSubmission() {
 // Завантаження операторів для екіпажу (чекбокси)
 // Функція для оновлення відображення старшого екіпажу
 function updateCrewLeaderIndication() {
-    // Спочатку прибираємо клас та текст "(старший)" від всіх лейблів
+    // Спочатку прибираємо клас та відновлюємо оригінальні імена від всіх лейблів
     document.querySelectorAll('.crew-name-label').forEach(label => {
         label.classList.remove('crew-leader');
-        label.textContent = label.textContent.replace(' (старший)', '');
+        // Відновлюємо оригінальне ім'я з data-original-name
+        if (label.dataset.originalName) {
+            label.textContent = label.dataset.originalName;
+        }
     });
     
-    // Додаємо клас та текст "(старший)" до вибраного
+    // Для вибраного лідера показуємо тільки "старший"
     const selectedRadio = document.querySelector('.crew-leader-input:checked');
     if (selectedRadio) {
         const leaderLabel = document.querySelector(`label[for="crew-${selectedRadio.value}"]`);
         if (leaderLabel) {
+            // Зберігаємо оригінальне ім'я
+            if (!leaderLabel.dataset.originalName) {
+                leaderLabel.dataset.originalName = leaderLabel.textContent;
+            }
             leaderLabel.classList.add('crew-leader');
-            leaderLabel.textContent += ' (старший)';
+            leaderLabel.textContent = 'старший';
         }
     }
 }
@@ -133,6 +140,7 @@ async function loadCrewMembers() {
             checkboxLabel.htmlFor = `crew-${operator.value}`;
             checkboxLabel.textContent = operator.label;
             checkboxLabel.className = 'crew-name-label';
+            checkboxLabel.dataset.originalName = operator.label; // Зберігаємо оригінальне ім'я
             
             // Радіобатон для старшого екіпажу
             const radioWrapper = document.createElement('span');
