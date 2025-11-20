@@ -300,7 +300,7 @@ async function loadDroneFrequencies(resourceItem) {
         const { data: videoData, error: videoError } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
-            .eq('option_type', 'videoFrequencies')
+            .eq('option_type', 'videoFrequency')
             .order('label');
         
         if (videoError) throw videoError;
@@ -317,7 +317,7 @@ async function loadDroneFrequencies(resourceItem) {
         const { data: controlData, error: controlError } = await window.supabaseClient
             .from('user_custom_options')
             .select('value, label')
-            .eq('option_type', 'controlFrequencies')
+            .eq('option_type', 'controlFrequency')
             .order('label');
         
         if (controlError) throw controlError;
