@@ -746,6 +746,12 @@ async function saveSubmission() {
         
         currentSubmission = submissionData;
         displayCurrentSubmission();
+        
+        // Оновити списки дронів/БК в генераторі звітів
+        if (window.populateSelects) {
+            window.populateSelects();
+        }
+        
         showSuccess('Подання збережено успішно!');
         console.log('✅ Подання збережено в БД');
         
@@ -774,6 +780,11 @@ async function loadCurrentSubmission() {
             
             // Відновити вибір екіпажу
             restoreCrewSelection(data);
+
+            // Оновити списки дронів/БК в генераторі звітів
+            if (window.populateSelects) {
+                window.populateSelects();
+            }
         }
         
     } catch (error) {

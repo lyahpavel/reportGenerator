@@ -181,11 +181,16 @@ async function loadData() {
     
     // В будь-якому випадку заповнюємо селекти
     populateSelects();
+    
+    // Експортуємо функцію для глобального використання
+    window.populateSelects = populateSelects;
 }
 
 // Заповнення випадаючих списків даними
 function populateSelects() {
     if (!appData) return;
+    
+    console.log('🔄 populateSelects викликано');
     
     // Заповнення підрозділів
     populateSelect('subdivision', appData.subdivisions);
@@ -193,6 +198,7 @@ function populateSelects() {
     
     // Отримуємо поточне подання для фільтрації
     const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+    console.log('📋 Поточне подання:', currentSubmission);
     
     // Заповнення дронів ТІЛЬКИ з поточного подання
     if (currentSubmission && currentSubmission.drones && currentSubmission.drones.length > 0) {
