@@ -1014,8 +1014,30 @@ async function closeSubmission() {
         if (removeVideoBtn) removeVideoBtn.style.display = 'none';
         
         // Очистити відображення подання
-        if (window.submissionFunctions?.loadCurrentSubmission) {
-            await window.submissionFunctions.loadCurrentSubmission();
+        const currentSubmissionContainer = document.getElementById('currentSubmission');
+        if (currentSubmissionContainer) {
+            currentSubmissionContainer.classList.add('hidden');
+        }
+        
+        // Очистити форму подання
+        const submissionForm = document.getElementById('submissionForm');
+        if (submissionForm) {
+            submissionForm.reset();
+        }
+        
+        // Очистити контейнери дронів та БК
+        const dronesContainer = document.getElementById('dronesContainer');
+        const bkContainer = document.getElementById('bkContainer');
+        if (dronesContainer) {
+            dronesContainer.innerHTML = '<button type="button" class="btn btn-outline" id="addDroneBtn">+ Додати дрон</button>';
+        }
+        if (bkContainer) {
+            bkContainer.innerHTML = '<button type="button" class="btn btn-outline" id="addBkBtn">+ Додати БК</button>';
+        }
+        
+        // Перепідключити обробники кнопок після очищення
+        if (window.submissionFunctions?.initSubmission) {
+            window.submissionFunctions.initSubmission();
         }
         
         // Оновити списки в генераторі
