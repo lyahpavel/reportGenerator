@@ -984,6 +984,8 @@ async function closeSubmission() {
         
         // 1. Зберегти подання в архів
         const submissionId = currentSubmission.id;
+        console.log('📝 Submission ID для видалення:', submissionId);
+        
         const archiveData = {
             user_id: user.id,
             submission_id: submissionId,
@@ -995,6 +997,8 @@ async function closeSubmission() {
             bk: currentSubmission.bk,
             archived_at: new Date().toISOString()
         };
+        
+        console.log('💾 Дані для архівування:', archiveData);
         
         const { data: archivedSubmission, error: archiveError } = await supabase
             .from('archived_submissions')
@@ -1050,9 +1054,11 @@ async function closeSubmission() {
         const { error: deleteError } = await supabase
             .from('submissions')
             .delete()
+            .eq('id', submissionId)
             .eq('user_id', user.id);
         
         if (deleteError) {
+            console.error('Помилка видалення подання:', deleteError);
             throw deleteError;
         }
         
