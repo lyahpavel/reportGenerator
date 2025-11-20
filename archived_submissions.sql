@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS archived_submissions (
     id BIGSERIAL PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    submission_id BIGINT, -- ID оригінального подання
+    submission_id UUID, -- ID оригінального подання (UUID, бо submissions.id це UUID)
     date_from DATE NOT NULL,
     date_to DATE NOT NULL,
     crew_members TEXT[] NOT NULL, -- Масив імен членів екіпажу
@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_reports_archived_submission ON reports(archived_s
 
 -- Коментарі для документації
 COMMENT ON TABLE archived_submissions IS 'Архівні подання - збережені подання після закриття з усіма деталями';
-COMMENT ON COLUMN archived_submissions.submission_id IS 'ID оригінального подання з таблиці submissions (перед видаленням)';
+COMMENT ON COLUMN archived_submissions.submission_id IS 'UUID оригінального подання з таблиці submissions (перед видаленням)';
 COMMENT ON COLUMN archived_submissions.drones IS 'Масив дронів: [{name, label, count, type, videoFrequency, controlFrequency, channel, hasFiberOptic, fiberCableLength, modificationStatus, modification}]';
 COMMENT ON COLUMN archived_submissions.bk IS 'Масив боєкомплектів: [{name, label, count}]';
 COMMENT ON COLUMN reports.archived_submission_id IS 'Посилання на архівне подання, до якого належить звіт';
