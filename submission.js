@@ -119,6 +119,7 @@ function addResourceRow(type) {
     
     // Для дронів - розширена структура з додатковими полями
     if (type === 'drone') {
+        console.log('Створюємо HTML для дрона');
         resourceItem.innerHTML = `
             <div class="drone-main-row">
                 <div class="resource-select">
@@ -177,8 +178,12 @@ function addResourceRow(type) {
                 </div>
             </div>
         `;
+        console.log('HTML дрона створено');
+        console.log('drone-details елемент:', resourceItem.querySelector('.drone-details'));
+        console.log('drone-main-row елемент:', resourceItem.querySelector('.drone-main-row'));
     } else {
         // Для БК - проста структура
+        console.log('Створюємо HTML для БК');
         resourceItem.innerHTML = `
             <div class="resource-select">
                 <select id="${selectId}" class="form-control" required>
@@ -196,6 +201,7 @@ function addResourceRow(type) {
     
     // Завжди додаємо елемент, а потім переміщуємо кнопку в кінець
     container.appendChild(resourceItem);
+    console.log('Елемент додано в DOM');
     
     // Переміщуємо кнопку "Додати" в самий кінець
     if (button && button.parentNode === container) {

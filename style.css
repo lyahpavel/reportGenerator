@@ -1298,6 +1298,17 @@ textarea {
     padding: 8px;
 }
 
+/* БК зберігає стару структуру */
+.resource-item[data-type="bk"] {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.resource-item[data-type="bk"] .resource-select {
+    flex: 2;
+}
+
 .resource-select {
     flex: 2;
 }
