@@ -5,6 +5,7 @@ const reportContent = document.getElementById('reportContent');
 const downloadButton = document.getElementById('downloadReport');
 const newReportButton = document.getElementById('newReport');
 const newReportBasedOnButton = document.getElementById('newReportBasedOn');
+const closeSubmissionButton = document.getElementById('closeSubmission');
 
 // Глобальна змінна для зберігання даних
 let appData = null;
@@ -877,11 +878,10 @@ newReportButton.addEventListener('click', function() {
     reportForm.scrollIntoView({ behavior: 'smooth' });
 });
 
-// Закриття звіту (кнопка)
-const closeReportButton = document.getElementById('closeReport');
-if (closeReportButton) {
-    closeReportButton.addEventListener('click', async function() {
-        await closeReport();
+// Закриття подання (кнопка)
+if (closeSubmissionButton) {
+    closeSubmissionButton.addEventListener('click', async function() {
+        await closeSubmission();
     });
 }
 
@@ -937,8 +937,8 @@ function reloadData() {
     showSuccess('Дані перезавантажено');
 }
 
-// Функція для закриття звіту (архівування подання та очищення таблиці suggestions)
-async function closeReport() {
+// Функція для закриття подання (архівування та очищення таблиці suggestions)
+async function closeSubmission() {
     try {
         // Отримуємо поточне подання
         const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
@@ -950,11 +950,11 @@ async function closeReport() {
         
         // Підтвердження від користувача
         const confirmed = confirm(
-            'Ви впевнені, що хочете закрити звіт?\n\n' +
+            'Ви впевнені, що хочете закрити подання?\n\n' +
             'Це призведе до:\n' +
             '- Видалення поточного подання\n' +
             '- Очищення даних з таблиці suggestions\n' +
-            '- Збереження всіх звітів в архів\n\n' +
+            '- Всі згенеровані звіти залишаться в архіві\n\n' +
             'Продовжити?'
         );
         
@@ -970,7 +970,7 @@ async function closeReport() {
             throw new Error('Користувач не авторизований');
         }
         
-        console.log('Закриття звіту для користувача:', user.id);
+        console.log('Закриття подання для користувача:', user.id);
         
         // 1. Видаляємо дані з таблиці suggestions (якщо вона існує)
         try {
@@ -1024,14 +1024,14 @@ async function closeReport() {
         }
         
         // 4. Показуємо повідомлення про успіх
-        showSuccess('Звіт закрито! Подання архівовано, дані очищено.');
+        showSuccess('Подання закрито! Дані очищено, можна почати нове подання.');
         
         // Прокрутити до початку
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
     } catch (error) {
-        console.error('❌ Помилка закриття звіту:', error);
-        showError('Не вдалося закрити звіт: ' + error.message);
+        console.error('❌ Помилка закриття подання:', error);
+        showError('Не вдалося закрити подання: ' + error.message);
     }
 }
 
