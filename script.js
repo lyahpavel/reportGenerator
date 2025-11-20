@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Обробка відправки форми
-reportForm.addEventListener('submit', function(e) {
+reportForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // Збір даних з форми
@@ -448,7 +448,16 @@ reportForm.addEventListener('submit', function(e) {
     
     // Зберегти звіт у Supabase (асинхронно, не блокуємо UI)
     if (window.supabaseFunctions && window.supabaseClient) {
-        window.supabaseFunctions.saveReportToSupabase(formData).catch(error => {
+        window.supabaseFunctions.saveReportToSupabase(formData).then(async () => {
+            // Після успішного збереження перезавантажити подання
+            if (window.submissionFunctions?.loadCurrentSubmission) {
+                await window.submissionFunctions.loadCurrentSubmission();
+            }
+            // Потім оновити селекти
+            if (typeof populateSelects === 'function') {
+                await populateSelects();
+            }
+        }).catch(error => {
             console.error('Не вдалося зберегти звіт:', error);
             // Не показуємо помилку користувачу, якщо збереження не вдалося
             // Звіт все одно буде доступний локально
