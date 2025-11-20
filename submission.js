@@ -253,6 +253,7 @@ async function saveSubmission() {
         }
         
         const { data: { user } } = await window.supabaseClient.auth.getUser();
+        console.log('User ID:', user.id);
         
         const submissionData = {
             user_id: user.id,
@@ -263,33 +264,44 @@ async function saveSubmission() {
             bk: bk,
             updated_at: new Date().toISOString()
         };
+        console.log('Дані для збереження:', submissionData);
         
         // Перевірити чи є вже подання
-        const { data: existing } = await window.supabaseClient
+        const { data: existing, error: existingError } = await window.supabaseClient
             .from('submissions')
             .select('id')
             .eq('user_id', user.id)
             .single();
         
+        console.log('Існуюче подання:', existing, 'Помилка:', existingError);
+        
         let result;
         if (existing) {
             // Оновити існуюче
+            console.log('Оновлюємо існуюче подання:', existing.id);
             result = await window.supabaseClient
                 .from('submissions')
                 .update(submissionData)
                 .eq('id', existing.id);
         } else {
             // Створити нове
+            console.log('Створюємо нове подання');
             result = await window.supabaseClient
                 .from('submissions')
                 .insert([submissionData]);
         }
         
-        if (result.error) throw result.error;
+        console.log('Результат збереження:', result);
+        
+        if (result.error) {
+            console.error('Помилка від Supabase:', result.error);
+            throw result.error;
+        }
         
         currentSubmission = submissionData;
         displayCurrentSubmission();
         showSuccess('Подання збережено успішно! 📋');
+        console.log('✅ Подання збережено в БД');
         
     } catch (error) {
         console.error('Помилка збереження подання:', error);
