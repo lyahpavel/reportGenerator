@@ -172,7 +172,8 @@ function addResourceRow(type) {
                 </div>
                 <div class="drone-field modification-details-field" style="display: none;">
                     <label>Модифікації (через кому)</label>
-                    <input type="text" class="drone-modification form-control" placeholder="5.8 GHz, FPV антена...">
+                    <input type="text" class="drone-modification form-control" placeholder="5.8 GHz, FPV антена..." list="modificationsList_${Date.now()}">
+                    <datalist id="modificationsList_${Date.now()}"></datalist>
                 </div>
             </div>
         `;
@@ -215,6 +216,7 @@ function addResourceRow(type) {
     if (type === 'drone') {
         loadDroneFrequencies(resourceItem);
         loadDroneChannels(resourceItem);
+        loadDroneModifications(resourceItem);
         
         // Показати/сховати поле модифікації залежно від статусу
         const modStatusSelect = resourceItem.querySelector('.drone-modification-status');
@@ -364,6 +366,38 @@ async function loadDroneChannels(resourceItem) {
     } catch (error) {
         console.error('Помилка завантаження каналів:', error);
         channelSelect.innerHTML = '<option value="">Помилка завантаження</option>';
+    }
+}
+
+// Завантаження модифікацій в datalist
+async function loadDroneModifications(resourceItem) {
+    const modInput = resourceItem.querySelector('.drone-modification');
+    if (!modInput) return;
+    
+    const datalistId = modInput.getAttribute('list');
+    const datalist = resourceItem.querySelector(`#${datalistId}`);
+    if (!datalist) return;
+    
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('user_custom_options')
+            .select('value, label')
+            .eq('option_type', 'modifications')
+            .order('label');
+        
+        if (error) throw error;
+        
+        datalist.innerHTML = '';
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            datalist.appendChild(option);
+        });
+        
+        console.log('Модифікації завантажені:', data.length);
+        
+    } catch (error) {
+        console.error('Помилка завантаження модифікацій:', error);
     }
 }
 
