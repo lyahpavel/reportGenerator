@@ -1497,24 +1497,6 @@ textarea {
     cursor: pointer;
     user-select: none;
 }
-
-/* БК зберігає стару структуру */
-.resource-item[data-type="bk"] {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.resource-item[data-type="bk"] .resource-count {
-    flex-shrink: 0;
-    margin-left: auto;
-}
-
-.resource-item[data-type="bk"] .resource-select {
-    flex: 1;
-    min-width: 0;
-}
-
 .resource-select {
     flex: 1;
     min-width: 0;
