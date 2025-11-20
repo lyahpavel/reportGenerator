@@ -78,26 +78,17 @@ async function initSubmission() {
 // Завантаження операторів для екіпажу (чекбокси)
 // Функція для оновлення відображення старшого екіпажу
 function updateCrewLeaderIndication() {
-    // Спочатку прибираємо клас та відновлюємо оригінальні імена від всіх лейблів
+    // Спочатку прибираємо клас від всіх лейблів
     document.querySelectorAll('.crew-name-label').forEach(label => {
         label.classList.remove('crew-leader');
-        // Відновлюємо оригінальне ім'я з data-original-name
-        if (label.dataset.originalName) {
-            label.textContent = label.dataset.originalName;
-        }
     });
     
-    // Для вибраного лідера показуємо тільки "старший"
+    // Додаємо клас до вибраного лідера
     const selectedRadio = document.querySelector('.crew-leader-input:checked');
     if (selectedRadio) {
         const leaderLabel = document.querySelector(`label[for="crew-${selectedRadio.value}"]`);
         if (leaderLabel) {
-            // Зберігаємо оригінальне ім'я
-            if (!leaderLabel.dataset.originalName) {
-                leaderLabel.dataset.originalName = leaderLabel.textContent;
-            }
             leaderLabel.classList.add('crew-leader');
-            leaderLabel.textContent = 'старший';
         }
     }
 }
@@ -140,7 +131,6 @@ async function loadCrewMembers() {
             checkboxLabel.htmlFor = `crew-${operator.value}`;
             checkboxLabel.textContent = operator.label;
             checkboxLabel.className = 'crew-name-label';
-            checkboxLabel.dataset.originalName = operator.label; // Зберігаємо оригінальне ім'я
             
             // Радіобатон для старшого екіпажу
             const radioWrapper = document.createElement('span');
@@ -741,7 +731,9 @@ function displayCurrentSubmission() {
         </div>
         <div class="info-row">
             <span class="info-label">Екіпаж:</span>
-            <span class="info-value">${currentSubmission.crew_members.join(', ')}${currentSubmission.crew_leader ? ` (Старший: ${currentSubmission.crew_leader})` : ''}</span>
+            <span class="info-value">${currentSubmission.crew_members.map(member => 
+                member === currentSubmission.crew_leader ? `${member} (старший)` : member
+            ).join(', ')}</span>
         </div>
     `;
     
