@@ -1102,6 +1102,11 @@ async function closeSubmission() {
             bkContainer.innerHTML = '<button type="button" class="btn btn-outline" id="addBkBtn">+ Додати БК</button>';
         }
         
+        // ВАЖЛИВО: Очистити змінну currentSubmission в submission.js
+        if (window.submissionFunctions?.clearSubmission) {
+            window.submissionFunctions.clearSubmission();
+        }
+        
         // Перепідключити обробники кнопок після очищення
         if (window.submissionFunctions?.initSubmission) {
             window.submissionFunctions.initSubmission();

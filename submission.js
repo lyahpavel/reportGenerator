@@ -1131,9 +1131,16 @@ function getCurrentSubmission() {
     return currentSubmission;
 }
 
+// Очищення поточного подання (викликається при закритті)
+function clearSubmission() {
+    console.log('🧹 Очищення currentSubmission');
+    currentSubmission = null;
+}
+
 // Експорт функцій
 window.submissionFunctions = {
     initSubmission,
     getCurrentSubmission,
-    loadCurrentSubmission
+    loadCurrentSubmission,
+    clearSubmission
 };
