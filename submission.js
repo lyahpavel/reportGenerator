@@ -395,7 +395,7 @@ async function addResourceRow(type) {
         console.log('drone-details елемент:', resourceItem.querySelector('.drone-details'));
         console.log('drone-main-row елемент:', resourceItem.querySelector('.drone-main-row'));
     } else {
-        // Для БК - проста структура
+        // Для БК - проста структура (слайдер знизу, як у дронів)
         console.log('Створюємо HTML для БК');
         resourceItem.innerHTML = `
             <div class="bk-main-row">
