@@ -222,10 +222,7 @@ async function addResourceRow(type) {
                 <div class="drone-field">
                     <label>Тип</label>
                     <select class="drone-type form-control" required>
-                        <option value="">Оберіть тип</option>
-                        <option value="day">Денний</option>
-                        <option value="night">Нічний</option>
-                        <option value="day-night">Денний/Нічний</option>
+                        <option value="">Завантаження...</option>
                     </select>
                 </div>
                 <div class="drone-field">
@@ -311,6 +308,7 @@ async function addResourceRow(type) {
     if (type === 'drone') {
         // Завантажити всі дані спочатку
         await Promise.all([
+            loadDroneTypes(resourceItem),
             loadDroneFrequencies(resourceItem),
             loadDroneChannels(resourceItem),
             loadDroneModifications(resourceItem)
@@ -557,6 +555,39 @@ function autoFillDroneFields(select) {
     }
 
     console.log('✅ Поля дрона автозаповнено:', selectedDrone);
+}
+
+// Завантаження типів дронів (камер) з БД
+async function loadDroneTypes(resourceItem) {
+    const typeSelect = resourceItem.querySelector('.drone-type');
+    if (!typeSelect) return;
+    
+    try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
+        const { data, error } = await window.supabaseClient
+            .from('user_custom_options')
+            .select('value, label')
+            .eq('option_type', 'cameraType')
+            .eq('user_id', user.id)
+            .order('label');
+        
+        if (error) throw error;
+        
+        typeSelect.innerHTML = '<option value="">Оберіть тип</option>';
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.label;
+            typeSelect.appendChild(option);
+        });
+        
+        console.log('Типи дронів завантажені:', data.length);
+        
+    } catch (error) {
+        console.error('Помилка завантаження типів дронів:', error);
+        typeSelect.innerHTML = '<option value="">Помилка завантаження</option>';
+    }
 }
 
 // Завантаження частот для дронів з БД
@@ -938,7 +969,7 @@ function displayCurrentSubmission() {
                     <div class="drone-info-card">
                         <div class="drone-info-header">${d.label} <span class="badge">${d.count} шт</span></div>
                         <div class="drone-info-details">
-                            <span><strong>Тип:</strong> ${d.type === 'day' ? 'Денний' : d.type === 'night' ? 'Нічний' : 'Денний/Нічний'}</span>
+                            <span><strong>Тип:</strong> ${d.type || 'Не вказано'}</span>
                             ${d.hasFiberOptic 
                                 ? `<span><strong>🔌 Оптоволокно:</strong> ${d.fiberCableLength} км</span>`
                                 : `
@@ -987,11 +1018,10 @@ function shareSubmission() {
     if (currentSubmission.drones && currentSubmission.drones.length > 0) {
         text += `\nЗасоби (Дрони):\n`;
         currentSubmission.drones.forEach(drone => {
-            const typeText = drone.type === 'day' ? 'Денний' : drone.type === 'night' ? 'Нічний' : 'Денний/Нічний';
             const statusText = drone.modificationStatus === 'factory' ? 'Заводський' : `Модифікований (${drone.modification || 'деталі не вказані'})`;
             
             text += `• ${drone.label}: ${drone.count} шт\n`;
-            text += `  - Тип: ${typeText}\n`;
+            text += `  - Тип: ${drone.type || 'Не вказано'}\n`;
             
             if (drone.hasFiberOptic) {
                 text += `  - Оптоволокно: ${drone.fiberCableLength} км\n`;

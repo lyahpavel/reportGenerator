@@ -877,6 +877,14 @@ newReportButton.addEventListener('click', function() {
     reportForm.scrollIntoView({ behavior: 'smooth' });
 });
 
+// Закриття звіту (кнопка)
+const closeReportButton = document.getElementById('closeReport');
+if (closeReportButton) {
+    closeReportButton.addEventListener('click', async function() {
+        await closeReport();
+    });
+}
+
 // Створення нового звіту на основі поточного
 newReportBasedOnButton.addEventListener('click', function() {
     reportOutput.classList.add('hidden');
@@ -927,6 +935,104 @@ newReportBasedOnButton.addEventListener('click', function() {
 function reloadData() {
     loadData();
     showSuccess('Дані перезавантажено');
+}
+
+// Функція для закриття звіту (архівування подання та очищення таблиці suggestions)
+async function closeReport() {
+    try {
+        // Отримуємо поточне подання
+        const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+        
+        if (!currentSubmission) {
+            showError('Немає активного подання для закриття');
+            return;
+        }
+        
+        // Підтвердження від користувача
+        const confirmed = confirm(
+            'Ви впевнені, що хочете закрити звіт?\n\n' +
+            'Це призведе до:\n' +
+            '- Видалення поточного подання\n' +
+            '- Очищення даних з таблиці suggestions\n' +
+            '- Збереження всіх звітів в архів\n\n' +
+            'Продовжити?'
+        );
+        
+        if (!confirmed) return;
+        
+        const supabase = window.supabaseClient;
+        if (!supabase) {
+            throw new Error('Supabase client не ініціалізовано');
+        }
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            throw new Error('Користувач не авторизований');
+        }
+        
+        console.log('Закриття звіту для користувача:', user.id);
+        
+        // 1. Видаляємо дані з таблиці suggestions (якщо вона існує)
+        try {
+            const { error: suggestionsError } = await supabase
+                .from('suggestions')
+                .delete()
+                .eq('user_id', user.id);
+            
+            if (suggestionsError && suggestionsError.code !== 'PGRST116') { // PGRST116 = no rows found
+                console.warn('Помилка очищення suggestions:', suggestionsError);
+            } else {
+                console.log('✅ Таблиця suggestions очищена');
+            }
+        } catch (err) {
+            console.warn('Таблиця suggestions може не існувати:', err);
+        }
+        
+        // 2. Видаляємо поточне подання
+        const { error: deleteError } = await supabase
+            .from('submissions')
+            .delete()
+            .eq('user_id', user.id);
+        
+        if (deleteError) {
+            throw deleteError;
+        }
+        
+        console.log('✅ Подання видалено');
+        
+        // 3. Очищаємо інтерфейс
+        reportForm.reset();
+        reportOutput.classList.add('hidden');
+        
+        // Очистити прикріплене відео
+        attachedVideoFile = null;
+        const videoFileInput = document.getElementById('videoFile');
+        const videoFileName = document.getElementById('videoFileName');
+        const removeVideoBtn = document.getElementById('removeVideoBtn');
+        if (videoFileInput) videoFileInput.value = '';
+        if (videoFileName) videoFileName.textContent = '';
+        if (removeVideoBtn) removeVideoBtn.style.display = 'none';
+        
+        // Очистити відображення подання
+        if (window.submissionFunctions?.loadCurrentSubmission) {
+            await window.submissionFunctions.loadCurrentSubmission();
+        }
+        
+        // Оновити списки в генераторі
+        if (window.populateSelects) {
+            window.populateSelects();
+        }
+        
+        // 4. Показуємо повідомлення про успіх
+        showSuccess('Звіт закрито! Подання архівовано, дані очищено.');
+        
+        // Прокрутити до початку
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+    } catch (error) {
+        console.error('❌ Помилка закриття звіту:', error);
+        showError('Не вдалося закрити звіт: ' + error.message);
+    }
 }
 
 // Функція для показу/приховування поля ручного введення населеного пункту та керування координатами
@@ -1095,18 +1201,13 @@ function autoFillReportDroneFields() {
         }
     }
     
-    // Тип камери (підбираємо на основі типу дрона)
+    // Тип камери (беремо з подання)
     if (cameraTypeSelect && selectedDrone.type) {
-        if (selectedDrone.type === 'night') {
-            const nightOption = Array.from(cameraTypeSelect.options).find(opt => 
-                opt.value.includes('Тепловізор') || opt.value.includes('Ніч')
-            );
-            if (nightOption) cameraTypeSelect.value = nightOption.value;
-        } else if (selectedDrone.type === 'day-night') {
-            const dayNightOption = Array.from(cameraTypeSelect.options).find(opt => 
-                opt.value.includes('Ніч/день')
-            );
-            if (dayNightOption) cameraTypeSelect.value = dayNightOption.value;
+        const option = Array.from(cameraTypeSelect.options).find(opt => 
+            opt.value === selectedDrone.type
+        );
+        if (option) {
+            cameraTypeSelect.value = selectedDrone.type;
         }
     }
     
