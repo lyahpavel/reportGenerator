@@ -1414,7 +1414,7 @@ textarea {
 .drone-main-row .resource-count {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     flex-shrink: 0;
 }
 
@@ -1511,16 +1511,16 @@ textarea {
 .resource-count {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
 }
 
 .count-btn {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     border: 2px solid #e2e8f0;
     background: white;
-    border-radius: 6px;
-    font-size: 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1536,13 +1536,13 @@ textarea {
 }
 
 .count-input {
-    width: 40px;
+    width: 32px;
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: 6px 4px;
+    padding: 4px 2px;
     border: 2px solid #e2e8f0;
-    border-radius: 6px;
+    border-radius: 4px;
 }
 
 .remove-resource-btn {
