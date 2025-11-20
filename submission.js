@@ -117,19 +117,82 @@ function addResourceRow(type) {
     
     const selectId = `${type}_${Date.now()}`;
     
-    resourceItem.innerHTML = `
-        <div class="resource-select">
-            <select id="${selectId}" class="form-control" required>
-                <option value="">Завантаження...</option>
-            </select>
-        </div>
-        <div class="resource-count">
-            <button type="button" class="count-btn minus">−</button>
-            <input type="number" class="count-input" value="1" min="1" max="999" required>
-            <button type="button" class="count-btn plus">+</button>
-        </div>
-        <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
-    `;
+    // Для дронів - розширена структура з додатковими полями
+    if (type === 'drone') {
+        resourceItem.innerHTML = `
+            <div class="drone-main-row">
+                <div class="resource-select">
+                    <select id="${selectId}" class="form-control" required>
+                        <option value="">Завантаження...</option>
+                    </select>
+                </div>
+                <div class="resource-count">
+                    <button type="button" class="count-btn minus">−</button>
+                    <input type="number" class="count-input" value="1" min="1" max="999" required>
+                    <button type="button" class="count-btn plus">+</button>
+                </div>
+                <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
+            </div>
+            <div class="drone-details">
+                <div class="drone-field">
+                    <label>Тип</label>
+                    <select class="drone-type form-control" required>
+                        <option value="">Оберіть тип</option>
+                        <option value="day">Денний</option>
+                        <option value="night">Нічний</option>
+                        <option value="day-night">Денний/Нічний</option>
+                    </select>
+                </div>
+                <div class="drone-field">
+                    <label>Частота відео</label>
+                    <select class="drone-video-freq form-control" required>
+                        <option value="">Оберіть частоту</option>
+                    </select>
+                </div>
+                <div class="drone-field">
+                    <label>Частота керування</label>
+                    <select class="drone-control-freq form-control" required>
+                        <option value="">Оберіть частоту</option>
+                    </select>
+                </div>
+                <div class="drone-field">
+                    <label>Канал</label>
+                    <select class="drone-channel form-control" required>
+                        <option value="">Завантаження...</option>
+                    </select>
+                </div>
+                <div class="drone-field">
+                    <label>Стан</label>
+                    <select class="drone-modification-status form-control" required>
+                        <option value="">Оберіть стан</option>
+                        <option value="factory">Заводський</option>
+                        <option value="modified">Модифікований</option>
+                    </select>
+                </div>
+                <div class="drone-field modification-details-field" style="display: none;">
+                    <label>Модифікація</label>
+                    <select class="drone-modification form-control">
+                        <option value="">Завантаження...</option>
+                    </select>
+                </div>
+            </div>
+        `;
+    } else {
+        // Для БК - проста структура
+        resourceItem.innerHTML = `
+            <div class="resource-select">
+                <select id="${selectId}" class="form-control" required>
+                    <option value="">Завантаження...</option>
+                </select>
+            </div>
+            <div class="resource-count">
+                <button type="button" class="count-btn minus">−</button>
+                <input type="number" class="count-input" value="1" min="1" max="999" required>
+                <button type="button" class="count-btn plus">+</button>
+            </div>
+            <button type="button" class="remove-resource-btn" title="Видалити">✕</button>
+        `;
+    }
     
     // Завжди додаємо елемент, а потім переміщуємо кнопку в кінець
     container.appendChild(resourceItem);
@@ -143,6 +206,25 @@ function addResourceRow(type) {
     
     // Завантажити опції
     loadResourceOptions(selectId, type);
+    
+    // Якщо це дрон, завантажити додаткові опції
+    if (type === 'drone') {
+        loadDroneFrequencies(resourceItem);
+        loadDroneChannels(resourceItem);
+        loadDroneModifications(resourceItem);
+        
+        // Показати/сховати поле модифікації залежно від статусу
+        const modStatusSelect = resourceItem.querySelector('.drone-modification-status');
+        const modDetailsField = resourceItem.querySelector('.modification-details-field');
+        
+        modStatusSelect.addEventListener('change', () => {
+            if (modStatusSelect.value === 'modified') {
+                modDetailsField.style.display = 'block';
+            } else {
+                modDetailsField.style.display = 'none';
+            }
+        });
+    }
     
     // Обробники кнопок
     const minusBtn = resourceItem.querySelector('.minus');
@@ -199,6 +281,94 @@ async function loadResourceOptions(selectId, type) {
     }
 }
 
+// Завантаження частот для дронів
+async function loadDroneFrequencies(resourceItem) {
+    const videoFreqSelect = resourceItem.querySelector('.drone-video-freq');
+    const controlFreqSelect = resourceItem.querySelector('.drone-control-freq');
+    
+    // Частоти відео
+    const videoFreqs = [
+        "2.4 ГГц", "5.8 ГГц", "1.2 ГГц", "900 МГц", 
+        "Аналогова 5.8 ГГц", "Інша"
+    ];
+    
+    videoFreqs.forEach(freq => {
+        const option = document.createElement('option');
+        option.value = freq;
+        option.textContent = freq;
+        videoFreqSelect.appendChild(option);
+    });
+    
+    // Частоти керування
+    const controlFreqs = [
+        "2.4 ГГц", "433 МГц", "868 МГц", "915 МГц",
+        "Crossfire (868/915 МГц)", "ExpressLRS", "Інша"
+    ];
+    
+    controlFreqs.forEach(freq => {
+        const option = document.createElement('option');
+        option.value = freq;
+        option.textContent = freq;
+        controlFreqSelect.appendChild(option);
+    });
+}
+
+// Завантаження каналів
+async function loadDroneChannels(resourceItem) {
+    const channelSelect = resourceItem.querySelector('.drone-channel');
+    if (!channelSelect) return;
+    
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('user_custom_options')
+            .select('value, label')
+            .eq('option_type', 'channels')
+            .order('label');
+        
+        if (error) throw error;
+        
+        channelSelect.innerHTML = '<option value="">Оберіть канал</option>';
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.label;
+            channelSelect.appendChild(option);
+        });
+        
+    } catch (error) {
+        console.error('Помилка завантаження каналів:', error);
+        channelSelect.innerHTML = '<option value="">Помилка завантаження</option>';
+    }
+}
+
+// Завантаження модифікацій
+async function loadDroneModifications(resourceItem) {
+    const modSelect = resourceItem.querySelector('.drone-modification');
+    if (!modSelect) return;
+    
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('user_custom_options')
+            .select('value, label')
+            .eq('option_type', 'modifications')
+            .order('label');
+        
+        if (error) throw error;
+        
+        modSelect.innerHTML = '<option value="">Оберіть модифікацію</option>';
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.label;
+            modSelect.appendChild(option);
+        });
+        
+    } catch (error) {
+        console.error('Помилка завантаження модифікацій:', error);
+        modSelect.innerHTML = '<option value="">Помилка завантаження</option>';
+    }
+}
+
 // Збереження подання
 async function saveSubmission() {
     try {
@@ -210,20 +380,37 @@ async function saveSubmission() {
         const crewMembers = Array.from(crewCheckboxes).map(cb => cb.value);
         console.log('Екіпаж зібрано:', crewMembers);
         
-        // Збір дронів
+        // Збір дронів з усіма полями
         const droneItems = document.querySelectorAll('.resource-item[data-type="drone"]');
         console.log('Знайдено рядків дронів:', droneItems.length);
         const drones = Array.from(droneItems).map(item => {
             const select = item.querySelector('select');
             const count = parseInt(item.querySelector('.count-input').value) || 0;
+            
+            // Додаткові поля для дрона
+            const type = item.querySelector('.drone-type')?.value || '';
+            const videoFreq = item.querySelector('.drone-video-freq')?.value || '';
+            const controlFreq = item.querySelector('.drone-control-freq')?.value || '';
+            const channel = item.querySelector('.drone-channel')?.value || '';
+            const modStatus = item.querySelector('.drone-modification-status')?.value || '';
+            const modification = modStatus === 'modified' 
+                ? (item.querySelector('.drone-modification')?.value || '') 
+                : '';
+            
             const droneData = {
                 name: select.value,
                 label: select.options[select.selectedIndex]?.text || select.value,
-                count: count
+                count: count,
+                type: type,
+                videoFrequency: videoFreq,
+                controlFrequency: controlFreq,
+                channel: channel,
+                modificationStatus: modStatus,
+                modification: modification
             };
             console.log('Дрон:', droneData);
             return droneData;
-        }).filter(d => d.name && d.count > 0);
+        }).filter(d => d.name && d.count > 0 && d.type && d.videoFrequency && d.controlFrequency && d.channel && d.modificationStatus);
         console.log('Дрони після фільтру:', drones);
         
         // Збір БК
@@ -358,11 +545,22 @@ function displayCurrentSubmission() {
     `;
     
     if (currentSubmission.drones && currentSubmission.drones.length > 0) {
-        html += `<div class="info-row">
+        html += `<div class="info-section">
             <span class="info-label">Дрони:</span>
-            <span class="info-value">
-                ${currentSubmission.drones.map(d => `${d.label}: ${d.count} шт`).join(', ')}
-            </span>
+            <div class="drones-list">
+                ${currentSubmission.drones.map(d => `
+                    <div class="drone-info-card">
+                        <div class="drone-info-header">${d.label} <span class="badge">${d.count} шт</span></div>
+                        <div class="drone-info-details">
+                            <span>Тип: ${d.type === 'day' ? 'Денний' : d.type === 'night' ? 'Нічний' : 'Денний/Нічний'}</span>
+                            <span>Відео: ${d.videoFrequency}</span>
+                            <span>Керування: ${d.controlFrequency}</span>
+                            <span>Канал: ${d.channel}</span>
+                            <span>Стан: ${d.modificationStatus === 'factory' ? 'Заводський' : `Модифікований (${d.modification})`}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
         </div>`;
     }
     

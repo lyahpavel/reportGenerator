@@ -1240,9 +1240,6 @@ textarea {
 }
 
 .resource-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
     background: white;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
@@ -1254,6 +1251,41 @@ textarea {
 .resource-item:hover {
     border-color: #4facfe;
     box-shadow: 0 2px 8px rgba(79, 172, 254, 0.1);
+}
+
+/* Основний рядок дрона (назва + кількість + видалити) */
+.drone-main-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Деталі дрона (додаткові поля) */
+.drone-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.drone-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.drone-field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin: 0;
+}
+
+.drone-field select {
+    font-size: 0.95rem;
+    padding: 8px;
 }
 
 .resource-select {
@@ -1351,6 +1383,69 @@ textarea {
 
 .submission-display .info-value {
     font-weight: 500;
+}
+
+/* Секція з дронами */
+.submission-display .info-section {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.submission-display .info-section:last-child {
+    border-bottom: none;
+}
+
+.submission-display .info-section .info-label {
+    display: block;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.drones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.drone-info-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.drone-info-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.drone-info-header .badge {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.drone-info-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    font-size: 0.9rem;
+    opacity: 0.95;
+}
+
+.drone-info-details span {
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
 /* Стилі для завантаження відео */
