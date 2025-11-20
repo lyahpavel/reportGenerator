@@ -905,13 +905,17 @@ async function saveSubmission() {
             result = await window.supabaseClient
                 .from('submissions')
                 .update(submissionData)
-                .eq('id', existing.id);
+                .eq('id', existing.id)
+                .select()
+                .single();
         } else {
             // Створити нове
             console.log('Створюємо нове подання');
             result = await window.supabaseClient
                 .from('submissions')
-                .insert([submissionData]);
+                .insert([submissionData])
+                .select()
+                .single();
         }
         
         console.log('Результат збереження:', result);
@@ -921,7 +925,8 @@ async function saveSubmission() {
             throw result.error;
         }
         
-        currentSubmission = submissionData;
+        // Зберегти повні дані з БД (включно з id)
+        currentSubmission = result.data;
         displayCurrentSubmission();
         
         // Оновити списки дронів/БК в генераторі звітів
