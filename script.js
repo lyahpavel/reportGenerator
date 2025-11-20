@@ -1101,8 +1101,12 @@ async function closeSubmission() {
                 throw archiveError;
             }
         } else {
+            console.log('📦 Подання архівовано, ID:', archivedSubmission.id);
+            
             // 2. Оновити всі звіти користувача, додавши посилання на архівне подання
-            const { error: updateReportsError } = await supabase
+            console.log('🔄 Оновлюємо звіти за період:', currentSubmission.date_from, '-', currentSubmission.date_to);
+            
+            const { data: updatedReports, error: updateReportsError } = await supabase
                 .from('reports')
                 .update({ 
                     archived_submission_id: archivedSubmission.id,
@@ -1110,10 +1114,13 @@ async function closeSubmission() {
                 })
                 .eq('user_id', user.id)
                 .gte('mission_date', currentSubmission.date_from)
-                .lte('mission_date', currentSubmission.date_to);
+                .lte('mission_date', currentSubmission.date_to)
+                .select('id, report_number, mission_date');
             
             if (updateReportsError) {
-                console.warn('Помилка оновлення звітів:', updateReportsError);
+                console.error('❌ Помилка оновлення звітів:', updateReportsError);
+            } else {
+                console.log(`✅ Оновлено ${updatedReports?.length || 0} звітів:`, updatedReports);
             }
         }
         
@@ -2395,7 +2402,7 @@ async function viewArchivedSubmission(submissionId) {
         // Завантажити звіти цього подання
         const { data: reports, error: reportsError } = await supabase
             .from('reports')
-            .select('*')
+            .select('report_number, report_text, created_at, subdivision, drone_name')
             .eq('archived_submission_id', submissionId)
             .order('created_at', { ascending: false });
         
@@ -2405,60 +2412,38 @@ async function viewArchivedSubmission(submissionId) {
         document.getElementById('modalSubmissionTitle').textContent = 
             `Подання ${submission.date_from} — ${submission.date_to}`;
         
-        // Деталі подання
+        // Простий текст подання
         const detailsHTML = `
-            <p><strong>Період:</strong> ${submission.date_from} — ${submission.date_to}</p>
-            <p><strong>Екіпаж:</strong> ${submission.crew_members?.join(', ') || 'Не вказано'}</p>
-            <p><strong>Старший:</strong> ${submission.crew_leader || 'Не вказано'}</p>
-            <p><strong>Заархівовано:</strong> ${new Date(submission.archived_at).toLocaleString('uk-UA')}</p>
-            
-            <h4>Дрони (${submission.drones?.length || 0})</h4>
-            ${submission.drones?.length > 0 ? submission.drones.map(d => `
-                <div class="drone-card">
-                    <strong>${d.label || d.name}</strong> <span style="color: #667eea;">×${d.count}</span><br>
-                    <small>
-                        Тип: ${d.type} | Відео: ${d.videoFrequency} | Керування: ${d.controlFrequency}<br>
-                        Канал: ${d.channel} | Стан: ${d.modificationStatus}
-                        ${d.modification ? ` | Модифікація: ${d.modification}` : ''}
-                    </small>
-                </div>
-            `).join('') : '<p style="color: #a0aec0;">Немає дронів</p>'}
-            
-            <h4>Боєкомплекти (${submission.bk?.length || 0})</h4>
-            ${submission.bk?.length > 0 ? submission.bk.map(b => `
-                <div class="bk-card">
-                    <strong>${b.label || b.name}</strong> <span style="color: #667eea;">×${b.count}</span>
-                </div>
-            `).join('') : '<p style="color: #a0aec0;">Немає БК</p>'}
+            <p style="font-size: 1.1em; margin: 1em 0;"><strong>Період:</strong> ${submission.date_from} — ${submission.date_to}</p>
         `;
         
         document.getElementById('modalSubmissionDetails').innerHTML = detailsHTML;
         
         // Список звітів
         if (reports && reports.length > 0) {
-            const reportsHTML = reports.map(report => {
-                const reportText = report.report_text || 'Текст звіту відсутній';
-                const escapedText = reportText.replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\\/g, '\\\\');
-                
-                return `
-                <div class="report-item">
-                    <div class="report-item-header">
-                        <strong>Звіт №${report.report_number || 'Без номеру'}</strong>
-                        <span style="color: #718096;">${new Date(report.created_at).toLocaleString('uk-UA')}</span>
+            const reportsHTML = `
+                <h4 style="margin: 1.5em 0 1em 0;">Звіти (${reports.length})</h4>
+                ${reports.map(report => {
+                    const reportText = report.report_text || 'Текст звіту відсутній';
+                    const escapedText = reportText.replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\\/g, '\\\\');
+                    const reportDate = new Date(report.created_at).toLocaleDateString('uk-UA');
+                    
+                    return `
+                    <div class="report-item">
+                        <div class="report-item-header">
+                            <strong>№${report.report_number || 'Без номеру'}</strong>
+                            <span style="color: #718096;">${reportDate}</span>
+                        </div>
+                        <div class="report-item-content">${reportText}</div>
+                        <div class="report-item-actions">
+                            <button class="btn btn-outline btn-sm" onclick="copyReportText(\`${escapedText}\`)">
+                                📋 Копіювати
+                            </button>
+                        </div>
                     </div>
-                    <div class="report-item-meta">
-                        ${report.subdivision ? `Підрозділ: ${report.subdivision} | ` : ''}
-                        ${report.drone_name ? `Дрон: ${report.drone_name}` : ''}
-                    </div>
-                    <div class="report-item-content">${reportText}</div>
-                    <div class="report-item-actions">
-                        <button class="btn btn-outline btn-sm" onclick="copyReportText(\`${escapedText}\`)">
-                            📋 Копіювати
-                        </button>
-                    </div>
-                </div>
-                `;
-            }).join('');
+                    `;
+                }).join('')}
+            `;
             
             document.getElementById('modalReportsList').innerHTML = reportsHTML;
         } else {
