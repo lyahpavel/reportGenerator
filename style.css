@@ -679,9 +679,26 @@ textarea {
     
     .form-group-row {
         flex-direction: column;
-        gap: 20px;
+        gap: 12px;
         padding: 0;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
+    }
+    
+    /* Зменшити padding полів дат на мобільних */
+    .form-group-row input[type="date"] {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+    
+    .form-group-row label {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+    
+    .form-group-row .form-group {
+        min-width: 0;
     }
     
     .submission-form .form-actions {
