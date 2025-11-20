@@ -1335,6 +1335,32 @@ textarea {
     grid-column: span 2;
 }
 
+/* Поле довжини кабелю для оптоволокна */
+.fiber-cable-length-field {
+    grid-column: span 2;
+}
+
+.fiber-cable-length-field input {
+    max-width: 200px;
+}
+
+/* Стиль для чекбокса оптоволокна */
+.drone-fiber-optic-checkbox {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+.drone-field label:has(.drone-fiber-optic-checkbox) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    user-select: none;
+}
+
 /* БК зберігає стару структуру */
 .resource-item[data-type="bk"] {
     display: flex;

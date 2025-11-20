@@ -226,18 +226,28 @@ async function addResourceRow(type) {
                     </select>
                 </div>
                 <div class="drone-field">
+                    <label>
+                        <input type="checkbox" class="drone-fiber-optic-checkbox" style="margin-right: 8px;">
+                        Оптоволокно
+                    </label>
+                </div>
+                <div class="drone-field fiber-cable-length-field" style="display: none;">
+                    <label>Довжина кабелю (км)</label>
+                    <input type="number" class="drone-fiber-cable-length form-control" min="0" step="0.1" placeholder="Введіть довжину">
+                </div>
+                <div class="drone-field freq-field">
                     <label>Частота відео</label>
                     <select class="drone-video-freq form-control" required>
                         <option value="">Завантаження...</option>
                     </select>
                 </div>
-                <div class="drone-field">
+                <div class="drone-field freq-field">
                     <label>Частота керування</label>
                     <select class="drone-control-freq form-control" required>
                         <option value="">Завантаження...</option>
                     </select>
                 </div>
-                <div class="drone-field">
+                <div class="drone-field channel-field">
                     <label>Канал</label>
                     <select class="drone-channel form-control" multiple>
                         <option value="">Завантаження...</option>
@@ -357,6 +367,45 @@ async function addResourceRow(type) {
                 modDetailsField.style.display = 'none';
             }
         });
+        
+        // Логіка для оптоволокна
+        const fiberCheckbox = resourceItem.querySelector('.drone-fiber-optic-checkbox');
+        const fiberCableLengthField = resourceItem.querySelector('.fiber-cable-length-field');
+        const freqFields = resourceItem.querySelectorAll('.freq-field');
+        const channelField = resourceItem.querySelector('.channel-field');
+        const fiberCableLengthInput = resourceItem.querySelector('.drone-fiber-cable-length');
+        const videoFreqSelect = resourceItem.querySelector('.drone-video-freq');
+        const controlFreqSelect = resourceItem.querySelector('.drone-control-freq');
+        const channelSelect = resourceItem.querySelector('.drone-channel');
+        
+        fiberCheckbox.addEventListener('change', () => {
+            if (fiberCheckbox.checked) {
+                // Показати поле довжини кабелю
+                fiberCableLengthField.style.display = 'block';
+                fiberCableLengthInput.required = true;
+                
+                // Сховати частоти та канал
+                freqFields.forEach(field => field.style.display = 'none');
+                channelField.style.display = 'none';
+                
+                // Зняти required з прихованих полів
+                videoFreqSelect.required = false;
+                controlFreqSelect.required = false;
+            } else {
+                // Сховати поле довжини кабелю
+                fiberCableLengthField.style.display = 'none';
+                fiberCableLengthInput.required = false;
+                fiberCableLengthInput.value = '';
+                
+                // Показати частоти та канал
+                freqFields.forEach(field => field.style.display = 'block');
+                channelField.style.display = 'block';
+                
+                // Встановити required для частот
+                videoFreqSelect.required = true;
+                controlFreqSelect.required = true;
+            }
+        });
     }
     
     // Обробники кнопок
@@ -433,6 +482,8 @@ function autoFillDroneFields(select) {
 
     // Заповнюємо поля
     const typeSelect = resourceItem.querySelector('.drone-type');
+    const fiberCheckbox = resourceItem.querySelector('.drone-fiber-optic-checkbox');
+    const fiberCableLengthInput = resourceItem.querySelector('.drone-fiber-cable-length');
     const videoFreqSelect = resourceItem.querySelector('.drone-video-freq');
     const controlFreqSelect = resourceItem.querySelector('.drone-control-freq');
     const channelSelect = resourceItem.querySelector('.drone-channel');
@@ -443,25 +494,42 @@ function autoFillDroneFields(select) {
         typeSelect.value = selectedDrone.type;
     }
 
-    if (videoFreqSelect && selectedDrone.videoFrequency) {
-        // Спробуємо знайти відповідну опцію
-        const option = Array.from(videoFreqSelect.options).find(opt => opt.value === selectedDrone.videoFrequency);
-        if (option) {
-            videoFreqSelect.value = selectedDrone.videoFrequency;
+    // Встановлюємо статус оптоволокна
+    if (fiberCheckbox && selectedDrone.hasFiberOptic) {
+        fiberCheckbox.checked = true;
+        // Trigger change event to update visibility
+        fiberCheckbox.dispatchEvent(new Event('change'));
+        
+        if (fiberCableLengthInput && selectedDrone.fiberCableLength) {
+            fiberCableLengthInput.value = selectedDrone.fiberCableLength;
         }
+    } else if (fiberCheckbox) {
+        fiberCheckbox.checked = false;
+        fiberCheckbox.dispatchEvent(new Event('change'));
     }
 
-    if (controlFreqSelect && selectedDrone.controlFrequency) {
-        const option = Array.from(controlFreqSelect.options).find(opt => opt.value === selectedDrone.controlFrequency);
-        if (option) {
-            controlFreqSelect.value = selectedDrone.controlFrequency;
+    // Заповнюємо частоти та канал тільки якщо не оптоволокно
+    if (!selectedDrone.hasFiberOptic) {
+        if (videoFreqSelect && selectedDrone.videoFrequency) {
+            // Спробуємо знайти відповідну опцію
+            const option = Array.from(videoFreqSelect.options).find(opt => opt.value === selectedDrone.videoFrequency);
+            if (option) {
+                videoFreqSelect.value = selectedDrone.videoFrequency;
+            }
         }
-    }
 
-    if (channelSelect && selectedDrone.channel) {
-        // Для мультиселекту каналів
-        if (window.customMultiSelects && window.customMultiSelects[channelSelect.id]) {
-            window.customMultiSelects[channelSelect.id].setValue([selectedDrone.channel]);
+        if (controlFreqSelect && selectedDrone.controlFrequency) {
+            const option = Array.from(controlFreqSelect.options).find(opt => opt.value === selectedDrone.controlFrequency);
+            if (option) {
+                controlFreqSelect.value = selectedDrone.controlFrequency;
+            }
+        }
+
+        if (channelSelect && selectedDrone.channel) {
+            // Для мультиселекту каналів
+            if (window.customMultiSelects && window.customMultiSelects[channelSelect.id]) {
+                window.customMultiSelects[channelSelect.id].setValue([selectedDrone.channel]);
+            }
         }
     }
 
@@ -635,15 +703,27 @@ async function saveSubmission() {
             
             // Додаткові поля для дрона
             const type = item.querySelector('.drone-type')?.value || '';
-            const videoFreq = item.querySelector('.drone-video-freq')?.value || '';
-            const controlFreq = item.querySelector('.drone-control-freq')?.value || '';
-            const modStatus = item.querySelector('.drone-modification-status')?.value || '';
+            const fiberOpticCheckbox = item.querySelector('.drone-fiber-optic-checkbox');
+            const hasFiberOptic = fiberOpticCheckbox ? fiberOpticCheckbox.checked : false;
+            const fiberCableLength = hasFiberOptic ? (item.querySelector('.drone-fiber-cable-length')?.value || '') : '';
             
-            // Канали - збираємо масив вибраних значень з мультиселекту
-            const channelSelect = item.querySelector('.drone-channel');
-            const channel = channelSelect 
-                ? Array.from(channelSelect.selectedOptions).map(opt => opt.value).join(', ')
-                : '';
+            let videoFreq = '';
+            let controlFreq = '';
+            let channel = '';
+            
+            if (!hasFiberOptic) {
+                // Якщо не оптоволокно, збираємо частоти та канал
+                videoFreq = item.querySelector('.drone-video-freq')?.value || '';
+                controlFreq = item.querySelector('.drone-control-freq')?.value || '';
+                
+                // Канали - збираємо масив вибраних значень з мультиселекту
+                const channelSelect = item.querySelector('.drone-channel');
+                channel = channelSelect 
+                    ? Array.from(channelSelect.selectedOptions).map(opt => opt.value).join(', ')
+                    : '';
+            }
+            
+            const modStatus = item.querySelector('.drone-modification-status')?.value || '';
             
             // Модифікації - збираємо масив вибраних значень з мультиселекту
             let modification = '';
@@ -660,6 +740,8 @@ async function saveSubmission() {
                 label: select.options[select.selectedIndex]?.text || select.value,
                 count: count,
                 type: type,
+                hasFiberOptic: hasFiberOptic,
+                fiberCableLength: fiberCableLength,
                 videoFrequency: videoFreq,
                 controlFrequency: controlFreq,
                 channel: channel,
@@ -668,7 +750,18 @@ async function saveSubmission() {
             };
             console.log('Дрон:', droneData);
             return droneData;
-        }).filter(d => d.name && d.count > 0 && d.type && d.videoFrequency && d.controlFrequency && d.channel && d.modificationStatus);
+        }).filter(d => {
+            // Базові перевірки
+            if (!d.name || d.count <= 0 || !d.type || !d.modificationStatus) return false;
+            
+            // Якщо оптоволокно, перевіряємо довжину кабелю
+            if (d.hasFiberOptic) {
+                return d.fiberCableLength && d.fiberCableLength.length > 0;
+            }
+            
+            // Якщо не оптоволокно, перевіряємо частоти та канал
+            return d.videoFrequency && d.controlFrequency && d.channel;
+        });
         console.log('Дрони після фільтру:', drones);
         
         // Збір БК
@@ -830,9 +923,14 @@ function displayCurrentSubmission() {
                         <div class="drone-info-header">${d.label} <span class="badge">${d.count} шт</span></div>
                         <div class="drone-info-details">
                             <span><strong>Тип:</strong> ${d.type === 'day' ? 'Денний' : d.type === 'night' ? 'Нічний' : 'Денний/Нічний'}</span>
-                            <span><strong>Відео:</strong> ${d.videoFrequency}</span>
-                            <span><strong>Керування:</strong> ${d.controlFrequency}</span>
-                            <span><strong>Канал:</strong> ${d.channel || 'Не вказано'}</span>
+                            ${d.hasFiberOptic 
+                                ? `<span><strong>🔌 Оптоволокно:</strong> ${d.fiberCableLength} км</span>`
+                                : `
+                                    <span><strong>Відео:</strong> ${d.videoFrequency}</span>
+                                    <span><strong>Керування:</strong> ${d.controlFrequency}</span>
+                                    <span><strong>Канал:</strong> ${d.channel || 'Не вказано'}</span>
+                                `
+                            }
                             <span><strong>Стан:</strong> ${d.modificationStatus === 'factory' ? 'Заводський' : `Модифікований (${d.modification || 'деталі не вказані'})`}</span>
                         </div>
                     </div>
@@ -878,9 +976,15 @@ function shareSubmission() {
             
             text += `• ${drone.label}: ${drone.count} шт\n`;
             text += `  - Тип: ${typeText}\n`;
-            text += `  - Частота відео: ${drone.videoFrequency}\n`;
-            text += `  - Частота керування: ${drone.controlFrequency}\n`;
-            text += `  - Канал: ${drone.channel || 'Не вказано'}\n`;
+            
+            if (drone.hasFiberOptic) {
+                text += `  - Оптоволокно: ${drone.fiberCableLength} км\n`;
+            } else {
+                text += `  - Частота відео: ${drone.videoFrequency}\n`;
+                text += `  - Частота керування: ${drone.controlFrequency}\n`;
+                text += `  - Канал: ${drone.channel || 'Не вказано'}\n`;
+            }
+            
             text += `  - Стан: ${statusText}\n\n`;
         });
     }
