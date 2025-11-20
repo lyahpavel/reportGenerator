@@ -881,9 +881,7 @@ newReportButton.addEventListener('click', function() {
 // Закриття подання (кнопка)
 if (closeSubmissionButton) {
     closeSubmissionButton.addEventListener('click', async function() {
-        console.log('🔴 Натиснуто кнопку закриття подання');
         await closeSubmission();
-        console.log('🟢 Функція closeSubmission завершена');
     });
 }
 
@@ -941,23 +939,16 @@ function reloadData() {
 
 // Функція для закриття подання (архівування та очищення таблиці suggestions)
 async function closeSubmission() {
-    console.log('🔵 Функція closeSubmission викликана');
     try {
         // Отримуємо поточне подання
         const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
-        console.log('📦 Поточне подання:', currentSubmission);
-        console.log('📦 currentSubmission.id:', currentSubmission?.id);
-        console.log('📦 Тип currentSubmission:', typeof currentSubmission);
-        console.log('📦 Ключі currentSubmission:', currentSubmission ? Object.keys(currentSubmission) : 'null');
         
         if (!currentSubmission) {
-            console.error('❌ Немає активного подання');
             showError('Немає активного подання для закриття');
             return;
         }
         
         // Підтвердження від користувача
-        console.log('⏳ Показуємо діалог підтвердження...');
         const confirmed = confirm(
             'Ви впевнені, що хочете закрити подання?\n\n' +
             'Це призведе до:\n' +
@@ -967,11 +958,7 @@ async function closeSubmission() {
             'Продовжити?'
         );
         
-        console.log('📝 Результат підтвердження:', confirmed);
-        if (!confirmed) {
-            console.log('🚫 Користувач скасував закриття');
-            return;
-        }
+        if (!confirmed) return;
         
         const supabase = window.supabaseClient;
         if (!supabase) {
@@ -983,12 +970,8 @@ async function closeSubmission() {
             throw new Error('Користувач не авторизований');
         }
         
-        console.log('Закриття подання для користувача:', user.id);
-        
         // 1. Зберегти подання в архів
         const submissionId = currentSubmission.id;
-        console.log('📝 Submission ID для видалення:', submissionId);
-        
         const archiveData = {
             user_id: user.id,
             submission_id: submissionId,
@@ -1001,8 +984,6 @@ async function closeSubmission() {
             archived_at: new Date().toISOString()
         };
         
-        console.log('💾 Дані для архівування:', archiveData);
-        
         const { data: archivedSubmission, error: archiveError } = await supabase
             .from('archived_submissions')
             .insert([archiveData])
@@ -1010,15 +991,11 @@ async function closeSubmission() {
             .single();
         
         if (archiveError) {
-            console.error('Помилка архівування подання:', archiveError);
             // Якщо таблиця не існує, просто продовжуємо без архівування
             if (archiveError.code !== '42P01') { // 42P01 = таблиця не існує
                 throw archiveError;
             }
-            console.warn('Таблиця archived_submissions не існує, пропускаємо архівування');
         } else {
-            console.log('✅ Подання заархівовано:', archivedSubmission);
-            
             // 2. Оновити всі звіти користувача, додавши посилання на архівне подання
             const { error: updateReportsError } = await supabase
                 .from('reports')
@@ -1032,25 +1009,17 @@ async function closeSubmission() {
             
             if (updateReportsError) {
                 console.warn('Помилка оновлення звітів:', updateReportsError);
-            } else {
-                console.log('✅ Звіти прив\'язані до архівного подання');
             }
         }
         
         // 3. Видаляємо дані з таблиці suggestions (якщо вона існує)
         try {
-            const { error: suggestionsError } = await supabase
+            await supabase
                 .from('suggestions')
                 .delete()
                 .eq('user_id', user.id);
-            
-            if (suggestionsError && suggestionsError.code !== 'PGRST116') { // PGRST116 = no rows found
-                console.warn('Помилка очищення suggestions:', suggestionsError);
-            } else {
-                console.log('✅ Таблиця suggestions очищена');
-            }
         } catch (err) {
-            console.warn('Таблиця suggestions може не існувати:', err);
+            // Таблиця може не існувати - ігноруємо помилку
         }
         
         // 4. Видаляємо поточне подання
@@ -1061,11 +1030,8 @@ async function closeSubmission() {
             .eq('user_id', user.id);
         
         if (deleteError) {
-            console.error('Помилка видалення подання:', deleteError);
             throw deleteError;
         }
-        
-        console.log('✅ Поточне подання видалено');
         
         // 5. Очищаємо інтерфейс
         reportForm.reset();
@@ -1124,7 +1090,7 @@ async function closeSubmission() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
     } catch (error) {
-        console.error('❌ Помилка закриття подання:', error);
+        console.error('Помилка закриття подання:', error);
         showError('Не вдалося закрити подання: ' + error.message);
     }
 }
