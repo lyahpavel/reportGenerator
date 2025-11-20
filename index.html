@@ -83,7 +83,11 @@
             
             <!-- Навігація -->
             <nav class="main-nav">
-                <button class="nav-tab active" data-page="generator">
+                <button class="nav-tab active" data-page="submission">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-label">Подання</span>
+                </button>
+                <button class="nav-tab" data-page="generator">
                     <span class="nav-icon">📝</span>
                     <span class="nav-label">Новий звіт</span>
                 </button>
@@ -107,8 +111,66 @@
             </div>
         </header>
 
+        <!-- Секція: Подання -->
+        <section id="submissionSection" class="page-section active">
+            <h2>📋 Подання на чергування</h2>
+            <div class="submission-content">
+                <form id="submissionForm" class="submission-form">
+                    <!-- Період чергування -->
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="dutyDateFrom">Чергування з:</label>
+                            <input type="date" id="dutyDateFrom" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dutyDateTo">Чергування по:</label>
+                            <input type="date" id="dutyDateTo" required>
+                        </div>
+                    </div>
+
+                    <!-- Склад екіпажу -->
+                    <div class="form-group">
+                        <label for="crewMembers">Склад екіпажу:</label>
+                        <select id="crewMembers" multiple size="5">
+                            <option value="">Завантаження операторів...</option>
+                        </select>
+                        <small class="form-hint">Оберіть одного або декількох операторів</small>
+                    </div>
+
+                    <!-- Засоби (Дрони) -->
+                    <div class="form-group">
+                        <h3>Засоби (Дрони)</h3>
+                        <div id="dronesContainer" class="resources-container">
+                            <button type="button" class="btn btn-outline" id="addDroneBtn">+ Додати дрон</button>
+                        </div>
+                    </div>
+
+                    <!-- Боєкомплект -->
+                    <div class="form-group">
+                        <h3>Боєкомплект (БК)</h3>
+                        <div id="bkContainer" class="resources-container">
+                            <button type="button" class="btn btn-outline" id="addBkBtn">+ Додати БК</button>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки дій -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Зберегти подання</button>
+                        <button type="button" id="shareSubmission" class="btn btn-outline">Поділитися</button>
+                        <button type="reset" class="btn btn-secondary">Очистити</button>
+                    </div>
+                </form>
+
+                <!-- Поточне подання (перегляд) -->
+                <div id="currentSubmission" class="current-submission hidden">
+                    <h3>Поточне подання</h3>
+                    <div id="submissionDisplay" class="submission-display"></div>
+                </div>
+            </div>
+        </section>
+
         <!-- Секція: Генератор звітів -->
-        <section id="generatorSection" class="page-section active">
+        <section id="generatorSection" class="page-section">
         <form id="reportForm" class="report-form">
             <!-- Додавання відео -->
             <div class="form-group video-upload-section">
@@ -494,6 +556,7 @@
     <script src="multiselect.js"></script>
     <script src="script.js"></script>
     <script src="reports-history.js"></script>
+    <script src="submission.js"></script>
     <script>
         // Функція для показу/приховування поля довжини котушки та частот
         function toggleFiberLength() {

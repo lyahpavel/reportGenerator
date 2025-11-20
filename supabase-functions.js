@@ -115,6 +115,70 @@ async function loadDataFromSupabase() {
     }
 }
 
+// Віднімання ресурсів з подання після створення звіту
+async function decrementSubmissionResources(reportData) {
+    try {
+        const supabase = window.supabaseClient;
+        if (!supabase) return;
+
+        // Отримуємо поточне подання
+        const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+        if (!currentSubmission || !currentSubmission.id) {
+            console.log('ℹ️ Немає активного подання для віднімання ресурсів');
+            return;
+        }
+
+        let updated = false;
+
+        // Віднімаємо дрон якщо використовувався
+        if (reportData.droneName && currentSubmission.drones) {
+            const droneIndex = currentSubmission.drones.findIndex(d => d.name === reportData.droneName);
+            if (droneIndex !== -1 && currentSubmission.drones[droneIndex].count > 0) {
+                currentSubmission.drones[droneIndex].count -= 1;
+                updated = true;
+                console.log(`📉 Зменшено кількість дрону "${reportData.droneName}": залишилось ${currentSubmission.drones[droneIndex].count}`);
+            }
+        }
+
+        // Віднімаємо БК якщо використовувався
+        if (reportData.bk && currentSubmission.bk) {
+            const bkIndex = currentSubmission.bk.findIndex(b => b.name === reportData.bk);
+            if (bkIndex !== -1 && currentSubmission.bk[bkIndex].count > 0) {
+                currentSubmission.bk[bkIndex].count -= 1;
+                updated = true;
+                console.log(`📉 Зменшено кількість БК "${reportData.bk}": залишилось ${currentSubmission.bk[bkIndex].count}`);
+            }
+        }
+
+        // Оновлюємо подання в БД якщо були зміни
+        if (updated) {
+            const { data: { user } } = await supabase.auth.getUser();
+            const { error } = await supabase
+                .from('submissions')
+                .update({
+                    drones: currentSubmission.drones,
+                    bk: currentSubmission.bk,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('user_id', user.id);
+
+            if (error) {
+                console.error('❌ Помилка оновлення подання:', error);
+            } else {
+                console.log('✅ Подання оновлено після створення звіту');
+                // Перезавантажуємо подання для оновлення UI
+                if (window.submissionFunctions?.loadCurrentSubmission) {
+                    await window.submissionFunctions.loadCurrentSubmission();
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ Помилка віднімання ресурсів:', error);
+        // Не кидаємо помилку далі, щоб не заважати збереженню звіту
+    }
+}
+
 // Збереження звіту в Supabase
 async function saveReportToSupabase(reportData) {
     try {
@@ -167,6 +231,10 @@ async function saveReportToSupabase(reportData) {
         }
 
         console.log('✅ Звіт успішно збережено в Supabase:', data);
+        
+        // Віднімаємо ресурси з подання після успішного збереження
+        await decrementSubmissionResources(reportData);
+        
         showSuccess('Звіт збережено в базу даних');
         return data[0];
 

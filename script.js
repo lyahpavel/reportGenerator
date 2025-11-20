@@ -191,8 +191,21 @@ function populateSelects() {
     populateSelect('subdivision', appData.subdivisions);
     populateSelect('jointWith', appData.jointWithOptions || appData.subdivisions);
     
+    // Отримуємо поточне подання для фільтрації
+    const currentSubmission = window.submissionFunctions?.getCurrentSubmission?.();
+    
     // Заповнення дронів (три окремі поля)
-    populateSelect('droneName', appData.droneNames);
+    // Якщо є активне подання - фільтруємо по ньому
+    if (currentSubmission && currentSubmission.drones && currentSubmission.drones.length > 0) {
+        const availableDrones = appData.droneNames.filter(drone => {
+            const submissionDrone = currentSubmission.drones.find(d => d.name === drone.value);
+            return submissionDrone && submissionDrone.count > 0;
+        });
+        populateSelect('droneName', availableDrones.length > 0 ? availableDrones : appData.droneNames);
+    } else {
+        populateSelect('droneName', appData.droneNames);
+    }
+    
     populateSelect('droneSize', appData.droneSizes);
     populateSelect('cameraType', appData.cameraTypes);
     
@@ -202,8 +215,17 @@ function populateSelects() {
     
     // Поле 'Тип місії' видалено
     
-    // Заповнення нових полів
-    populateSelect('bk', appData.bkOptions);
+    // Заповнення БК з фільтрацією по поданню
+    if (currentSubmission && currentSubmission.bk && currentSubmission.bk.length > 0) {
+        const availableBk = appData.bkOptions.filter(bkOption => {
+            const submissionBk = currentSubmission.bk.find(b => b.name === bkOption.value);
+            return submissionBk && submissionBk.count > 0;
+        });
+        populateSelect('bk', availableBk.length > 0 ? availableBk : appData.bkOptions);
+    } else {
+        populateSelect('bk', appData.bkOptions);
+    }
+    
     populateSelect('initiationBoard', appData.initiationBoardOptions);
     populateSelect('targetType', appData.targetTypeOptions);
     populateSelect('settlement', appData.settlementOptions);
@@ -1841,6 +1863,7 @@ function formatFileSize(bytes) {
 function initRouter() {
     const navTabs = document.querySelectorAll('.nav-tab');
     const sections = {
+        'submission': document.getElementById('submissionSection'),
         'generator': document.getElementById('generatorSection'),
         'archive': document.getElementById('archiveSection'),
         'settings': document.getElementById('settingsSection')
@@ -1857,7 +1880,7 @@ function initRouter() {
     
     // Функція переключення сторінок
     function navigate() {
-        const hash = window.location.hash.slice(1) || 'generator';
+        const hash = window.location.hash.slice(1) || 'submission';
         const page = hash.split('/')[0]; // Беремо першу частину хешу
         
         // Оновлюємо активний таб
@@ -1876,7 +1899,12 @@ function initRouter() {
         }
         
         // Спеціальні дії для кожної сторінки
-        if (page === 'archive') {
+        if (page === 'submission') {
+            // Ініціалізуємо секцію подання
+            if (window.submissionFunctions && typeof window.submissionFunctions.initSubmission === 'function') {
+                window.submissionFunctions.initSubmission();
+            }
+        } else if (page === 'archive') {
             // Автоматично завантажуємо історію при відкритті архіву
             if (typeof loadReportsHistory === 'function') {
                 loadReportsHistory();
