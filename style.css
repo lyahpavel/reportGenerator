@@ -1154,6 +1154,13 @@ textarea {
     border-radius: 8px;
     padding: 20px;
     margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.resources-container .btn-outline {
+    margin-top: 10px;
 }
 
 /* Чекбокси для екіпажу */

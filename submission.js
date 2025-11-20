@@ -6,8 +6,8 @@ let currentSubmission = null;
 // Ініціалізація секції подання
 function initSubmission() {
     const submissionForm = document.getElementById('submissionForm');
-    const addDroneBtn = document.getElementById('addDroneBtn');
-    const addBkBtn = document.getElementById('addBkBtn');
+    const dronesContainer = document.getElementById('dronesContainer');
+    const bkContainer = document.getElementById('bkContainer');
     const shareSubmissionBtn = document.getElementById('shareSubmission');
     
     if (!submissionForm) return;
@@ -18,11 +18,26 @@ function initSubmission() {
     // Завантажити поточне подання
     loadCurrentSubmission();
     
-    // Додавання дрону
-    addDroneBtn?.addEventListener('click', () => addResourceRow('drone'));
+    // Event delegation для кнопок додавання (працює завжди)
+    dronesContainer?.addEventListener('click', (e) => {
+        console.log('Клік в dronesContainer:', e.target);
+        if (e.target.id === 'addDroneBtn' || e.target.closest('#addDroneBtn')) {
+            console.log('Додаємо дрон');
+            e.preventDefault();
+            e.stopPropagation();
+            addResourceRow('drone');
+        }
+    });
     
-    // Додавання БК
-    addBkBtn?.addEventListener('click', () => addResourceRow('bk'));
+    bkContainer?.addEventListener('click', (e) => {
+        console.log('Клік в bkContainer:', e.target);
+        if (e.target.id === 'addBkBtn' || e.target.closest('#addBkBtn')) {
+            console.log('Додаємо БК');
+            e.preventDefault();
+            e.stopPropagation();
+            addResourceRow('bk');
+        }
+    });
     
     // Збереження подання
     submissionForm.addEventListener('submit', async (e) => {
@@ -82,8 +97,19 @@ async function loadCrewMembers() {
 
 // Додавання рядка ресурсу (дрон або БК)
 function addResourceRow(type) {
+    console.log('addResourceRow викликано для:', type);
+    
     const container = document.getElementById(type === 'drone' ? 'dronesContainer' : 'bkContainer');
+    if (!container) {
+        console.error('Контейнер не знайдено:', type);
+        return;
+    }
+    
     const button = container.querySelector('button');
+    if (!button) {
+        console.error('Кнопка не знайдена в контейнері:', type);
+        return;
+    }
     
     const resourceItem = document.createElement('div');
     resourceItem.className = 'resource-item';
@@ -107,6 +133,7 @@ function addResourceRow(type) {
     
     // Вставити перед кнопкою "Додати"
     container.insertBefore(resourceItem, button);
+    console.log('Елемент додано перед кнопкою');
     
     // Завантажити опції
     loadResourceOptions(selectId, type);
