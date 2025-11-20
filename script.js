@@ -2126,6 +2126,12 @@ document.addEventListener('DOMContentLoaded', function() {
         videoFileName.textContent = '';
         removeVideoBtn.style.display = 'none';
     });
+    
+    // Кнопка оновлення архівних подань
+    const refreshArchivedBtn = document.getElementById('refreshArchivedSubmissions');
+    if (refreshArchivedBtn) {
+        refreshArchivedBtn.addEventListener('click', loadArchivedSubmissions);
+    }
 });
 
 // Форматування розміру файлу
@@ -2187,7 +2193,10 @@ function initRouter() {
                 window.submissionFunctions.initSubmission();
             }
         } else if (page === 'archive') {
-            // Автоматично завантажуємо історію при відкритті архіву
+            // Автоматично завантажуємо архів при відкритті
+            if (typeof loadArchivedSubmissions === 'function') {
+                loadArchivedSubmissions();
+            }
             if (typeof loadReportsHistory === 'function') {
                 loadReportsHistory();
             }
@@ -2206,6 +2215,101 @@ function initRouter() {
     
     // Ініціалізація при завантаженні
     navigate();
+}
+
+// Функція для завантаження архівних подань
+async function loadArchivedSubmissions() {
+    try {
+        const supabase = window.supabaseClient;
+        if (!supabase) return;
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        const { data: submissions, error } = await supabase
+            .from('archived_submissions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('archived_at', { ascending: false });
+        
+        if (error) {
+            console.error('Помилка завантаження архівних подань:', error);
+            return;
+        }
+        
+        const container = document.getElementById('archivedSubmissionsList');
+        if (!container) return;
+        
+        if (!submissions || submissions.length === 0) {
+            container.innerHTML = '<p class="info-message">Архівних подань поки немає</p>';
+            return;
+        }
+        
+        container.innerHTML = submissions.map(sub => {
+            const crewList = sub.crew_members.map(member => 
+                member === sub.crew_leader ? `<strong>${member} (старший)</strong>` : member
+            ).join(', ');
+            
+            const dronesCount = sub.drones?.reduce((sum, d) => sum + (d.count || 0), 0) || 0;
+            const bkCount = sub.bk?.reduce((sum, b) => sum + (b.count || 0), 0) || 0;
+            
+            return `
+                <div class="archived-submission-card">
+                    <div class="submission-header">
+                        <h4>Подання ${sub.date_from} - ${sub.date_to}</h4>
+                        <small>Заархівовано: ${new Date(sub.archived_at).toLocaleString('uk-UA')}</small>
+                    </div>
+                    <div class="submission-details">
+                        <p><strong>Екіпаж:</strong> ${crewList}</p>
+                        <p><strong>Дрони:</strong> ${dronesCount} шт. | <strong>БК:</strong> ${bkCount} шт.</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="viewArchivedSubmission(${sub.id})">Переглянути деталі</button>
+                </div>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('Помилка завантаження архівних подань:', error);
+    }
+}
+
+// Функція для перегляду деталей архівного подання
+async function viewArchivedSubmission(submissionId) {
+    try {
+        const supabase = window.supabaseClient;
+        const { data: submission, error } = await supabase
+            .from('archived_submissions')
+            .select('*')
+            .eq('id', submissionId)
+            .single();
+        
+        if (error) throw error;
+        
+        // Створити детальне відображення
+        const details = `
+            <h3>Подання ${submission.date_from} - ${submission.date_to}</h3>
+            <p><strong>Екіпаж:</strong> ${submission.crew_members.join(', ')}</p>
+            <p><strong>Старший:</strong> ${submission.crew_leader}</p>
+            <h4>Дрони:</h4>
+            ${submission.drones?.map(d => `
+                <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <strong>${d.label || d.name}</strong> x${d.count}<br>
+                    Тип: ${d.type}, Відео: ${d.videoFrequency}, Керування: ${d.controlFrequency}<br>
+                    Канал: ${d.channel}, Стан: ${d.modificationStatus}
+                    ${d.modification ? `<br>Модифікація: ${d.modification}` : ''}
+                </div>
+            `).join('') || 'Немає'}
+            <h4>Боєкомплекти:</h4>
+            ${submission.bk?.map(b => `<div>${b.label || b.name} x${b.count}</div>`).join('') || 'Немає'}
+        `;
+        
+        // Показати в модальному вікні або alert
+        alert(details.replace(/<[^>]*>/g, '\n'));
+        
+    } catch (error) {
+        console.error('Помилка перегляду подання:', error);
+        showError('Не вдалося завантажити деталі подання');
+    }
 }
 
 // Запуск роутера після завантаження DOM

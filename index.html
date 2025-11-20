@@ -484,8 +484,24 @@
 
         <!-- Секція: Архів звітів -->
         <section id="archiveSection" class="page-section">
-            <h2>Архів звітів</h2>
+            <h2>Архів</h2>
+            
+            <!-- Архівні подання -->
+            <div id="archivedSubmissions" class="archived-submissions">
+                <h3>Архівні подання</h3>
+                <div class="history-controls">
+                    <button id="refreshArchivedSubmissions" class="btn btn-outline">🔄 Оновити</button>
+                </div>
+                <div id="archivedSubmissionsList" class="archived-submissions-list">
+                    <!-- Список архівних подань буде тут -->
+                </div>
+            </div>
+            
+            <hr style="margin: 2rem 0;">
+            
+            <!-- Звіти -->
             <div id="reportsHistory" class="reports-history">
+                <h3>Звіти</h3>
                 <div class="history-controls">
                     <button id="refreshHistory" class="btn btn-outline">🔄 Оновити</button>
                 </div>

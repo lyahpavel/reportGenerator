@@ -1617,3 +1617,57 @@ textarea {
     font-size: 0.85rem;
     font-style: italic;
 }
+
+/* Стилі для архівних подань */
+.archived-submissions {
+    margin-bottom: 2rem;
+}
+
+.archived-submissions h3 {
+    margin-bottom: 1rem;
+}
+
+.archived-submissions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.archived-submission-card {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.2s;
+}
+
+.archived-submission-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e0;
+}
+
+.submission-header h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+.submission-header small {
+    color: #718096;
+    font-size: 0.85rem;
+}
+
+.submission-details {
+    margin: 1rem 0;
+}
+
+.submission-details p {
+    margin: 0.5rem 0;
+    color: #4a5568;
+    font-size: 0.95rem;
+}
+
+.reports-history h3 {
+    margin-bottom: 1rem;
+}
