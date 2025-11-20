@@ -50,7 +50,10 @@ async function initSubmission() {
     
     console.log('✅ Supabase готовий, користувач авторизований, ініціалізуємо подання');
     
-    // Завантажити операторів як чекбокси
+    // Спочатку завантажити всі опції в кеш
+    await preloadOptionsCache();
+    
+    // Тепер завантажити операторів з кешу
     await loadCrewMembers();
     
     // Завантажити поточне подання
@@ -118,9 +121,6 @@ async function initSubmission() {
     // Встановити дату з сьогодні
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('dutyDateFrom').value = today;
-    
-    // Завантажити всі опції в кеш для швидкої роботи
-    await preloadOptionsCache();
 }
 
 // Функція для попереднього завантаження всіх опцій в кеш
