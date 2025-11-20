@@ -2305,20 +2305,11 @@ function initRouter() {
                 window.submissionFunctions.initSubmission();
             }
         } else if (page === 'archive') {
-            // Автоматично завантажуємо архів при відкритті
-            if (typeof loadArchivedSubmissions === 'function') {
-                loadArchivedSubmissions();
-            }
-            if (typeof loadReportsHistory === 'function') {
-                loadReportsHistory();
-            }
+            // Показуємо повідомлення про розробку
+            showSuccess('🚧 Функціонал архіву в розробці. Очікуйте у версії 2.1!');
         } else if (page === 'settings') {
-            // Оновлюємо email користувача в налаштуваннях
-            const userEmail = document.getElementById('userEmailDisplay')?.textContent;
-            const settingsEmail = document.getElementById('settingsUserEmail');
-            if (settingsEmail && userEmail) {
-                settingsEmail.textContent = userEmail;
-            }
+            // Показуємо повідомлення про розробку
+            showSuccess('🚧 Налаштування в розробці. Очікуйте у версії 2.1!');
         }
     }
     
